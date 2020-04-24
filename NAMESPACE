@@ -1,0 +1,31 @@
+
+importFrom("grDevices", "dev.new", "hcl", "dev.cur")
+importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
+           "par", "plot", "polygon", "segments", "text")
+importFrom("stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
+           "dt", "fligner.test", "lm", "na.omit", "oneway.test",
+           "pnorm", "pt", "relevel", "sd", "t.test", "var")
+           
+export(
+    anovaFK,
+    daria,
+    dariat,
+    dbinoms,
+    dfcalc,
+    finvert,
+    fmode,
+    frelevel,
+    frtable,
+    hclr,
+    histc,
+    mbinom,
+    mod,
+    permutations,
+    sbinom,
+    spooled,
+    t_testAB,
+    using
+)
+
+S3method(print, "frtable")
+S3method(print, "usage")

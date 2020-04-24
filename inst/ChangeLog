@@ -1,0 +1,73 @@
+Versiunea 1.0
+    o functia recode() a fost mutata in pachetul admisc
+
+Versiunea 0.9
+    o doua noi functii: permutari() si combinari()
+
+Versiunea 0.8
+    o actualizare pachet pentru versiuni Windows 64 biti
+
+Versiunea 0.7
+    o functie noua recode()
+
+Versiunea 0.6-5
+    o t.testAB() si anovaFK() returneaza invizibil si o lista cu rezultatele testelor
+    o argumentul "new" din functia dbinoms() este acum predefinit FALSE
+
+Versiunea 0.6-4
+    o adaptare pentru diverse sisteme de operare
+
+Versiunea 0.6-1
+    o modificare in functia hclr(), argumentul "h" nu mai intoarce o eroare daca 
+      valoarea este in afara intervalului 0 - 360
+
+Versiunea 0.6-0
+    o actualizat pachetul la noua versiune de R, cu toate cerintele standard
+    
+Versiunea 0.5-6
+    o adaugat argumentul zoom la functia dbinoms(); daca TRUE, desenul face zoom doar
+      pe valorile cu o probabilitate mai mare decat zero
+
+Versiunea 0.5-5
+    o modificat functiile glcalc() si spooled(), mai multe erori capturate
+
+Versiunea 0.5-4
+    o adaugat functia hclr() pentru a genera culori din gama HCL (Hue Chroma Luminance)
+    o modificat functia spooled(), acum accepta si valorile celor doua grupuri in primele doua
+      argumente
+
+Versiunea 0.5-3
+    o adaugat functia invert() pentru inversarea valorilor unui factor
+
+Versiunea 0.5-2
+    o eliminat functia grafic() - devenise redundanta prin introducerea functiei dbinoms()
+
+Versiunea 0.5-1
+    o rezolvat o eroare la functia anovaFK() atunci cand variabila de grup este un factor
+
+Versiunea 0.5
+    o functia t.testAB() accepta si o formula ca prim argument
+    o adaugat functia anovaFK() care utilizeaza testul Fligner-Killeen pentru
+      verificarea asumptiei de omogenitate a variantelor
+
+Versiunea 0.4-6
+    o functia sp() se numeste acum spooled()
+      (mai exista o alta functie sp(), intr-un alt pachet al lui R).
+
+Versiunea 0.4-5
+    o adaugat functia sp() pentru calculul lui s_pooled
+    o functia testul.t() se numeste acum t.testAB() unde "AB" vine de la 
+      testul Anserin-Bradley pentru omogenitatea variantelor
+    o modificat exemplele de la glcalc() si t.testAB()
+
+Versiunea 0.4
+    o modificat functia glcalc() pentru a contine doar 4 argumente in loc de 6
+    o adaugat functia testul.t() care utilizeaza testul ansari.test() pentru
+      verificarea asumptiei de omogenitate a variantelor
+
+Versiunea 0.3-1
+    o modificat functia glcalc() ca sa admita si argumente ca simple numere, nu doar variabile
+
+Versiunea 0.3
+    o adaugat functia glcalc() pentru calcularea gradelor de libertate
+
