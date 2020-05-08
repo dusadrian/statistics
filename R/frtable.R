@@ -16,11 +16,13 @@
             misvals <- vallab[vallab >= na_range[1] & vallab <= na_range[2]]
         }
 
-        vallab <- vallab[!is.element(vallab, misvals)]
-        misvals <- misvals[is.element(misvals, unique(x))]
-        names(vallab) <- gsub("´|`", "'", names(vallab))
-        names(misvals) <- gsub("´|`", "'", names(misvals))
-        vallab <- c(vallab, misvals)
+        if (!is.null(misvals)) {
+            vallab <- vallab[!is.element(vallab, misvals)]
+            misvals <- misvals[is.element(misvals, unique(x))]
+            names(vallab) <- gsub("´|`", "'", names(vallab))
+            names(misvals) <- gsub("´|`", "'", names(misvals))
+            vallab <- c(vallab, misvals)
+        }
         x <- factor(x, levels = vallab, labels = names(vallab), ordered = TRUE)
     }
 
