@@ -6,7 +6,7 @@
 
 \description{
   The function expects a tabel (a data frame or a matrix) with just two columns:
-  the first containing the values of the random variable, and the associated
+  the first containing the values of a random variable, and the associated
   probabilities in the second column.
 }
 
@@ -20,9 +20,8 @@ sbinom(x)
 }
 
 \details{
-  The sum of the probabilities on the second columns should be equal to 1, otherwise the
-  function considers them as absolute frequencies and recalculates the relative frequencies
-  based on the current values.
+  If the sum of the probabilities on the second columns is not equal to 1, the function
+  interprets them as absolute values and recalculates the relative frequencies.
 }
 
 \author{Adrian Dusa}

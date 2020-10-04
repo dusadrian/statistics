@@ -17,15 +17,19 @@
         }
 
         if (!is.null(misvals)) {
+            misvals <- vallab[is.element(vallab, misvals)]
             vallab <- vallab[!is.element(vallab, misvals)]
             misvals <- misvals[is.element(misvals, unique(x))]
-            names(vallab) <- gsub("´|`", "'", names(vallab))
-            names(misvals) <- gsub("´|`", "'", names(misvals))
+            
+            # back tick and forward tick
+            bftick <- paste(unlist(strsplit(rawToChar(as.raw(c(194, 180, 96))), split = "")), collapse = "|")
+            
+            names(vallab) <- gsub(bftick, "'", names(vallab))
+            names(misvals) <- gsub(bftick, "'", names(misvals))
             vallab <- c(vallab, misvals)
         }
         x <- factor(x, levels = vallab, labels = names(vallab), ordered = TRUE)
     }
-
 
     tbl <- table(x)
     res <- data.frame(freq = as.vector(tbl))
@@ -64,7 +68,7 @@
 
     if (nrow(x) > 100 & !force) {
         cat("\n")
-        stop(simpleError("Hmm... this looks like a lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
+        stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
     cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), "freq  relf  perc  cump\n")

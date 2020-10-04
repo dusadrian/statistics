@@ -94,8 +94,12 @@
                 
                 variable <- variable[selection]
                 misvals <- misvals[is.element(misvals, unique(variable))]
-                names(vallab) <- gsub("´|`", "'", names(vallab))
-                names(misvals) <- gsub("´|`", "'", names(misvals))
+
+                # back tick and forward tick
+                bftick <- paste(unlist(strsplit(rawToChar(as.raw(c(194, 180, 96))), split = "")), collapse = "|")
+
+                names(vallab) <- gsub(bftick, "'", names(vallab))
+                names(misvals) <- gsub(bftick, "'", names(misvals))
                 vallab <- c(vallab, misvals)
                 variable <- factor(variable, levels = vallab, labels = names(vallab), ordered = TRUE)
                 attr(variable, "missing") <- misvals

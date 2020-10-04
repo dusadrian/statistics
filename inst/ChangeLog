@@ -1,73 +1,31 @@
-Versiunea 1.0
-    o functia recode() a fost mutata in pachetul admisc
+Version 0.6
+  o new function frtable() to make a frequency table
+  o new function using() as a more flexible alternative to with()
 
-Versiunea 0.9
-    o doua noi functii: permutari() si combinari()
+Version 0.5
+  o new function fmode() to calculate the mode of a variable
+  o new function histc() to fraw a histogram with an added distribution
+    density curve
 
-Versiunea 0.8
-    o actualizare pachet pentru versiuni Windows 64 biti
+Version 0.4
+  o t.testAB() and anovaFK() invisibly return a list of test results
+  o argument "new" from function dbinoms() is now FALSE by default
+  o modified function hclr(), argument "h" did not return an error if the
+    value is outside the interval 0 - 360
 
-Versiunea 0.7
-    o functie noua recode()
+Version 0.3
+  o new argument "zoom" for function dbinoms(); if TRUE, the drawing only zooms
+    on the values with a positive probability
+  o new function hclr() pentru a genera culori din gama HCL (Hue Chroma Luminance)
+  o function t.testAB() now also accepts a formula in the first argument
+  o new function anovaFK() using the Fligner-Killeen test to verify the
+    homogeneity of variance assumption
 
-Versiunea 0.6-5
-    o t.testAB() si anovaFK() returneaza invizibil si o lista cu rezultatele testelor
-    o argumentul "new" din functia dbinoms() este acum predefinit FALSE
+Version 0.2
+  o new function dfcalc() to calculate degrees of freedom
+  o new function t.testAB() using the Ansari-Bradley test to verify the
+    homogeneity of variance assumption
+  o new function spooled() to calculate the pooled variance
 
-Versiunea 0.6-4
-    o adaptare pentru diverse sisteme de operare
-
-Versiunea 0.6-1
-    o modificare in functia hclr(), argumentul "h" nu mai intoarce o eroare daca 
-      valoarea este in afara intervalului 0 - 360
-
-Versiunea 0.6-0
-    o actualizat pachetul la noua versiune de R, cu toate cerintele standard
-    
-Versiunea 0.5-6
-    o adaugat argumentul zoom la functia dbinoms(); daca TRUE, desenul face zoom doar
-      pe valorile cu o probabilitate mai mare decat zero
-
-Versiunea 0.5-5
-    o modificat functiile glcalc() si spooled(), mai multe erori capturate
-
-Versiunea 0.5-4
-    o adaugat functia hclr() pentru a genera culori din gama HCL (Hue Chroma Luminance)
-    o modificat functia spooled(), acum accepta si valorile celor doua grupuri in primele doua
-      argumente
-
-Versiunea 0.5-3
-    o adaugat functia invert() pentru inversarea valorilor unui factor
-
-Versiunea 0.5-2
-    o eliminat functia grafic() - devenise redundanta prin introducerea functiei dbinoms()
-
-Versiunea 0.5-1
-    o rezolvat o eroare la functia anovaFK() atunci cand variabila de grup este un factor
-
-Versiunea 0.5
-    o functia t.testAB() accepta si o formula ca prim argument
-    o adaugat functia anovaFK() care utilizeaza testul Fligner-Killeen pentru
-      verificarea asumptiei de omogenitate a variantelor
-
-Versiunea 0.4-6
-    o functia sp() se numeste acum spooled()
-      (mai exista o alta functie sp(), intr-un alt pachet al lui R).
-
-Versiunea 0.4-5
-    o adaugat functia sp() pentru calculul lui s_pooled
-    o functia testul.t() se numeste acum t.testAB() unde "AB" vine de la 
-      testul Anserin-Bradley pentru omogenitatea variantelor
-    o modificat exemplele de la glcalc() si t.testAB()
-
-Versiunea 0.4
-    o modificat functia glcalc() pentru a contine doar 4 argumente in loc de 6
-    o adaugat functia testul.t() care utilizeaza testul ansari.test() pentru
-      verificarea asumptiei de omogenitate a variantelor
-
-Versiunea 0.3-1
-    o modificat functia glcalc() ca sa admita si argumente ca simple numere, nu doar variabile
-
-Versiunea 0.3
-    o adaugat functia glcalc() pentru calcularea gradelor de libertate
-
+Version 0.1
+  o initial version

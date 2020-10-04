@@ -8,7 +8,7 @@
   test, the Welch approximation is applied if the groups are not homogeneous.
 }
 \usage{
-anovaFK(x, y=NULL, data)
+anovaFK(x, y = NULL, data)
 }
 
 \arguments{

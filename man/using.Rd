@@ -16,9 +16,9 @@ using(data, expr, split.by = NULL, select = NULL, ...)
 \arguments{
     \item{data}{A data frame.}
     \item{expr}{Expression to evaluate}
-    \item{split.by}{A (factor) variable from the \code{data}}
+    \item{split.by}{A factor variable from the \code{data}}
     \item{select}{An expression to subset the data}
-    \item{...}{More factors to split by.}
+    \item{...}{Other internal arguments.}
 }
 
 \value{
@@ -33,10 +33,10 @@ Adrian Dusa
 \examples{
 set.seed(123)
 df <- data.frame(
-                Area = sample(c("Urban", "Rural"), 20, replace = TRUE),
-                Gender = sample(c("Male", "Female"), 20, replace = TRUE),
-                Age = sample(18:90, 20, replace = TRUE)
-                )
+    Area = factor(sample(c("Urban", "Rural"), 20, replace = TRUE)),
+    Gender = factor(sample(c("Male", "Female"), 20, replace = TRUE)),
+    Age = sample(18:90, 20, replace = TRUE)
+)
 
 # table of frequencies for Area
 frtable(df$Area)

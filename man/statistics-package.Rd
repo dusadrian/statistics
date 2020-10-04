@@ -7,7 +7,7 @@
 \docType{package}
 
 \title{
-A package containing useful function to teach introductory statistics.
+A package containing useful functions to teach introductory statistics.
 }
 
 \description{
@@ -26,8 +26,8 @@ standard deviation using the t distribution etc.
     Package: \tab statistics\cr
     Type: \tab Package\cr
     Version: \tab 0.6\cr
-    Date: \tab 2020-04-24\cr
-    License: \tab GPL-v2\cr
+    Date: \tab 2020-10-04\cr
+    License: \tab GPL-v3\cr
     }
 }
 \author{

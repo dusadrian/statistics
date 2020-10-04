@@ -1,16 +1,16 @@
 Package: statistics
 Version: 0.6
-Date: 2020-04-24
+Date: 2020-10-04
 Title: Miscellanea functions for the Intro Stats class
 Authors@R: person(given = "Adrian", family = "Dusa",
                   role = c("aut", "cre", "cph"),
                   email = "dusa.adrian@unibuc.ro",
                   comment = c(ORCID = "0000-0002-3525-9253"))
 Depends: R (>= 3.5.0)
+License: GPL (>= 3)
 LazyData: yes
 Description: The majority of functions in this package are designed to facilitate
  undestanding the statistical concepts taught in the class (such as the functions to
  create graphics or areas under the normal curve), while some are designed to ease
  calculations for the lab exercises (for instance the degrees of freedom or the
  pooled variation for two independent samples).
-License: GPL (>= 3)
