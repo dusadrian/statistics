@@ -1,13 +1,13 @@
 # http://adv-r.had.co.nz/Computing-on-the-language.html
 
-`using` <- function(data, expr, split.by = NULL, select = NULL, ...) {
+`using` <- function(data, expr, select = NULL, split.by = NULL, ...) {
 
     expr <- substitute(expr)
     enclos <- parent.frame()
+
     if (!missing(select)) {
         data <- data[eval(substitute(select), data, parent.frame()), , drop = FALSE]
     }
-    
     
     if (!missing(split.by)) {
         sb <- substitute(split.by)
