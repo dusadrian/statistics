@@ -65,7 +65,7 @@ function(x, size, prob, log = FALSE, draw = FALSE,
         colorate <- is.element(axaX, x)
         vector.culori[colorate] <- "#79a74c" # green
         
-        barplot(y, names.arg = axaX, ylim = c(0, max(y)*1.05), col = vector.culori)# , space=0
+        barplot(y, names.arg = axaX, ylim = c(0, max(y)*1.05), col = vector.culori, space=0)
         
         if (text) {
             text(bare[colorate], y[colorate], round(y[colorate], digits = 3), pos = 3, cex = 0.8)
