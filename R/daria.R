@@ -54,12 +54,11 @@ function (area, z1, z2, draw = FALSE) {
         if (draw) {
             polygon(c(xdreapta, rev(xdreapta)), c(rep(0, length(xdreapta)), rev(ydreapta)), border=NA, col="#79a74c")
             segments(z1, 0, z1, dnorm(z1))
-            text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
-                c(paste("The area to the right of", paste("z=", zet1, sep=""),
-                  "has:", sep=" "), round(area, 3), "or",
-                  paste(round(area, 3)*100,"%", sep="")),
-                  col=rep(c("black", "#cb2626"), 2))
-            eval(parse(text = "curve(dnorm(x, mean=0, sd=1), from=-4, to=4, las=1, add=TRUE)"))
+            # text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
+            #     c(paste("The area to the right of", paste("z=", zet1, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or",
+            #       paste(round(area, 3)*100,"%", sep="")),
+            #       col=rep(c("black", "#cb2626"), 2))
             }
     } else if (area %in% c("u", "l", "under", "left")) {
         area <- pnorm(z1)
@@ -69,12 +68,11 @@ function (area, z1, z2, draw = FALSE) {
         if (draw) {
             polygon(c(xstanga, rev(xstanga)), c(rep(0, length(xstanga)), rev(ystanga)), border=NA, col="#79a74c" )
             segments(z1, 0, z1, dnorm(z1))
-            text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
-                c(paste("The area to the left of", paste("z=", zet1, sep=""),
-                  "has:", sep=" "), round(area, 3), "or",
-                  paste(round(area, 3)*100, "%", sep="")),
-                  col=rep(c("black", "#cb2626"), 2))
-            eval(parse(text = "curve(dnorm(x, mean=0, sd=1), from=-4, to=4, las=1, add=TRUE)"))
+            # text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
+            #     c(paste("The area to the left of", paste("z=", zet1, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or",
+            #       paste(round(area, 3)*100, "%", sep="")),
+            #       col=rep(c("black", "#cb2626"), 2))
             }
     } else if (area %in% c("b", "between")) {
         if (z1 > z2) {sz <- z1; z1 <- z2; z2 <- sz}
@@ -87,17 +85,17 @@ function (area, z1, z2, draw = FALSE) {
             polygon( c(xintre,rev(xintre)), c(rep(0,length(xintre)),rev(yintre)), border=NA, col="#79a74c" )
             segments(z1, 0, z1, dnorm(z1))
             segments(z2, 0, z2, dnorm(z2))
-            text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
-                c(paste("The area between", paste("z=", zet1, sep=""),
-                  "and", paste("z=", zet2, sep=""),
-                  "has:", sep=" "), round(area, 3), "or",
-                  paste(round(area, 3)*100, "%", sep="")),
-                  col=rep(c("black", "#cb2626"), 2))
-            eval(parse(text = "curve(dnorm(x, mean=0, sd=1), from=-4, to=4, las=1, add=TRUE)"))
+            # text(rep(-2.8, 4), c(0.3, 0.28, 0.26, 0.24),
+            #     c(paste("The area between", paste("z=", zet1, sep=""),
+            #       "and", paste("z=", zet2, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or",
+            #       paste(round(area, 3)*100, "%", sep="")),
+            #       col=rep(c("black", "#cb2626"), 2))
         }
     }
     
     if (draw) {
+        eval(parse(text = "curve(dnorm(x, mean=0, sd=1), from=-4, to=4, las=1, add=TRUE)"))
         segments(-4, 0, 4, 0)
         segments(-4:4, rep(0, 9), -4:4, rep(-0.004, 9))
         text(-4:4, rep(-0.01, 9), c(-4:0, paste("+", as.character(1:4), sep="")), cex=0.8)

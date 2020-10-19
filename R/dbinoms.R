@@ -73,11 +73,12 @@ function(x, size, prob, log = FALSE, draw = FALSE,
         
         suma <- round(sum(y2[is.element(seq(0, size), x)]), digits = 3)
         
-        text(rep(max(bare)*ifelse(prob < 0.4, 0.8, 0.2), 4), max(y)*seq(0.95, 0.8, -0.05),
-            c("The probability is", suma, "or", paste(suma*100, "%", sep = "")),
-            col = rep(c("black", "#cb2626"), 2))
+        # text(rep(max(bare)*ifelse(prob < 0.4, 0.8, 0.2), 4), max(y)*seq(0.95, 0.8, -0.05),
+        #     c("The probability is", suma, "or", paste(suma*100, "%", sep = "")),
+        #     col = rep(c("black", "#cb2626"), 2))
         
     }
-    return(sum(y2[0:size %in% x]))
+    
+    return(sum(y2[is.element(seq(0, size), x)]))
 }
 

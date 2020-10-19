@@ -66,14 +66,12 @@ function (area, t1, t2, df, draw=FALSE) {
                     c(rep(0, length(xdreapta)), rev(ydreapta)),
                     border=NA, col="#79a74c")
             segments(t1, 0, t1, dt(t1, df))
-            text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
-                c(paste("At", df, "degrees of freedom,"), 
-                  paste("the area to the right of", paste("t=", te1, sep=""),
-                  "has:", sep=" "), round(area, 3), "or", 
-                  paste(round(area, 3)*100,"%", sep="")),
-                  col=c("black", rep(c("black", "#cb2626"), 2)))
-            command <- paste("curve(dt(x, df), from=-", limita, ", to=", limita, ", las=1, add=TRUE)", sep = "")
-            eval(parse(text = command))
+            # text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
+            #     c(paste("At", df, "degrees of freedom,"), 
+            #       paste("the area to the right of", paste("t=", te1, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or", 
+            #       paste(round(area, 3)*100,"%", sep="")),
+            #       col=c("black", rep(c("black", "#cb2626"), 2)))
         }
     } else if (area %in% c("l", "u", "left", "under")) {
         area <- pt(t1, df)
@@ -85,14 +83,12 @@ function (area, t1, t2, df, draw=FALSE) {
                     c(rep(0, length(xstanga)), rev(ystanga)),
                     border=NA, col="#79a74c" )
             segments(t1, 0, t1, dt(t1, df))
-            text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
-                c(paste("At", df, "degrees of freedom,"), 
-                  paste("the area to the left of", paste("t=", te1, sep=""),
-                  "has:", sep=" "), round(area, 3), "or", 
-                  paste(round(area, 3)*100, "%", sep="")),
-                  col=c("black", rep(c("black", "#cb2626"), 2)))
-            command <- paste("curve(dt(x, df), from=-", limita, ", to=", limita, ", las=1, add=TRUE)", sep = "")
-            eval(parse(text = command))
+            # text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
+            #     c(paste("At", df, "degrees of freedom,"), 
+            #       paste("the area to the left of", paste("t=", te1, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or", 
+            #       paste(round(area, 3)*100, "%", sep="")),
+            #       col=c("black", rep(c("black", "#cb2626"), 2)))
             # curve(dt(x, df), from=-limita, to=limita, las=1, add=TRUE)
         }
     } else if (area %in% c("b", "between")) {
@@ -107,19 +103,19 @@ function (area, t1, t2, df, draw=FALSE) {
                     c(rep(0, length(xintre)), rev(yintre)),
                     border=NA, col="#79a74c" )
             segments(c(t1, t2), 0, c(t1, t2), dt(c(t1, t2), df))
-            text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
-                c(paste("At", df, "degrees of freedom,"), 
-                  paste("the area between", paste("t=", te1, sep=""),
-                  "and", paste("t=", te2, sep=""),
-                  "has:", sep=" "), round(area, 3), "or",
-                  paste(round(area, 3)*100, "%", sep="")),
-                  col=c("black", rep(c("black", "#cb2626"), 2)))
-            command <- paste("curve(dt(x, df), from=-", limita, ", to=", limita, ", las=1, add=TRUE)", sep = "")
-            eval(parse(text = command))
+            # text(rep(-3.2 + 0.5*(limita == 4), 5), seq(0.32, 0.24, -0.02),
+            #     c(paste("At", df, "degrees of freedom,"), 
+            #       paste("the area between", paste("t=", te1, sep=""),
+            #       "and", paste("t=", te2, sep=""),
+            #       "has:", sep=" "), round(area, 3), "or",
+            #       paste(round(area, 3)*100, "%", sep="")),
+            #       col=c("black", rep(c("black", "#cb2626"), 2)))
         }
     }
     
     if (draw) {
+        command <- paste("curve(dt(x, df), from=-", limita, ", to=", limita, ", las=1, add=TRUE)", sep = "")
+        eval(parse(text = command))
         segments(-limita, 0, limita, 0)
         segments(-limita:limita, rep(0, limita*2 + 1),
                  -limita:limita, rep(-0.004, limita*2 + 1))

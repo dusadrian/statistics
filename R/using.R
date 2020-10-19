@@ -113,7 +113,7 @@
         eval(expr = expr, envir = cdata, enclos = enclos)
     })
 
-    # return(res)
+    # return(res) 
     
     class(res) <- c("usage")
     attr(res, "split") <- expand.grid(lapply(sl, function(x) {
