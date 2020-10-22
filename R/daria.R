@@ -8,7 +8,7 @@ function (area, z1, z2, draw = FALSE) {
         cat("\n")
         cat("The area of an exact value, out of an infinity of other values, is\ninfinitely small, practically equal to zero.")
         return()
-    } else if (!(area %in% c("r", "o", "right", "over",
+    } else if (!(area %in% c("r", "o", "a", "right", "over", "above",
                              "l", "u", "left", "under",
                              "b", "between"))) {
         cat("\n")
@@ -46,7 +46,7 @@ function (area, z1, z2, draw = FALSE) {
         plot(seq(-4, 4, length=1000), seq(0, 0.4, length=1000), type="n", xlab="", ylab="", axes=FALSE)
     }
     
-    if (area %in% c("r", "o", "right", "over")) {
+    if (area %in% c("r", "o", "a", "right", "over", "above")) {
         area <- 1 - pnorm(z1)
         if (abs(z1) > 4) {z1 <- 4*sign(z1)}
         xdreapta <- seq(z1, 4, 0.001)

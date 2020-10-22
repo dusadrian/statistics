@@ -22,7 +22,7 @@ In the argument \bold{\code{area}}, the function accepts:
 
 \code{"l"}, \code{"u"}, \code{"left"} and \code{"under"} for the area to the left of z,
 
-\code{"r"}, \code{"o"}, \code{"right"} and \code{"over"} for the area to the right of z
+\code{"r"}, \code{"o"}, \code{"a"}, \code{"right"} \code{"over"} and \code{"above"} for the area to the right of z
 
 \code{"b"} and \code{"between"} for the area between two z values.
 

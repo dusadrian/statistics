@@ -56,7 +56,7 @@ function (area, t1, t2, df, draw=FALSE) {
              type="n", xlab="", ylab="", axes=FALSE)
     }
     
-    if (area %in% c("r", "o", "right", "over")) {
+    if (area %in% c("r", "o", "a", "right", "over", "above")) {
         area <- 1 - pt(t1, df)
         if (abs(t1) > limita) {t1 <- limita*sign(t1)}
         xdreapta <- seq(t1, limita, 0.001)
