@@ -1,7 +1,7 @@
 \name{anovaFK}
 \alias{anovaFK}
 
-\title{ANOVA including homogeneity of variance test}
+\title{ANOVA including the homogeneity of variance test}
 \description{
   The function 'anovaFK' - contains two separate tests: in a first state, the
   Fligner-Killeen test for the homogeneity of variances is run, and function of this
@@ -57,4 +57,3 @@ anovaFK(values ~ groups, data = my.data)
 }
 
 \keyword{misc}
-
