@@ -24,5 +24,6 @@ export(
     using
 )
 
+S3method(print, "anovaFK")
 S3method(print, "frtable")
 S3method(print, "usage")
