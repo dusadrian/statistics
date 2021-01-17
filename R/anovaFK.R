@@ -6,26 +6,26 @@ function(x, y = NULL, data) {
     if (is.null(y)) {
         if (missing(x) || length(x) != 3) {
             stop("The formula is incorrect.\n\n", call. = FALSE)
-            }
-        values.x <- deparse(substitute(x)[[2]])
-        group.y  <- deparse(substitute(x)[[3]])
+        }
+        values_x <- deparse(substitute(x)[[2]])
+        group_y  <- deparse(substitute(x)[[3]])
         
         if (missing(data)) {
-            values.x <- get(values.x)
-            group.y  <- get(deparse(substitute(x)[[3]]))
-            if (is.character(group.y)) {
-                group.y <- as.factor(group.y)
+            values_x <- get(values_x, envir = parent.frame())
+            group_y  <- get(group_y, envir = parent.frame())
+            if (is.character(group_y)) {
+                group_y <- as.factor(group_y)
             }
-            omog.test <- fligner.test(values.x, group.y)
+            omog.test <- fligner.test(values_x, group_y)
         }
         else {
             # omog.test <- fligner.test(x, data=data)
-            values.x <- data[, values.x]
-            group.y <- data[, group.y]
-            if (is.character(group.y)) {
-                group.y <- as.factor(group.y)
+            values_x <- data[, values_x]
+            group_y <- data[, group_y]
+            if (is.character(group_y)) {
+                group_y <- as.factor(group_y)
             }
-            omog.test <- fligner.test(values.x, group.y)
+            omog.test <- fligner.test(values_x, group_y)
         }
     }
     else {                     
@@ -33,12 +33,12 @@ function(x, y = NULL, data) {
             y <- as.factor(y)
         }
         omog.test <- fligner.test(x, y)
-        values.x <- x
-        group.y <- y
+        values_x <- x
+        group_y <- y
     }
     
     p.value <- omog.test$p.value
-    # group.y <- as.factor(group.y)
+    # group_y <- as.factor(group_y)
     
     omogenitate <- c("do not have equal variation (using Welch approximation).", "have equal variation.")
     
@@ -49,8 +49,8 @@ function(x, y = NULL, data) {
     
     if (var.equal) {
         cat("ANOVA table\n\n")
-        group <- group.y
-        test <- aov(values.x ~ group)
+        group <- group_y
+        test <- aov(values_x ~ group)
         print(summary(test))
         cat("\n")
         return(invisible(list("Homogeneity of variances" = omog.test, "aov" = test)))
@@ -59,8 +59,8 @@ function(x, y = NULL, data) {
         output.table <- matrix("", nrow=2, ncol=5)
         rownames(output.table) <- c("group", "Residuals")
         colnames(output.table) <- c("Df", "Sum Sq", "Mean Sq", "F value", "Pr(>F)")
-        tabel <- anova(lm(values.x ~ group.y))
-        test <- oneway.test(values.x ~ group.y)
+        tabel <- anova(lm(values_x ~ group_y))
+        test <- oneway.test(values_x ~ group_y)
         output.table[ , 1] <- tabel$Df
         output.table[ , 2] <- round(tabel$Sum, 2)
         output.table[ , 3] <- round(tabel$Mean, 2)
@@ -72,4 +72,3 @@ function(x, y = NULL, data) {
         cat("\n")
         }
     }
-

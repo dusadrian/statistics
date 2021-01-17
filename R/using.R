@@ -3,13 +3,12 @@
 `using` <- function(data, expr, select = NULL, split.by = NULL, ...) {
 
     expr <- substitute(expr)
-    enclos <- parent.frame()
-
-    if (!missing(select)) {
-        data <- data[eval(substitute(select), data, parent.frame()), , drop = FALSE]
+    
+    if (!is.null(select)) {
+        data <- data[eval(expr = substitute(select), envir = data, enclos = parent.frame()), , drop = FALSE]
     }
     
-    if (!missing(split.by)) {
+    if (!is.null(split.by)) {
         sb <- substitute(split.by)
         if (as.character(sb)[1] == "c" & substr(deparse(sb), 1, 2) == "c(") {
             split.by <- as.character(sb)[-1]
@@ -24,9 +23,8 @@
     }
 
     if (is.null(split.by)) {
-        return(eval(expr = expr, envir = data, enclos = enclos))
+        return(eval(expr = expr, envir = data, enclos = parent.frame()))
     }
-    
 
     if (nchar(split.by[1]) == 1 & !is.element(split.by[1], colnames(data))) {
         # for situations such as A + B, or A ~ B, instead of the formal A & B
@@ -110,7 +108,7 @@
         tsubset <- paste("subset(data,", paste(split.by, paste("\"", x, "\"", sep = ""), sep = " == ", collapse = " & "), ")")
         cdata <- eval(parse(text = tsubset))
         
-        eval(expr = expr, envir = cdata, enclos = enclos)
+        eval(expr = expr, envir = cdata, enclos = parent.frame())
     })
 
     # return(res) 
@@ -139,5 +137,3 @@
         }
     }
 }
-
-
