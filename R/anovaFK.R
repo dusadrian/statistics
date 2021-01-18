@@ -85,7 +85,7 @@ function(x, y = NULL, data) {
 
     attr(test, "homog_test") <- homog_test
     class(test) <- c("anovaFK", class(test))
-    return(invisible(test))
+    return(test)
 }
 
 
