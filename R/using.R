@@ -11,7 +11,12 @@
     }
     
     if (length(split.by) > 1) {
-        split.by <- split.by[-1]
+        if (is.element(split.by[1], c("c", "&", "+"))) {
+            split.by <- split.by[-1]
+        }
+    }
+    else if (length(split.by) == 1 & is.character(split.by)) {
+        split.by <- splitstr_statistics(split.by)
     }
 
     if (is.null(split.by) || length(split.by) == 0) {
@@ -26,7 +31,7 @@
 
     if (!all(is.element(split.by, colnames(data)))) {
         cat("\n")
-        stop(simpleError("One or more by variables not found in the data.\n\n"))
+        stop(simpleError("One or more split.by variables not found in the data.\n\n"))
     }
 
 
@@ -47,7 +52,7 @@
 
         if (!is.factor(x)) {
             cat("\n")
-            stop(simpleError(sprintf("The split variable %s should be a factor.\n\n", sb)))
+            stop(simpleError(sprintf("The split.by variable %s should be a factor.\n\n", sb)))
         }
 
         return(levels(x))

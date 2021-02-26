@@ -21,7 +21,13 @@ export(
     sbinom,
     spooled,
     t_testAB,
-    using
+    using,
+
+    asNumeric_statistics,
+    getName_statistics,
+    trimstr_statistics,
+    splitstr_statistics,
+    possibleNumeric_statistics
 )
 
 S3method(print, "anovaFK")
