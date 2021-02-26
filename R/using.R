@@ -5,14 +5,22 @@
     expr <- substitute(expr)
     split.by <- as.character(substitute(split.by))
     
-    
     if (!is.null(select)) {
         data <- data[eval(expr = substitute(select), envir = data, enclos = parent.frame()), , drop = FALSE]
     }
     
     if (length(split.by) > 1) {
+        # if landing here, it means the split.by argument has more than one column
+        # and this cannot possibly happen unless there is some way (other than using a comma)
+        # to specify this, such as: c(A, B), or A & B, or A + B or something similar
+
         if (is.element(split.by[1], c("c", "&", "+"))) {
             split.by <- split.by[-1]
+        }
+        else {
+            # for any other situations such as A ~ B
+            cat("\n")
+            stop(simpleError("Incorrect specification of the split.by argument.\n\n"))
         }
     }
     else if (length(split.by) == 1 & is.character(split.by)) {
@@ -21,12 +29,6 @@
 
     if (is.null(split.by) || length(split.by) == 0) {
         return(eval(expr = expr, envir = data, enclos = parent.frame()))
-    }
-
-    if (nchar(split.by[1]) == 1 & !is.element(split.by[1], colnames(data))) {
-        # for situations such as A + B, or A ~ B, instead of the formal A & B
-        cat("\n")
-        stop(simpleError("Incorrect specification of the split.by argument.\n\n"))
     }
 
     if (!all(is.element(split.by, colnames(data)))) {
