@@ -3,26 +3,18 @@
 `using` <- function(data, expr, select = NULL, split.by = NULL, ...) {
 
     expr <- substitute(expr)
+    split.by <- as.character(substitute(split.by))
+    
     
     if (!is.null(select)) {
         data <- data[eval(expr = substitute(select), envir = data, enclos = parent.frame()), , drop = FALSE]
     }
     
-    if (!is.null(split.by)) {
-        sb <- substitute(split.by)
-        if (as.character(sb)[1] == "c" & substr(deparse(sb), 1, 2) == "c(") {
-            split.by <- as.character(sb)[-1]
-        }
-        else {
-            split.by <- deparse(sb)
-        }
-
-        split.by <- gsub("\\\"", "", unlist(strsplit(gsub("[[:space:]]", "", split.by), split = "\\&")))
-
-        if (identical(split.by, "")) split.by <- NULL
+    if (length(split.by) > 1) {
+        split.by <- split.by[-1]
     }
 
-    if (is.null(split.by)) {
+    if (is.null(split.by) || length(split.by) == 0) {
         return(eval(expr = expr, envir = data, enclos = parent.frame()))
     }
 
