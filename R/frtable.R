@@ -32,12 +32,12 @@
     }
 
     tbl <- table(x)
-    res <- data.frame(freq = as.vector(tbl))
+    res <- data.frame(fre = as.vector(tbl))
     rownames(res) <- names(tbl)
 
-    res$relf <- prop.table(res$freq)
-    res$perc <- res$relf * 100
-    res$cump <- cumsum(res$perc)
+    res$rel <- prop.table(res$fre)
+    res$per <- res$rel * 100
+    res$cpd <- cumsum(res$per)
 
     attr(res, "missing") <- misvals
     class(res) <- c("frtable", "data.frame")
@@ -51,14 +51,14 @@
     misvals <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), names(attr(x, "missing")))
     sums <- colSums(x[, 1:3])
 
-    freqs <- formatC(as.character(c(x$freq, sums[1])), format = "s")
-    freqs <- sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), freqs)
-    x$relf <- formatC(x$relf, digits = 3, format = "f")
-    relf <- sprintf("% 5s", x$relf)
-    x$perc <- formatC(x$perc, digits = 1, format = "f")
-    perc <- sprintf("% 5s", c(x$perc, sums[3]))
-    cump <- formatC(x$cump, digits = 1, format = "f")
-    cump <- sprintf(paste("% 5s", sep = ""), cump)
+    fres <- formatC(as.character(c(x$fre, sums[1])), format = "s")
+    fres <- sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), fres)
+    x$rel <- formatC(x$rel, digits = 3, format = "f")
+    rel <- sprintf("% 5s", x$rel)
+    x$per <- formatC(x$per, digits = 1, format = "f")
+    per <- sprintf("% 5s", c(x$per, sums[3]))
+    cpd <- formatC(x$cpd, digits = 1, format = "f")
+    cpd <- sprintf(paste("% 5s", sep = ""), cpd)
     
     miseparator <- paste(c(rep(" ", ifelse(max.nchar.cases > 5, max.nchar.cases - 5, 0)),
                            rep("-", min(max.nchar.cases, 5)), "\n"), collapse = "")
@@ -71,14 +71,14 @@
         stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
-    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), "fre   rel   per   cpd\n")
+    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), " fre   rel   per   cpd\n")
     cat(separator)
     for (i in seq(nrow(x))) {
         if (is.element(rnms[i], misvals)) {
             cat(miseparator)
             misvals <- NULL
         }
-        cat(rnms[i], freqs[i], relf[i], perc[i], cump[i], "\n")
+        cat(rnms[i], fres[i], rel[i], per[i], cpd[i], "\n")
     }
     cat(separator)
     cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), sums[1]), " 1.000 100.0\n", sep = "")
