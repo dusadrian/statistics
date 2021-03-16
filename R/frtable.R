@@ -71,7 +71,7 @@
         stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
-    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), "freq  relf  perc  cump\n")
+    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), "fre   rel   per   cpd\n")
     cat(separator)
     for (i in seq(nrow(x))) {
         if (is.element(rnms[i], misvals)) {
