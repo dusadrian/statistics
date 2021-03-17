@@ -66,7 +66,8 @@
     sums <- colSums(x[, 1:3])
 
     fres <- formatC(as.character(c(x$fre, sums[1])), format = "s")
-    fres <- sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), fres)
+    fres <- paste(sprintf(paste("%", max(3, nchar(sums[1])), "s", sep = ""), fres), "")
+    # fres <- format(c(paste(rep(1, max(4, nchar(sums[1]))), collapse = ""), fres), justify = "centre")[-1]
     x$rel <- formatC(x$rel, digits = 3, format = "f")
     rel <- sprintf("% 5s", x$rel)
     x$per <- formatC(x$per, digits = 1, format = "f")
@@ -75,17 +76,18 @@
     cpd <- sprintf(paste("% 5s", sep = ""), cpd)
     
     miseparator <- paste(c(rep(" ", ifelse(max.nchar.cases > 5, max.nchar.cases - 5, 0)),
-                           rep("-", min(max.nchar.cases, 5)), "\n"), collapse = "")
+                           rep("-", min(max.nchar.cases, 5) + 1 * (sums[1] >= 1000)), "\n"), collapse = "")
     separator <- paste(c(rep(" ", max.nchar.cases + 1), rep("-", nchar(sums[1])),
-        ifelse(nchar(sums[1]) < 4, paste(rep("-", 4 - nchar(sums[1])), collapse = ""), ""),
-        "------------------\n"), collapse = "")
+        ifelse(nchar(sums[1]) < 3, paste(rep("-", 3 - nchar(sums[1])), collapse = ""), ""),
+        "-------------------\n"), collapse = "")
 
     if (nrow(x) > 100 & !force) {
         cat("\n")
         stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
-    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""), " fre   rel   per   cpd\n")
+    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""),
+        ifelse(sums[1] < 1000, "fre    rel   per   cpd\n", " fre    rel   per   cpd\n"))
     cat(separator)
     for (i in seq(nrow(x))) {
         if (is.element(rnms[i], misvals)) {
@@ -95,7 +97,8 @@
         cat(rnms[i], fres[i], rel[i], per[i], cpd[i], "\n")
     }
     cat(separator)
-    cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), sums[1]), " 1.000 100.0\n", sep = "")
+    # cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), sums[1]), " 1.000 100.0\n", sep = "")
+    cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", fres[length(fres)], " 1.000 100.0\n", sep = "")
 
 }
 
