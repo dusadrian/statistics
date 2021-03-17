@@ -3,11 +3,13 @@
 `using` <- function(data, expr, select = NULL, split.by = NULL, ...) {
 
     expr <- substitute(expr)
+    select <- substitute(select)
     split.by <- as.character(substitute(split.by))
     
     if (!is.null(select)) {
-        data <- data[eval(expr = substitute(select), envir = data, enclos = parent.frame()), , drop = FALSE]
+        data <- data[eval(expr = select, envir = data, enclos = parent.frame()), , drop = FALSE]
     }
+
     
     if (length(split.by) > 1) {
         # if landing here, it means the split.by argument has more than one column
@@ -64,7 +66,7 @@
 
     res <- apply(expand.grid(sl), 1, function(x) {
 
-        if (identical(as.character(expr)[[1]], "frtable")) {
+        if (identical(as.character(expr)[[1]], "fret")) {
             varx <- as.character(expr[[2]])
             if (!is.element(varx, names(data))) {
                 cat("\n")
@@ -100,7 +102,7 @@
                 vallab <- c(vallab, misvals)
                 variable <- factor(variable, levels = vallab, labels = names(vallab), ordered = TRUE)
                 attr(variable, "missing") <- misvals
-                return(frtable(variable))
+                return(fret(variable))
             }
         }
 
