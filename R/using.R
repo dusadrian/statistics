@@ -1,14 +1,14 @@
 # http://adv-r.had.co.nz/Computing-on-the-language.html
 
-`using` <- function(data, expr, select = NULL, split.by = NULL, ...) {
+`using` <- function(data, expr, split.by = NULL, ...) {
 
     expr <- substitute(expr)
-    select <- substitute(select)
+    # select <- substitute(select)
     split.by <- as.character(substitute(split.by))
     
-    if (!is.null(select)) {
-        data <- data[eval(expr = select, envir = data, enclos = parent.frame()), , drop = FALSE]
-    }
+    # if (!is.null(select)) {
+    #     data <- data[eval(expr = select, envir = data, enclos = parent.frame()), , drop = FALSE]
+    # }
 
     
     if (length(split.by) > 1) {

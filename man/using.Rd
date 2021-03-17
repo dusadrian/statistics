@@ -10,13 +10,12 @@ to evaluate the expression in every subset of a split file.
 }
 
 \usage{
-using(data, expr, select = NULL, split.by = NULL, ...)
+using(data, expr, split.by = NULL, ...)
 }
 
 \arguments{
     \item{data}{A data frame.}
     \item{expr}{Expression to evaluate}
-    \item{select}{An expression to subset the data}
     \item{split.by}{A factor variable from the \code{data}}
     \item{...}{Other internal arguments.}
 }
@@ -45,19 +44,16 @@ fret(df$Area)
 using(df, fret(Area))
 
 # calculate the mean age by gender
-using(df, split.by = Gender, mean(Age))
+using(df, mean(Age), split.by = Gender)
 
 # select cases from the urban area
-using(subset(df, Area == "Urban"), split.by = Gender, mean(Age))
-
-# same with
-using(df, select = Area == "Urban", split.by = Gender, mean(Age))
+using(subset(df, Area == "Urban"), mean(Age), split.by = Gender)
 
 # mean age by gender and area
-using(df, split.by = Area & Gender, mean(Age))
+using(df, mean(Age), split.by = Area & Gender)
 
 # same with
-using(df, split.by = c(Area, Gender), mean(Age))
+using(df, mean(Age), split.by = c(Area, Gender))
 }
 
 \keyword{functions}
