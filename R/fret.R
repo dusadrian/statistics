@@ -1,6 +1,20 @@
-`frtable` <- function(x) {
+`fret` <- function(x) {
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
+        if (is.atomic(x)) {
+            if (is.character(x)) {
+                cat("\n")
+                stop(simpleError("The input is general text, should be converted to a factor.\n\n"))
+            }
+
+            if (is.numeric(x) | is.integer(x)) {
+                if (length(unique(x)) > 15) {
+                    cat("\n")
+                    stop(simpleError("This is a interval type variable with too many values.\n\n"))
+                }
+            }
+        }
+
         cat("\n")
         stop(simpleError("Unsuitable input.\n\n"))
     }
@@ -40,11 +54,11 @@
     res$cpd <- cumsum(res$per)
 
     attr(res, "missing") <- misvals
-    class(res) <- c("frtable", "data.frame")
+    class(res) <- c("fret", "data.frame")
     return(res)
 }
 
-`print.frtable` <- function(x, force = FALSE, ...) {
+`print.fret` <- function(x, force = FALSE, ...) {
     
     max.nchar.cases <- max(nchar(encodeString(rownames(x))))
     rnms <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), rownames(x))
@@ -83,4 +97,12 @@
     cat(separator)
     cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), sums[1]), " 1.000 100.0\n", sep = "")
 
+}
+
+
+
+
+`frtable` <- function(...) {
+    .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fret()\n")
+    fret(...)
 }

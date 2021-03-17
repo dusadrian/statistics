@@ -39,10 +39,10 @@ df <- data.frame(
 )
 
 # table of frequencies for Area
-frtable(df$Area)
+fret(df$Area)
 
 # same with
-using(df, frtable(Area))
+using(df, fret(Area))
 
 # calculate the mean age by gender
 using(df, split.by = Gender, mean(Age))
