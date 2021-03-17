@@ -18,16 +18,14 @@ fret(x)
 
 \details{
 A frequency table is usually performed for a categorical variable, displaying the
-frequencies of the respective categories.
+frequencies of the respective categories. Note that general variables containing
+text are not necessarily factors, despite having a small number of words.
 
-It is however possible to perform a frequency table for numerical variables, if
-and only if the number of values is very limited. An example of such variable can
-be the number of children, where each value can be interpreted as a class,
-containing a single value (for instance 0 meaning the category of people with no
-children).
-
-Note that general variables containing text are not necessarily factors, despite
-having a small number of words.
+It is sometimes possible to perform a frequency table for numerical variables, if
+and only if the number of values is very limited (an arbitrary and debatable upper
+limit of 15 is used). An example of such variable can be the number of children,
+where each value can be interpreted as a class, containing a single value (for
+instance 0 meaning the category of people with no children).
 
 A special type of input variables are those of class \code{haven_labelled}, which
 are not pure factors (categorical variables in R) but they are nevertheless
