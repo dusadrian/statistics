@@ -1,5 +1,5 @@
 Version 0.6
-  o new function fret() to make a frequency table
+  o new function fretab() to make a frequency table
   o new function using() as a more flexible alternative to with()
 
 Version 0.5

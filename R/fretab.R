@@ -1,4 +1,4 @@
-`fret` <- function(x) {
+`fretab` <- function(x) {
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
         if (is.atomic(x)) {
@@ -54,11 +54,11 @@
     res$cpd <- cumsum(res$per)
 
     attr(res, "missing") <- misvals
-    class(res) <- c("fret", "data.frame")
+    class(res) <- c("fretab", "data.frame")
     return(res)
 }
 
-`print.fret` <- function(x, force = FALSE, ...) {
+`print.fretab` <- function(x, force = FALSE, ...) {
     
     max.nchar.cases <- max(nchar(encodeString(rownames(x))))
     rnms <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), rownames(x))
@@ -108,4 +108,11 @@
 `frtable` <- function(...) {
     .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fret()\n")
     fret(...)
+}
+
+
+
+
+`fret` <- function(...) {
+    fretab(...)
 }

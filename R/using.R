@@ -66,7 +66,7 @@
 
     res <- apply(expand.grid(sl), 1, function(x) {
 
-        if (identical(as.character(expr)[[1]], "fret")) {
+        if (identical(as.character(expr)[[1]], "fretab")) {
             varx <- as.character(expr[[2]])
             if (!is.element(varx, names(data))) {
                 cat("\n")
@@ -102,7 +102,7 @@
                 vallab <- c(vallab, misvals)
                 variable <- factor(variable, levels = vallab, labels = names(vallab), ordered = TRUE)
                 attr(variable, "missing") <- misvals
-                return(fret(variable))
+                return(fretab(variable))
             }
         }
 

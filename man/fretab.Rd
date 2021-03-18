@@ -1,5 +1,6 @@
-\name{fret}
+\name{fretab}
 \alias{fret}
+\alias{fretab}
 \alias{frtable}
 
 \title{Frequency table}
@@ -9,7 +10,7 @@ Presents the usual frequency distributions from a frequency table.
 }
 
 \usage{
-fret(x)
+fretab(x)
 }
 
 \arguments{
@@ -40,11 +41,11 @@ variables.
 \examples{
 # a pure categorical variable
 x <- factor(sample(letters[1:5], 115, replace = TRUE))
-fret(x)
+fretab(x)
 
 # simulate number of children
 y <- sample(0:4, 103, replace = TRUE)
-fret(y)
+fretab(y)
 }
 
 \keyword{functions}
