@@ -13,7 +13,6 @@ export(
     dbinoms,
     dfcalc,
     fmode,
-    fret,
     fretab,
     frtable,
     hclr,

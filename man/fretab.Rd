@@ -1,5 +1,4 @@
 \name{fretab}
-\alias{fret}
 \alias{fretab}
 \alias{frtable}
 
@@ -30,7 +29,7 @@ instance 0 meaning the category of people with no children).
 
 A special type of input variables are those of class \code{haven_labelled}, which
 are not pure factors (categorical variables in R) but they are nevertheless
-intepreted as similar to factors, and allow producing frequency tables for them.
+intepreted as similar to factors, and allow producing frequency tables for.
 Importing data from SPSS using the package \pkg{haven} usually produces such
 variables.
 }
