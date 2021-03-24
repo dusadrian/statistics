@@ -22,13 +22,18 @@
     misvals <- attr(x, "missing")
     
     if (!is.factor(x) & is.element("haven_labelled", cls)) {
-        vallab <- attr(x, "labels")
+        vallab <- sort(attr(x, "labels"))
         misvals <- attr(x, "na_values")
         na_range <- attr(x, "na_range")
         
         if (!is.null(na_range)) {
             misvals <- vallab[vallab >= na_range[1] & vallab <= na_range[2]]
         }
+
+        xu <- sort(union(vallab, as.vector(unique(x))))
+        names(xu) <- xu
+        names(xu)[is.element(xu, vallab)] <- names(vallab)
+        vallab <- xu
 
         if (!is.null(misvals)) {
             misvals <- vallab[is.element(vallab, misvals)]
@@ -108,11 +113,4 @@
 `frtable` <- function(...) {
     .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fret()\n")
     fret(...)
-}
-
-
-
-
-`fret` <- function(...) {
-    fretab(...)
 }
