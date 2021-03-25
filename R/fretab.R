@@ -1,4 +1,4 @@
-`fretab` <- function(x) {
+`fretab` <- function(x, values = FALSE) {
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
         if (is.atomic(x)) {
@@ -19,35 +19,100 @@
         stop(simpleError("Unsuitable input.\n\n"))
     }
 
-    misvals <- attr(x, "missing")
+    misvals <- attr(x, "na_values") # this is for labelled_spss only
+    vals <- NULL
     
     if (!is.factor(x) & is.element("haven_labelled", cls)) {
-        vallab <- sort(attr(x, "labels"))
-        misvals <- attr(x, "na_values")
-        na_range <- attr(x, "na_range")
+
+        vallab <- attr(x, "labels")
         
-        if (!is.null(na_range)) {
-            misvals <- vallab[vallab >= na_range[1] & vallab <= na_range[2]]
+        if (any(haven::is_tagged_na(x))) {
+            # meaning there are tagged_na values
+            
+            # vals <- unique(gsub("[[:space:]]|NA\\(|)", "", haven::format_tagged_na(x)))
+            # trynum <- suppressWarnings(as.numeric(vals))
+            tags <- unique(sort(na_tag(x)))
+            
+            if (is.null(misvals)) {
+                # misvals <- vals[is.na(trynum)]
+                misvals <- tags
+            }
+            else {
+                # misvals <- c(misvals[!is.na(misvals)], vals[is.na(trynum)])
+                misvals <- c(misvals[!is.na(misvals)], tags)
+            }
+
+            for (i in seq(length(misvals))) {
+                if (any(haven::is_tagged_na(x, misvals[i]))) {
+                    # multiple tagged_na values are (user) defined
+                    # but not all might be present in the data
+                    # if (dot) {
+                        # In case of a future option to print a preceding dot for the tagged missing values
+                        misvals[i] <- paste0(".", misvals[i])
+                    # }
+                    vallab[which(is.na(vallab))[1]] <- misvals[i]
+                }
+            }
+
+            
+            vallab <- sort(vallab)
+            misvals <- sort(misvals)
+            if (length(intersect(vallab, misvals)) > 0) {
+                names(misvals)[is.element(misvals, vallab)] <- names(vallab)[is.element(vallab, misvals)]
+            }
+
+            
+            y <- as.character(haven::as_factor(x))
+            for (i in seq(length(vallab))) {
+                y[y == names(vallab)[i]] <- unname(vallab[i])
+            }
+
+            if (length(setdiff(misvals, vallab)) > 0) {
+                for (i in seq(length(misvals))) {
+                    if (length(wt <- haven::is_tagged_na(x, gsub("\\.", "", misvals[i]))) > 0) {
+                        y[wt] <- misvals[i]
+                    }
+                }
+            }
+
+            # x <- c(sort(y[!is.element(y, misvals)]), sort(y[is.element(y, misvals)]))
+            x <- y
+        }
+        else {
+            
+            na_range <- attr(x, "na_range")
+            
+            if (!is.null(na_range)) {
+                misvals <- vallab[vallab >= na_range[1] & vallab <= na_range[2]]
+            }
         }
 
+        vallab <- sort(vallab)
         xu <- sort(union(vallab, as.vector(unique(x))))
         names(xu) <- xu
-        names(xu)[is.element(xu, vallab)] <- names(vallab)
-        vallab <- xu
-
-        if (!is.null(misvals)) {
+        
+        if (length(intersect(xu, vallab)) > 0) {
+            names(xu)[is.element(xu, vallab)] <- names(vallab)[is.element(vallab, xu)]
+        }
+        
+        
+        mislabels <- is.element(vallab, misvals)
+        if (!is.null(misvals) & any(mislabels)) {
+            wel <- which(is.element(misvals, vallab))
+            names(misvals)[wel] <- names(vallab)[match(misvals[wel], vallab)]
             misvals <- vallab[is.element(vallab, misvals)]
             vallab <- vallab[!is.element(vallab, misvals)]
             misvals <- misvals[is.element(misvals, unique(x))]
             
-            # back tick and forward tick
+            # back tick and forward tick, e.g. 'Don`t know'
             bftick <- paste(unlist(strsplit(rawToChar(as.raw(c(194, 180, 96))), split = "")), collapse = "|")
             
             names(vallab) <- gsub(bftick, "'", names(vallab))
             names(misvals) <- gsub(bftick, "'", names(misvals))
             vallab <- c(vallab, misvals)
         }
-        x <- factor(x, levels = vallab, labels = names(vallab), ordered = TRUE)
+        xu <- c(xu[!is.element(xu, misvals)], xu[is.element(xu, misvals)])
+        x <- factor(x, labels = names(xu)[is.element(xu, unique(x))], ordered = TRUE)
     }
 
     tbl <- table(x)
@@ -59,15 +124,40 @@
     res$cpd <- cumsum(res$per)
 
     attr(res, "missing") <- misvals
+    attr(res, "values") <- values
+    attr(res, "vallab") <- vallab
     class(res) <- c("fretab", "data.frame")
     return(res)
 }
 
 `print.fretab` <- function(x, force = FALSE, ...) {
     
+    values <- attr(x, "values")
+    vallab <- attr(x, "vallab")
+    misvals <- attr(x, "missing")
+    
+    rnms <- rownames(x)
+    if (values) {
+        rnms[is.element(rnms, names(vallab))] <- paste(names(vallab), vallab, sep = " ")
+        rownames(x) <- rnms
+        vallab <- vallab[is.element(vallab, misvals)]
+        if (length(intersect(vallab, misvals)) > 0) {
+            names(misvals)[is.element(misvals, vallab)] <- names(vallab)[is.element(vallab, misvals)]
+        }
+
+        if (!is.null(names(misvals))) {
+            misvals <- paste(names(misvals), misvals, sep = " ")
+        }
+    }
+    
     max.nchar.cases <- max(nchar(encodeString(rownames(x))))
     rnms <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), rownames(x))
-    misvals <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), names(attr(x, "missing")))
+
+    if (is.null(names(misvals))) {
+        names(misvals) <- misvals
+    }
+    misvals <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), names(misvals))
+
     sums <- colSums(x[, 1:3])
 
     fres <- formatC(as.character(c(x$fre, sums[1])), format = "s")
@@ -114,3 +204,6 @@
     .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fret()\n")
     fret(...)
 }
+
+
+#

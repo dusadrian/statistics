@@ -9,11 +9,12 @@ Presents the usual frequency distributions from a frequency table.
 }
 
 \usage{
-fretab(x)
+fretab(x, values = FALSE)
 }
 
 \arguments{
   \item{x}{A categorical variable, a factor}
+  \item{values}{Logical, print the values in the table rows}
 }
 
 \details{
@@ -32,6 +33,10 @@ are not pure factors (categorical variables in R) but they are nevertheless
 intepreted as similar to factors, and allow producing frequency tables for.
 Importing data from SPSS using the package \pkg{haven} usually produces such
 variables.
+
+The argument \code{values} makes sense only when the input is of class
+\code{haven_labelled}, otherwise for regular (base R) factors the values are
+just a sequence of numbers.
 }
 
 \author{Adrian Dusa}
@@ -39,12 +44,44 @@ variables.
 
 \examples{
 # a pure categorical variable
-x <- factor(sample(letters[1:5], 115, replace = TRUE))
+x <- factor(sample(letters[1:5], 215, replace = TRUE))
 fretab(x)
 
 # simulate number of children
-y <- sample(0:4, 103, replace = TRUE)
-fretab(y)
+x <- sample(0:4, 215, replace = TRUE)
+fretab(x)
+
+values <- sample(c(1:5, 9), 215, replace = TRUE)
+x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
+fretab(x)
+
+# Using labelled_spss for user defined missing values
+x <- labelled_spss(values, labels = c(Good = 1, Bad = 5), na_values = 9)
+fretab(x)
+
+# This time giving the missing value a label
+x <- labelled_spss(values, labels = c(Good = 1, Bad = 5, DK = 9), na_values = 9)
+fretab(x)
+
+# Also printing the values
+fretab(x, values = TRUE)
+
+
+# Using tagged_na values (similar to Stata or SAS)
+values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
+
+x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = tagged_na('a')))
+fretab(x, values = TRUE)
+
+
+# And even a combination between tagged_na() and labelled_spss()
+tags <- tagged_na('a', 'b')
+values <- sample(c(1:5, -9, tags), 215, replace = TRUE)
+labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], 'N/A' = tags[2])
+
+x <- labelled_spss(values, labels = labels, na_values = c(-9, tags))
+fretab(x, values = TRUE)
+
 }
 
 \keyword{functions}
