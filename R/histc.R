@@ -11,7 +11,7 @@ function(x, from, to, size = 15, ...) {
     testh <- hist(x, plot = FALSE)
     bdiff <- diff(testh$breaks[1:2])
     
-    xlab <- getName_statistics(funargs[1])
+    xlab <- admisc::getName(funargs[1])
     maintitle <- paste("Histogram of", xlab)
     
     
@@ -65,6 +65,3 @@ function(x, from, to, size = 15, ...) {
     }
     axis(2)
 }
-
-
-

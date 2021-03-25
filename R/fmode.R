@@ -1,8 +1,8 @@
 `fmode` <- function(x) {
     tbl <- table(x)
     fmode <- names(tbl[which.max(tbl)])
-    if (possibleNumeric_statistics(fmode)) {
-        fmode <- asNumeric_statistics(fmode)
+    if (admisc::possibleNumeric(fmode)) {
+        fmode <- admisc::asNumeric(fmode)
     }
     return(fmode)
 }

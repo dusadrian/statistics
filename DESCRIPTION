@@ -9,6 +9,7 @@ Authors@R: person(given = "Adrian", family = "Dusa",
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 LazyData: yes
+Imports: admisc, haven
 Description: The majority of functions in this package are designed to facilitate
  undestanding the statistical concepts taught in the class (such as the functions to
  create graphics or areas under the normal curve), while some are designed to ease

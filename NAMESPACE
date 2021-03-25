@@ -1,11 +1,13 @@
 
+import(haven)
+import(admisc)
 importFrom("grDevices", "dev.new", "hcl", "dev.cur")
 importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
            "par", "plot", "polygon", "segments", "text")
 importFrom("stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
            "dt", "fligner.test", "lm", "na.omit", "oneway.test",
            "pnorm", "pt", "relevel", "sd", "t.test", "var")
-           
+
 export(
     anovaFK,
     daria,
@@ -22,13 +24,7 @@ export(
     sbinom,
     spooled,
     t_testAB,
-    using,
-
-    asNumeric_statistics,
-    getName_statistics,
-    trimstr_statistics,
-    splitstr_statistics,
-    possibleNumeric_statistics
+    using
 )
 
 S3method(print, "anovaFK")

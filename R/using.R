@@ -26,7 +26,7 @@
         }
     }
     else if (length(split.by) == 1 & is.character(split.by)) {
-        split.by <- splitstr_statistics(split.by)
+        split.by <- admisc::splitstr(split.by)
     }
 
     if (is.null(split.by) || length(split.by) == 0) {
