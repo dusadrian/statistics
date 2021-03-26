@@ -32,21 +32,21 @@ Adrian Dusa
 \examples{
 set.seed(123)
 df <- data.frame(
-    Area = factor(sample(c("Urban", "Rural"), 20, replace = TRUE)),
-    Gender = factor(sample(c("Male", "Female"), 20, replace = TRUE)),
-    Age = sample(18:90, 20, replace = TRUE),
-    Children = sample(0:5, 20, replace = TRUE)
+    Area = factor(sample(c("Urban", "Rural"), 123, replace = TRUE)),
+    Gender = factor(sample(c("Male", "Female"), 123, replace = TRUE)),
+    Age = sample(18:90, 123, replace = TRUE),
+    Children = sample(0:5, 123, replace = TRUE)
 )
 
 
 # table of frequencies for Area
-fretab(df$Gender)
+fretable(df$Gender)
 
 # same with
-using(df, fretab(Gender))
+using(df, fretable(Gender))
 
 # same, but split by Area
-using(df, fretab(Gender), split.by = Area)
+using(df, fretable(Gender), split.by = Area)
 
 # calculate the mean age by gender
 using(df, mean(Age), split.by = Gender)
@@ -64,7 +64,7 @@ using(df, mean(Age), split.by = c(Area, Gender))
 using(df, mean(Children), split.by = Area)
 
 # frequency tables by Area
-using(df, fretab(Children), split.by = Area)
+using(df, fretable(Children), split.by = Area)
 }
 
 \keyword{functions}
