@@ -11,7 +11,7 @@
             if (is.numeric(x) | is.integer(x)) {
                 if (length(unique(x)) > 15) {
                     cat("\n")
-                    stop(simpleError("This is a interval type variable with too many values.\n\n"))
+                    stop(simpleError("This is an interval type variable with too many values.\n\n"))
                 }
             }
         }
@@ -25,6 +25,7 @@
     vallab <- NULL
     
     if (is.factor(x)) {
+        values <- FALSE
         vallab <- levels(x)
     }
     else if (is.element("haven_labelled", cls)) {
