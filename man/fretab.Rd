@@ -58,17 +58,17 @@ x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
 fretab(x)
 
 
-# Using labelled_spss for user defined missing values
+# Defining missing values (without labels)
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5), na_values = 9)
 fretab(x)
 
 
-# This time giving the missing value a label
+# Defined missing values with labels
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5, DK = 9), na_values = 9)
 fretab(x)
 
 
-# Also printing the values
+# Printing both values and labels
 fretab(x, values = TRUE)
 
 
@@ -82,7 +82,7 @@ fretab(x, values = TRUE)
 # And even a combination between tagged_na() and labelled_spss()
 tags <- tagged_na('a', 'b')
 values <- sample(c(1:5, -9, tags), 215, replace = TRUE)
-labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], 'N/A' = tags[2])
+labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], NR = tags[2])
 
 x <- labelled_spss(values, labels = labels, na_values = c(-9, tags))
 fretab(x, values = TRUE)

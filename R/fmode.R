@@ -10,5 +10,6 @@
 
 
 `mod` <- function(...) {
+    .Deprecated(msg = "Function mod() is deprecated, and has been renamed to fmode()\n")
     fmode(...)
 }

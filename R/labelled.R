@@ -1,22 +1,31 @@
 `unique_labelled` <- function(x) {
     
     labels <- attr(x, "labels")
-    tagged <- haven::is_tagged_na(labels)
+    tagged <- logical(length(labels))
+    
+    if (is.double(labels)) {
+        tagged <- haven::is_tagged_na(labels)
+    }
+
     taglab <- labels[tagged]
     labels <- labels[!tagged]
     
     utag <- c()
-    if (any(tagged)) {
+    if (is.double(x)) {
         utag <- haven::na_tag(x)
         utag <- utag[!is.na(utag)]
-        utag <- unique(utag)
+        utag <- sort(unique(utag))
     }
 
     numtag <- c()
 
     if (length(utag > 0)) {
         numtag <- haven::tagged_na(utag)
-        labtag <- haven::na_tag(taglab)
+        labtag <- c()
+
+        if (length(taglab) > 0) {
+            labtag <- haven::na_tag(taglab)
+        }
 
         names(numtag) <- paste0(".", utag)
     
@@ -28,8 +37,9 @@
         }
     }
 
-
-    x <- x[!haven::is_tagged_na(x)]
+    if (is.double(x)) {
+        x <- x[!haven::is_tagged_na(x)]
+    }
     x <- x[!duplicated(x)]
     xmis <- logical(length(x))
 
@@ -73,9 +83,9 @@
 
 `remove_labels` <- function(x) {
     y <- as.character(haven::as_factor(x, levels = "both"))
+    natag <- haven::na_tag(x)
     
     if (any(is.na(y))) {
-        natag <- haven::na_tag(x)
         # there are unlabelled tagged_na values
         y[is.na(y)] <- natag[is.na(y)]
     }
@@ -84,10 +94,7 @@
     labtag <- which(grepl("\\[NA\\]", y))
 
     if (length(labtag > 0)) {
-
         for (i in seq(length(labtag))) {
-            print(natag[labtag[i]])
-            print(y[labtag[i]])
             y[labtag[i]] <- gsub("\\[NA\\]", natag[labtag[i]], y[labtag[i]])
         }
     }

@@ -57,61 +57,14 @@
     })
 
     names(sl) <- split.by
+    slexp <- expand.grid(sl)
+    res <- vector(mode = "list", length = nrow(slexp))
 
-    res <- apply(expand.grid(sl), 1, function(x) {
-
-        if (identical(as.character(expr)[[1]], "fretab")) {
-            varx <- as.character(expr[[2]])
-            
-            if (!is.element(varx, names(data))) {
-                cat("\n")
-                stop(simpleError(sprintf("Variable %s not found in the data.\n\n", x)))
-            }
-
-            variable <- data[[varx]]
-            
-            if (is.atomic(variable) & !is.factor(variable) & is.element("haven_labelled", class(variable))) {
-                
-                vallab <- unique_labels(variable)
-                misvals <- attr(vallab, "missing")
-
-                # back tick and forward tick
-                bftick <- paste(unlist(strsplit(rawToChar(as.raw(c(194, 180, 96))), split = "")), collapse = "|")
-
-                names(vallab) <- gsub(bftick, "'", names(vallab))
-                names(misvals) <- gsub(bftick, "'", names(misvals))
-                
-                labels <- get_labels(variable)
-                
-                selection <- logical(length(variable))
-
-                for (i in seq(length(x))) {
-                    splitvar <- data[, split.by[i]]
-
-                    if (is.element("haven_labelled", class(splitvar))) {
-                        splitvar <- remove_labels(splitvar)
-                        xtag <- haven::is_tagged_na(splitvar)
-                        ntag <- haven::na_tag(splitvar)
-                        splitvar[xtag] <- paste0(".", ntag[xtag])
-                    }
-
-                    if (is_tagged_na(x[i])) {
-                        x[i] <- paste0(".", na_tag(x[i]))
-                    }
-
-                    selection <- selection | splitvar == x[i]
-                }
-                
-                variable <- variable[selection]
-
-                variable <- factor(variable, levels = vallab, labels = names(vallab), ordered = TRUE)
-                attr(variable, "missing") <- misvals
-                return(fretab(variable))
-            }
-        }
-
+    for (r in seq(nrow(slexp))) {
         selection <- logical(nrow(data))
-        for (i in seq(length(x))) {
+        for (i in seq(ncol(slexp))) {
+
+            val <- slexp[r, i]
             splitvar <- data[, split.by[i]]
 
             if (is.element("haven_labelled", class(splitvar))) {
@@ -121,22 +74,20 @@
                 splitvar[xtag] <- paste0(".", ntag[xtag])
             }
 
-            if (is_tagged_na(x[i])) {
-                x[i] <- paste0(".", na_tag(x[i]))
+            if (is_tagged_na(val)) {
+                val <- paste0(".", na_tag(val))
             }
 
-            selection <- selection | splitvar == x[i]
+            selection <- selection | splitvar == val
         }
 
-        # tsubset <- paste("subset(data,", paste(split.by, paste("\"", x, "\"", sep = ""), sep = " == ", collapse = " & "), ")")
-        # cdata <- eval(parse(text = tsubset))
-
         cdata <- subset(data, selection)
-        
-        eval(expr = expr, envir = cdata, enclos = parent.frame())
-    })
-    
-    class(res) <- c("usage")
+
+        res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
+    }
+
+
+    class(res) <- "usage"
     attr(res, "split") <- expand.grid(lapply(sl, function(x) {
 
         if (!is.null(names(x))) {
@@ -150,9 +101,7 @@
                 }
 
                 for (i in seq(length(we))) {
-                    print(we[i])
                     if (xtag[we[i]]) {
-                        print("?")
                         names(x)[we[i]] <- paste0(".", ntag[we[i]])
                     }
                     else {

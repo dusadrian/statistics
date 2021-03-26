@@ -88,7 +88,7 @@ function(x) {
                     
                     if (ptnfound) {
                         # check if it's a number
-                        if (possibleNumeric_statistics(ptn)) {
+                        if (admisc::possibleNumeric(ptn)) {
                             result <- eval.parent(parse(text=paste("colnames(", filename, ")[", ptn, "]", sep="")), n = n)
                         }
                         else {
