@@ -13,7 +13,7 @@ fretab(x, values = FALSE)
 }
 
 \arguments{
-  \item{x}{A categorical variable, a factor}
+  \item{x}{A categorical variable, either a factor or a \code{labelled} variable}
   \item{values}{Logical, print the values in the table rows}
 }
 
@@ -47,21 +47,26 @@ just a sequence of numbers.
 x <- factor(sample(letters[1:5], 215, replace = TRUE))
 fretab(x)
 
+
 # simulate number of children
 x <- sample(0:4, 215, replace = TRUE)
 fretab(x)
 
+library(haven)
 values <- sample(c(1:5, 9), 215, replace = TRUE)
 x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
 fretab(x)
+
 
 # Using labelled_spss for user defined missing values
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5), na_values = 9)
 fretab(x)
 
+
 # This time giving the missing value a label
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5, DK = 9), na_values = 9)
 fretab(x)
+
 
 # Also printing the values
 fretab(x, values = TRUE)

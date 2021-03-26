@@ -16,7 +16,7 @@ using(data, expr, split.by = NULL, ...)
 \arguments{
     \item{data}{A data frame.}
     \item{expr}{Expression to evaluate}
-    \item{split.by}{A factor variable from the \code{data}}
+    \item{split.by}{A factor variable from the \code{data}, or a \code{labelled} variable}
     \item{...}{Other internal arguments.}
 }
 
@@ -37,6 +37,7 @@ df <- data.frame(
     Age = sample(18:90, 20, replace = TRUE),
     Children = sample(0:5, 20, replace = TRUE)
 )
+
 
 # table of frequencies for Area
 fretab(df$Gender)

@@ -43,23 +43,17 @@
     sl <- lapply(split.by, function(sb) {
         x <- data[[sb]]
 
-        if (is.element("haven_labelled", class(x))) {
-            vallab <- attr(x, "labels")
-            vallab <- vallab[!is.element(vallab, attr(x, "na_values"))]
-            
-            if (!is.null(na_range <- attr(x, "na_range"))) {
-                vallab <- vallab[vallab < na_range[1] | vallab > na_range[2]]
-            }
-            
-            return(vallab)
+        if (is.factor(x)) {
+            return(levels(x))
         }
-
-        if (!is.factor(x)) {
+        else if (is.element("haven_labelled", class(x))) {
+            return(unique_labelled(x))
+        }
+        else if (!is.factor(x)) {
             cat("\n")
-            stop(simpleError(sprintf("The split.by variable %s should be a factor.\n\n", sb)))
+            stop(simpleError(sprintf("The split.by variable %s should be a factor or a labelled variable.\n\n", sb)))
         }
 
-        return(levels(x))
     })
 
     names(sl) <- split.by
@@ -68,56 +62,113 @@
 
         if (identical(as.character(expr)[[1]], "fretab")) {
             varx <- as.character(expr[[2]])
+            
             if (!is.element(varx, names(data))) {
                 cat("\n")
                 stop(simpleError(sprintf("Variable %s not found in the data.\n\n", x)))
             }
 
             variable <- data[[varx]]
+            
             if (is.atomic(variable) & !is.factor(variable) & is.element("haven_labelled", class(variable))) {
-
-                vallab <- attr(variable, "labels")
-                vallab <- vallab[!is.element(vallab, attr(variable, "na_values"))]
-                na_range <- attr(variable, "na_range")
-        
-                if (!is.null(na_range)) {
-                    misvals <- vallab[vallab >= na_range[1] & vallab <= na_range[2]]
-                }
-
-                vallab <- vallab[!is.element(vallab, misvals)]
                 
-                selection <- logical(length(variable))
-                for (i in seq(length(x))) {
-                    selection <- selection | data[, split.by[i]] == x[i]
-                }
-                
-                variable <- variable[selection]
-                misvals <- misvals[is.element(misvals, unique(variable))]
+                vallab <- unique_labels(variable)
+                misvals <- attr(vallab, "missing")
 
                 # back tick and forward tick
                 bftick <- paste(unlist(strsplit(rawToChar(as.raw(c(194, 180, 96))), split = "")), collapse = "|")
 
                 names(vallab) <- gsub(bftick, "'", names(vallab))
                 names(misvals) <- gsub(bftick, "'", names(misvals))
-                vallab <- c(vallab, misvals)
+                
+                labels <- get_labels(variable)
+                
+                selection <- logical(length(variable))
+
+                for (i in seq(length(x))) {
+                    splitvar <- data[, split.by[i]]
+
+                    if (is.element("haven_labelled", class(splitvar))) {
+                        splitvar <- remove_labels(splitvar)
+                        xtag <- haven::is_tagged_na(splitvar)
+                        ntag <- haven::na_tag(splitvar)
+                        splitvar[xtag] <- paste0(".", ntag[xtag])
+                    }
+
+                    if (is_tagged_na(x[i])) {
+                        x[i] <- paste0(".", na_tag(x[i]))
+                    }
+
+                    selection <- selection | splitvar == x[i]
+                }
+                
+                variable <- variable[selection]
+
                 variable <- factor(variable, levels = vallab, labels = names(vallab), ordered = TRUE)
                 attr(variable, "missing") <- misvals
                 return(fretab(variable))
             }
         }
 
-        tsubset <- paste("subset(data,", paste(split.by, paste("\"", x, "\"", sep = ""), sep = " == ", collapse = " & "), ")")
-        cdata <- eval(parse(text = tsubset))
+        selection <- logical(nrow(data))
+        for (i in seq(length(x))) {
+            splitvar <- data[, split.by[i]]
+
+            if (is.element("haven_labelled", class(splitvar))) {
+                splitvar <- remove_labels(splitvar)
+                xtag <- haven::is_tagged_na(splitvar)
+                ntag <- haven::na_tag(splitvar)
+                splitvar[xtag] <- paste0(".", ntag[xtag])
+            }
+
+            if (is_tagged_na(x[i])) {
+                x[i] <- paste0(".", na_tag(x[i]))
+            }
+
+            selection <- selection | splitvar == x[i]
+        }
+
+        # tsubset <- paste("subset(data,", paste(split.by, paste("\"", x, "\"", sep = ""), sep = " == ", collapse = " & "), ")")
+        # cdata <- eval(parse(text = tsubset))
+
+        cdata <- subset(data, selection)
         
         eval(expr = expr, envir = cdata, enclos = parent.frame())
     })
-
-    # return(res) 
     
     class(res) <- c("usage")
     attr(res, "split") <- expand.grid(lapply(sl, function(x) {
-        if (!is.null(names(x))) return(names(x))
-        return(x)
+
+        if (!is.null(names(x))) {
+            if (length(we <- which(names(x) == "")) > 0) {
+                xtag <- logical(length(x))
+                ntag <- x
+
+                if (is.double(x)) { # condition to have tagged_na values
+                    xtag <- haven::is_tagged_na(x)
+                    ntag <- haven::na_tag(x)
+                }
+
+                for (i in seq(length(we))) {
+                    print(we[i])
+                    if (xtag[we[i]]) {
+                        print("?")
+                        names(x)[we[i]] <- paste0(".", ntag[we[i]])
+                    }
+                    else {
+                        names(x)[we[i]] <- x
+                    }
+                }
+            }
+            return(names(x))
+        }
+        else {
+            if (is.double(x)) { # condition to have tagged_na values
+                xtag <- haven::is_tagged_na(x)
+                ntag <- haven::na_tag(x)
+            }
+            return(x)
+        }
     }))
     return(res)
 }

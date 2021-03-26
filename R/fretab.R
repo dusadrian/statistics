@@ -1,4 +1,5 @@
 `fretab` <- function(x, values = FALSE) {
+    
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
         if (is.atomic(x)) {
@@ -21,8 +22,12 @@
 
     misvals <- attr(x, "na_values") # this is for labelled_spss only
     vals <- NULL
+    vallab <- NULL
     
-    if (!is.factor(x) & is.element("haven_labelled", cls)) {
+    if (is.factor(x)) {
+        vallab <- levels(x)
+    }
+    else if (is.element("haven_labelled", cls)) {
 
         vallab <- attr(x, "labels")
         
@@ -201,8 +206,8 @@
 
 
 `frtable` <- function(...) {
-    .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fret()\n")
-    fret(...)
+    .Deprecated(msg = "Function frtable() is deprecated, and has been renamed to fretab()\n")
+    fretab(...)
 }
 
 

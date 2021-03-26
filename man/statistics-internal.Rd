@@ -1,10 +1,14 @@
 \name{statistics-internal}
 
+\alias{unique_labelled}
+\alias{remove_labels}
+\alias{get_labels}
+\alias{getName_statistics}
 
 \title{Internal functions}
 
 \description{
-  Functions or internal use only.
+  Functions for internal use only.
 }
 
 \keyword{internal}
