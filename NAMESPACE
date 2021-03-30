@@ -27,7 +27,7 @@ export(
     using,
 
     unique_labelled,
-    remove_labels,
+    rm_labels,
     get_labels,
     getName_statistics
 )

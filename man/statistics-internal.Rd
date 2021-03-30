@@ -1,7 +1,7 @@
 \name{statistics-internal}
 
 \alias{unique_labelled}
-\alias{remove_labels}
+\alias{rm_labels}
 \alias{get_labels}
 \alias{getName_statistics}
 

@@ -68,7 +68,7 @@
             splitvar <- data[, split.by[i]]
 
             if (is.element("haven_labelled", class(splitvar))) {
-                splitvar <- remove_labels(splitvar)
+                splitvar <- statistics::rm_labels(splitvar)
                 xtag <- haven::is_tagged_na(splitvar)
                 ntag <- haven::na_tag(splitvar)
                 splitvar[xtag] <- paste0(".", ntag[xtag])
@@ -133,7 +133,6 @@
     for (i in seq(length(x))) {
         cat(nms[i], "\n")
         cat("-----\n")
-        print(x[[i]])
         if (i < length(x)) {
             cat("\n")
         }

@@ -54,8 +54,8 @@
         xmis <- xmis | x <= na_range[1] | x >= na_range[2]
     }
 
-    xnotmis <- sort(remove_labels(x[!xmis]))
-    xmis <- sort(remove_labels(x[xmis]))
+    xnotmis <- sort(statistics::rm_labels(x[!xmis]))
+    xmis <- sort(statistics::rm_labels(x[xmis]))
     
     if (length(xmis) > 0) {
         names(xmis) <- xmis
@@ -81,7 +81,7 @@
 }
 
 
-`remove_labels` <- function(x) {
+`rm_labels` <- function(x) {
     y <- as.character(haven::as_factor(x, levels = "both"))
     natag <- haven::na_tag(x)
     
