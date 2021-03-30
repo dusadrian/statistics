@@ -54,17 +54,18 @@ frtable(x)
 
 library(haven)
 values <- sample(c(1:5, 9), 215, replace = TRUE)
-x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
+x <- labelled(values, labels = c(Good = 1, Bad = 5))
 frtable(x)
 
 
-# Defining missing values (without labels)
-x <- labelled_spss(values, labels = c(Good = 1, Bad = 5), na_values = 9)
+# Defining missing values
+na_values(x) <- 9
 frtable(x)
 
 
 # Defined missing values with labels
-x <- labelled_spss(values, labels = c(Good = 1, Bad = 5, DK = 9), na_values = 9)
+x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
+na_values(x) <- 9
 frtable(x)
 
 
@@ -84,7 +85,8 @@ tags <- tagged_na('a', 'b')
 values <- sample(c(1:5, -9, tags), 215, replace = TRUE)
 labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], NR = tags[2])
 
-x <- labelled_spss(values, labels = labels, na_values = c(-9, tags))
+x <- labelled(values, labels = labels)
+na_values(x)  <- c(-9, tags)
 frtable(x, values = TRUE)
 
 }
