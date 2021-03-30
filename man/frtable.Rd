@@ -1,6 +1,6 @@
-\name{fretable}
+\name{frtable}
+\alias{frtable}
 \alias{fretable}
-\alias{fretab}
 
 \title{Frequency table}
 
@@ -9,7 +9,7 @@ Presents the usual frequency distributions from a frequency table.
 }
 
 \usage{
-fretable(x, values = FALSE)
+frtable(x, values = FALSE)
 }
 
 \arguments{
@@ -45,38 +45,38 @@ just a sequence of numbers.
 \examples{
 # a pure categorical variable
 x <- factor(sample(letters[1:5], 215, replace = TRUE))
-fretable(x)
+frtable(x)
 
 
 # simulate number of children
 x <- sample(0:4, 215, replace = TRUE)
-fretable(x)
+frtable(x)
 
 library(haven)
 values <- sample(c(1:5, 9), 215, replace = TRUE)
 x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
-fretable(x)
+frtable(x)
 
 
 # Defining missing values (without labels)
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5), na_values = 9)
-fretable(x)
+frtable(x)
 
 
 # Defined missing values with labels
 x <- labelled_spss(values, labels = c(Good = 1, Bad = 5, DK = 9), na_values = 9)
-fretable(x)
+frtable(x)
 
 
 # Printing both values and labels
-fretable(x, values = TRUE)
+frtable(x, values = TRUE)
 
 
 # Using tagged_na values (similar to Stata or SAS)
 values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
 
 x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = tagged_na('a')))
-fretable(x, values = TRUE)
+frtable(x, values = TRUE)
 
 
 # And even a combination between tagged_na() and labelled_spss()
@@ -85,7 +85,7 @@ values <- sample(c(1:5, -9, tags), 215, replace = TRUE)
 labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], NR = tags[2])
 
 x <- labelled_spss(values, labels = labels, na_values = c(-9, tags))
-fretable(x, values = TRUE)
+frtable(x, values = TRUE)
 
 }
 

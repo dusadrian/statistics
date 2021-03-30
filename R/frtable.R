@@ -1,4 +1,4 @@
-`fretable` <- function(x, values = FALSE) {
+`frtable` <- function(x, values = FALSE) {
     
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
@@ -44,11 +44,11 @@
 
     attr(res, "values") <- values
     attr(res, "vallab") <- vallab
-    class(res) <- c("fretable", "data.frame")
+    class(res) <- c("frtable", "data.frame")
     return(res)
 }
 
-`print.fretable` <- function(x, force = FALSE, ...) {
+`print.frtable` <- function(x, force = FALSE, ...) {
     
     values <- attr(x, "values")
     vallab <- attr(x, "vallab")
@@ -132,9 +132,9 @@
 
 
 
-`fretab` <- function(...) {
-    .Deprecated(msg = "Function fretab() is deprecated, and has been renamed to fretable()\n")
-    fretable(...)
+`fretable` <- function(...) {
+    .Deprecated(msg = "Function fretable() is deprecated, and has been renamed to frtable()\n")
+    frtable(...)
 }
 
 

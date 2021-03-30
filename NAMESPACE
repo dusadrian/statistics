@@ -15,7 +15,7 @@ export(
     dbinoms,
     dfcalc,
     fmode,
-    fretab,
+    frtable,
     fretable,
     hclr,
     histc,
@@ -33,5 +33,5 @@ export(
 )
 
 S3method(print, "anovaFK")
-S3method(print, "fretable")
+S3method(print, "frtable")
 S3method(print, "usage")
