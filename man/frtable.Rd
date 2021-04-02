@@ -70,25 +70,32 @@ na_values(x) <- 9
 frtable(x)
 
 
-# Printing both values and labels
-frtable(x, values = TRUE)
+# Printing without values
+frtable(x, values = FALSE)
 
 
 # Using tagged_na values (similar to Stata or SAS)
 values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
 
 x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = tagged_na('a')))
-frtable(x, values = TRUE)
+frtable(x)
 
 
-# And even a combination between tagged_na() and labelled_spss()
+# And even a combination between tagged_na() and labelled()
 tags <- tagged_na('a', 'b')
 values <- sample(c(1:5, -9, tags), 215, replace = TRUE)
 labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tags[1], NR = tags[2])
 
 x <- labelled(values, labels = labels)
 na_values(x)  <- c(-9, tags)
-frtable(x, values = TRUE)
+frtable(x)
+
+
+# An example containing all possible missing values
+values <- sample(c(1:5, -9, tags, NA), 215, replace = TRUE)
+x <- labelled(values, labels = labels)
+na_values(x)  <- c(-9, tags)
+frtable(x)
 
 }
 
