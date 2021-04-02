@@ -1,7 +1,7 @@
-\name{fmode}
+\name{frmode}
 
+\alias{frmode}
 \alias{fmode}
-\alias{mod}
 
 \title{Calculates the mode of a variable}
 
@@ -11,11 +11,11 @@ but it is based on the values "f"requencies.
 }
 
 \usage{
-fmode(x)
+frmode(x)
 }
 
 \arguments{
-    \item{x}{A vector of any type.}
+    \item{x}{A factor, or a numeric / character vector.}
 }
 
 \value{
@@ -29,16 +29,16 @@ Adrian Dusa
 
 \examples{
 age <- sample(18:93, 150, replace = TRUE)
-fmode(age)
+frmode(age)
 
 # gender as a categorical variable
 gender <- factor(sample(c("Male", "Female"), 100, replace = TRUE))
 
 # the modal category
-fmode(gender)
+frmode(gender)
 
 # the modal value
-fmode(as.numeric(gender))
+frmode(as.numeric(gender))
 }
 
 \keyword{functions}

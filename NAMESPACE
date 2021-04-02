@@ -15,6 +15,7 @@ export(
     dbinoms,
     dfcalc,
     fmode,
+    frmode,
     frtable,
     fretable,
     hclr,

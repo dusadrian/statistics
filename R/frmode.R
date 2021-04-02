@@ -1,4 +1,4 @@
-`fmode` <- function(x) {
+`frmode` <- function(x) {
     tbl <- table(x)
     fmode <- names(tbl[which.max(tbl)])
     if (admisc::possibleNumeric(fmode)) {
@@ -9,7 +9,7 @@
 
 
 
-`mod` <- function(...) {
-    .Deprecated(msg = "Function mod() is deprecated, and has been renamed to fmode()\n")
+`fmode` <- function(...) {
+    .Deprecated(msg = "Function fmode() is deprecated, and has been renamed to frmode()\n")
     fmode(...)
 }
