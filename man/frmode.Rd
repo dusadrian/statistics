@@ -3,11 +3,11 @@
 \alias{frmode}
 \alias{fmode}
 
-\title{Calculates the mode of a variable}
+\title{Calculates the (frequency) mode of a variable}
 
 \description{
 The mode of a variable can be calculated for any level of measurement,
-but it is based on the values "f"requencies.
+but it is based on the values' "fr"equencies.
 }
 
 \usage{
