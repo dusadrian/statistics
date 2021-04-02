@@ -68,7 +68,7 @@
             splitvar <- data[, split.by[i]]
 
             if (is.element("haven_labelled", class(splitvar))) {
-                splitvar <- statistics::rm_labels(splitvar)
+                splitvar <- suppressMessages(labelled::remove_labels(splitvar))
                 xtag <- haven::is_tagged_na(splitvar)
                 ntag <- haven::na_tag(splitvar)
                 splitvar[xtag] <- paste0(".", ntag[xtag])

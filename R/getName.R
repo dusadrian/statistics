@@ -51,7 +51,7 @@ function(x) {
             stopindex <- ifelse(identical(condsplit[stindex - 1], "["), stindex - 2, stindex - 1)
             
             # determine if what remains is a number or a name
-            if (possibleNumeric_statistics(ptn)) {
+            if (admisc::possibleNumeric(ptn)) {
                 # it's a number (an index)
                 # see if it has column names
                 
@@ -88,7 +88,7 @@ function(x) {
                     
                     if (ptnfound) {
                         # check if it's a number
-                        if (possibleNumeric_statistics(ptn)) {
+                        if (admisc::possibleNumeric(ptn)) {
                             result <- eval.parent(parse(text=paste("colnames(", filename, ")[", ptn, "]", sep="")), n = n)
                         }
                         else {

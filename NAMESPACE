@@ -1,5 +1,6 @@
 
 import(haven)
+import(labelled)
 import(admisc)
 importFrom("grDevices", "dev.new", "hcl", "dev.cur")
 importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
@@ -21,14 +22,14 @@ export(
     hclr,
     histc,
     mbinom,
-    mod,
     sbinom,
     spooled,
     t_testAB,
     using,
 
     unique_labelled,
-    rm_labels,
+    sort_labelled,
+    names_values,
     get_labels,
     getName_statistics
 )

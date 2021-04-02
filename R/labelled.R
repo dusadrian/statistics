@@ -1,11 +1,94 @@
-`unique_labelled` <- function(x) {
+`sort_labelled` <- function(x) {
+
+    if (!is.element("haven_labelled", class(x))) {
+        cat("\n")
+        stop("The input should be a labelled vector.\n\n", call. = FALSE)
+    }
+
+    attrx <- attributes(x)
+    attributes(x) <- NULL
+
+    tagged <- logical(length(x))
+
+    tags <- c()
+    if (is.double(x)) {
+        tagged <- haven::is_tagged_na(x)
+        if (any(tagged)) {
+            tags <- haven::tagged_na(sort(haven::na_tag(x[tagged])))
+        }
+    }
+
+    xmis <- logical(length(x))
+    xmis <- xmis | (is.element(x, attrx$na_values[!is_tagged_na(attrx$na_values)]) & !tagged)
+
+    na_range <- attrx$na_range
+
+    if (!is.null(na_range)) {
+        xmis <- xmis | ((x <= na_range[1] | x >= na_range[2]) & !tagged)
+    }
+
+    truena <- is.na(x) & !xmis & !tagged
+
+    # > c(x[!xmis], x[xmis])
+    # Error: C stack usage  7970768 is too close to the limit
+    # therefore
     
+    result <- c(sort(x[!xmis & !truena]), sort(x[xmis & !truena]), tags, x[truena])
+    
+    attributes(result) <- attrx
+    return(result)
+
+}
+
+`unique_labelled` <- function(x, sort = FALSE) {
+
+    if (!is.element("haven_labelled", class(x))) {
+        cat("\n")
+        stop("The input should be a labelled vector.\n\n", call. = FALSE)
+    }
+
+    attrx <- attributes(x)
+    attributes(x) <- NULL
+
+    tagged <- logical(length(x))
+
+    if (is.double(x)) {
+        tagged <- haven::is_tagged_na(x)
+    }
+
+    if (any(tagged)) {
+        x[tagged] <- haven::na_tag(x[tagged])
+    }
+
+    dupx <- duplicated(x)
+    tagged <- tagged[!dupx]
+    x <- x[!dupx]
+
+    result <- rep(NA, length(unique(x)))
+
+    result[!(is.na(x) | tagged)] <- as.numeric(x[!(is.na(x) | tagged)])
+    if (any(tagged)) {
+        result[tagged] <- haven::tagged_na(x[tagged])
+    }
+    
+    attributes(result) <- attrx
+    return(result)
+}
+
+
+    
+
+
+`names_values` <- function(x) {
+
     labels <- attr(x, "labels")
     tagged <- logical(length(labels))
     
     if (is.double(labels)) {
         tagged <- haven::is_tagged_na(labels)
     }
+
+    nax <- is.na(x) & !tagged
 
     taglab <- labels[tagged]
     labels <- labels[!tagged]
@@ -15,6 +98,7 @@
         utag <- haven::na_tag(x)
         utag <- utag[!is.na(utag)]
         utag <- sort(unique(utag))
+        x <- x[!haven::is_tagged_na(x)]
     }
 
     numtag <- c()
@@ -37,9 +121,6 @@
         }
     }
 
-    if (is.double(x)) {
-        x <- x[!haven::is_tagged_na(x)]
-    }
     x <- x[!duplicated(x)]
     xmis <- logical(length(x))
 
@@ -54,8 +135,8 @@
         xmis <- xmis | x <= na_range[1] | x >= na_range[2]
     }
 
-    xnotmis <- sort(statistics::rm_labels(x[!xmis]))
-    xmis <- sort(statistics::rm_labels(x[xmis]))
+    xnotmis <- suppressMessages(sort(labelled::remove_labels(x[!xmis])))
+    xmis <- suppressMessages(sort(labelled::remove_labels(x[xmis])))
     
     if (length(xmis) > 0) {
         names(xmis) <- xmis
@@ -81,49 +162,53 @@
 }
 
 
-`rm_labels` <- function(x) {
-    y <- as.character(haven::as_factor(x, levels = "both"))
-    natag <- haven::na_tag(x)
-    
-    if (any(is.na(y))) {
-        # there are unlabelled tagged_na values
-        y[is.na(y)] <- natag[is.na(y)]
-    }
-    
-
-    labtag <- which(grepl("\\[NA\\]", y))
-
-    if (length(labtag > 0)) {
-        for (i in seq(length(labtag))) {
-            y[labtag[i]] <- gsub("\\[NA\\]", natag[labtag[i]], y[labtag[i]])
-        }
-    }
-
-    values <- gsub("\\[|\\]", "", unlist(lapply(strsplit(y, split = " "), "[[", 1)))
-    
-    numvals <- suppressWarnings(as.numeric(values))
-
-    if (any(is.na(numvals))) {
-        utags <- unique(values[is.na(numvals)])
-        for (i in seq(length(utags))) {
-            numvals[values == utags[i]] <- haven::tagged_na(utags[i])
-        }
-    }
-    
-    return(numvals)
-}
-
 
 `get_labels` <- function(x) {
+
+    if (!is.element("haven_labelled", class(x))) {
+        cat("\n")
+        stop("The input should be a labelled vector.\n\n", call. = FALSE)
+    }
+
+    # as_factor() alone is not good, if there is a tagged_na() value that
+    # does not have a label (but it is still a different missing value)
+
+    # x
+    # <labelled<double>[7]>
+    # [1]  1  2  3  4  5 .a NA
+
+    # Labels:
+    # value label
+    #     1  Good
+    #     5   Bad
+
+    # as.character(haven::as_factor(x, levels = "both"))
+    # [1] "[1] Good" "2"        "3"        "4"        "[5] Bad"  NA         NA
+
+    # while I am expecting:
+    # [1] "[1] Good" "2"        "3"        "4"        "[5] Bad"  ".a"         NA
+
+
+    tagged <- logical(length(x))
+
+    if (is.double(x)) {
+        tagged <- haven::is_tagged_na(x)
+    }
+    
+    tags <- paste0(".", haven::na_tag(x[tagged]))
+    
     y <- as.character(haven::as_factor(x, levels = "both"))
+
+
     misvals <- c()
     
     natag <- haven::na_tag(x)
-    
-    if (any(is.na(y))) {
-        # this means there are unlabelled tagged_na values
-        y[is.na(y)] <- paste0(".", natag[is.na(y)])
+    tagged <- logical(length(x))
+
+    if (is.double(x)) {
+        tagged <- haven::is_tagged_na(x)
     }
+
 
     labtag <- which(grepl("\\[NA\\]", y))
 
@@ -142,6 +227,9 @@
 
         return(paste(x[-1], collapse = " "))
     }))
+
+    
+    labels[is.na(labels) & tagged] <- tags
     
     return(labels)
 }

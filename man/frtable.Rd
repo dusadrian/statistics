@@ -9,7 +9,7 @@ Presents the usual frequency distributions from a frequency table.
 }
 
 \usage{
-frtable(x, values = FALSE)
+frtable(x, values = TRUE)
 }
 
 \arguments{
@@ -43,6 +43,8 @@ just a sequence of numbers.
 
 
 \examples{
+library(labelled)
+
 # a pure categorical variable
 x <- factor(sample(letters[1:5], 215, replace = TRUE))
 frtable(x)
@@ -52,7 +54,6 @@ frtable(x)
 x <- sample(0:4, 215, replace = TRUE)
 frtable(x)
 
-library(haven)
 values <- sample(c(1:5, 9), 215, replace = TRUE)
 x <- labelled(values, labels = c(Good = 1, Bad = 5))
 frtable(x)

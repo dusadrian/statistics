@@ -1,4 +1,4 @@
-`frtable` <- function(x, values = FALSE) {
+`frtable` <- function(x, values = TRUE) {
     
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
     if (length(cls) == 0 | !is.atomic(x)) {
@@ -24,17 +24,27 @@
     vals <- NULL
     vallab <- NULL
     
-    if (is.factor(x)) {
-        values <- FALSE
-        vallab <- levels(x)
-    }
-    else if (is.element("haven_labelled", cls)) {
-        vallab <- unique_labelled(x)
+    if (is.element("haven_labelled", cls)) {
+        # vallab <- get_labels(sort_labelled(unique_labelled(x)))
+        # vallab <- vallab[!is.na(vallab)]
+        # x <- factor(get_labels(x), levels = vallab)
+        vallab <- names_values(x)
         x <- factor(get_labels(x), levels = names(vallab))
         misvals <- attr(vallab, "missing")
     }
+    else {
+        values <- FALSE
+        if (is.factor(x)) {
+            vallab <- levels(x)
+        }
+    }
 
     tbl <- table(x)
+    if (any(is.na(x))) {
+        tbl <- c(tbl, sum(is.na(x)))
+        names(tbl)[length(tbl)] <- "NA"
+    }
+
     res <- data.frame(fre = as.vector(tbl))
     rownames(res) <- names(tbl)
 
@@ -72,6 +82,9 @@
     if (values) {
         names(vallab)[unname(vallab) == names(vallab)] <- ""
         rnms <- paste(names(vallab), vallab, sep = " ")
+        if (identical(rownames(x)[nrow(x)], "NA")) {
+            rnms <- c(rnms, "NA")
+        }
         vallab <- vallab[is.element(vallab, misvals)]
         if (length(intersect(vallab, misvals)) > 0) {
             names(misvals)[is.element(misvals, vallab)] <- names(vallab)[is.element(vallab, misvals)]
@@ -82,12 +95,18 @@
         }
     }
     
+    
     max.nchar.cases <- max(nchar(encodeString(rnms)))
     rnms <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), rnms)
 
     if (is.null(names(misvals))) {
         names(misvals) <- misvals
     }
+
+    # if (identical(rownames(x)[nrow(x)], "NA")) {
+    #     misvals <- c(misvals, "NA")
+    # }
+
     misvals <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), names(misvals))
 
     sums <- colSums(x[, 1:3])
