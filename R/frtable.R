@@ -25,11 +25,11 @@
     vallab <- NULL
     
     if (is.element("haven_labelled", cls)) {
-        # vallab <- get_labels(sort_labelled(unique_labelled(x)))
+        # vallab <- to_labels(unique_labelled(x, sort = TRUE))
         # vallab <- vallab[!is.na(vallab)]
-        # x <- factor(get_labels(x), levels = vallab)
+        # x <- factor(to_labels(x), levels = vallab)
         vallab <- names_values(x)
-        x <- factor(get_labels(x), levels = names(vallab))
+        x <- factor(to_labels(x), levels = names(vallab))
         misvals <- attr(vallab, "missing")
     }
     else {

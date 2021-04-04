@@ -30,7 +30,7 @@ export(
     unique_labelled,
     sort_labelled,
     names_values,
-    get_labels,
+    to_labels,
     getName_statistics
 )
 

@@ -3,7 +3,7 @@
 \alias{unique_labelled}
 \alias{sort_labelled}
 \alias{names_values}
-\alias{get_labels}
+\alias{to_labels}
 \alias{getName_statistics}
 
 \title{Internal functions}

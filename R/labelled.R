@@ -1,48 +1,138 @@
-`sort_labelled` <- function(x) {
+`order_labelled` <- function(x, according_to = c("values", "labels"), decreasing = FALSE,
+    user_na = c("last", "first", "ignore", "na"), na_value = c("last", "first", "na")) {
 
-    if (!is.element("haven_labelled", class(x))) {
+    if (!inherits(x, "haven_labelled")) {
         cat("\n")
         stop("The input should be a labelled vector.\n\n", call. = FALSE)
     }
 
+    according_to <- match.arg(according_to)
+    user_na <- match.arg(user_na)
+    na_value = match.arg(na_value)
+
+    labels <- labelled::val_labels(x)
+    na_values <- labelled::na_values(x)
+    na_range <- labelled::na_range(x)
+
+    indexes <- seq(length(x))
+
     attrx <- attributes(x)
     attributes(x) <- NULL
 
-    tagged <- logical(length(x))
-
-    tags <- c()
     if (is.double(x)) {
         tagged <- haven::is_tagged_na(x)
-        if (any(tagged)) {
-            tags <- haven::tagged_na(sort(haven::na_tag(x[tagged])))
-        }
+    }
+    else {
+        tagged <- logical(length(x))
     }
 
-    xmis <- logical(length(x))
-    xmis <- xmis | (is.element(x, attrx$na_values[!is_tagged_na(attrx$na_values)]) & !tagged)
-
-    na_range <- attrx$na_range
+    xmis <- logical(length(x)) # user defined missing values but not tagged
+    xmis <- xmis | (is.element(x, na_values[!haven::is_tagged_na(na_values)]) & !tagged)
 
     if (!is.null(na_range)) {
         xmis <- xmis | ((x <= na_range[1] | x >= na_range[2]) & !tagged)
     }
 
     truena <- is.na(x) & !xmis & !tagged
+    basena <- indexes[truena]
+    tagged <- tagged[!truena]
+    xmis <- xmis[!truena]
+    indexes <- indexes[!truena]
 
-    # > c(x[!xmis], x[xmis])
-    # Error: C stack usage  7970768 is too close to the limit
-    # therefore
+    x <- x[!truena]
     
-    result <- c(sort(x[!xmis & !truena]), sort(x[xmis & !truena]), tags, x[truena])
+    result <- c()
+    if (na_value == "first") {
+        result <- basena
+        length(basena) <- 0
+    }
+
+    y <- x
+
+    if (is.double(labels)) {
+        taglab <- haven::is_tagged_na(labels)
+        labels[taglab] <- haven::na_tag(labels[taglab])
+    }
+
+    if (any(tagged)) {
+        y[tagged] <- haven::na_tag(x[tagged])
+    }
+
+    if (according_to == "labels") {
+        haslabels <- is.element(y, labels)
+        tagged_no_label <- !haslabels & tagged
+
+        if (any(tagged_no_label)) {
+            if (length(result) > 0) {
+                result <- c(result, indexes[tagged_no_label])
+            }
+            else {
+                basena <- c(indexes[tagged_no_label], basena)
+            }
+
+            indexes <- indexes[!tagged_no_label]
+            x <- x[!tagged_no_label]
+            y <- y[!tagged_no_label]
+            xmis <- xmis[!tagged_no_label]
+            tagged <- tagged[!tagged_no_label]
+        }
+    }
+
+    if (na_value == "na") {
+        length(basena) <- 0
+    }
     
-    attributes(result) <- attrx
+    z <- y[xmis | tagged]
+    if (according_to == "labels") {
+        haslabels <- is.element(z, labels)
+        z[haslabels] <- names(labels)[match(z[haslabels], labels)]
+    }
+    if (user_na == "first") {
+        result <- c(result, indexes[xmis | tagged][order(z, decreasing = decreasing)])
+    }
+    else if (user_na == "last") {
+        basena <- c(indexes[xmis | tagged][order(z, decreasing = decreasing)], basena)
+    }
+    
+    if (user_na != "ignore") {
+        indexes <- indexes[!xmis & !tagged]
+        x <- x[!xmis & !tagged]
+        y <- y[!xmis & !tagged]
+    }
+    
+
+    if (according_to == "labels") {
+        haslabels <- is.element(y, labels)
+        y[haslabels] <- names(labels)[match(y[haslabels], labels)]
+        result <- c(result, indexes[order(y, decreasing = decreasing)])
+    }
+    else {
+        result <- c(result, indexes[order(y, decreasing = decreasing)])
+    }
+
+    result <- c(result, basena)
     return(result)
 
+    attributes(result) <- attrx
+    return(result)
 }
 
-`unique_labelled` <- function(x, sort = FALSE) {
 
-    if (!is.element("haven_labelled", class(x))) {
+
+`sort_labelled` <- function(x, according_to = c("values", "labels"), decreasing = FALSE,
+    user_na = c("last", "first", "ignore", "na"), na_value = c("last", "first", "na")) {
+
+    # vec_sort() in package vctrs is somewhat similar, but still does not
+    # differentiate between (hence does not sort) different tagged_na values
+
+    return(x[order_labelled(x, according_to = according_to, decreasing = decreasing, user_na = user_na, na_value = na_value)])
+}
+
+
+
+`unique_labelled` <- function(x, sort = FALSE, ...) {
+
+    if (!inherits(x, "haven_labelled")) {
         cat("\n")
         stop("The input should be a labelled vector.\n\n", call. = FALSE)
     }
@@ -72,23 +162,29 @@
     }
     
     attributes(result) <- attrx
+    
+    if (sort) {
+        return(sort_labelled(result, ... = ...))
+    }
+
     return(result)
 }
 
 
-    
-
 
 `names_values` <- function(x) {
 
+    if (!inherits(x, "haven_labelled")) {
+        cat("\n")
+        stop("The input should be a labelled vector.\n\n", call. = FALSE)
+    }
+    
     labels <- attr(x, "labels")
     tagged <- logical(length(labels))
     
     if (is.double(labels)) {
         tagged <- haven::is_tagged_na(labels)
     }
-
-    nax <- is.na(x) & !tagged
 
     taglab <- labels[tagged]
     labels <- labels[!tagged]
@@ -163,73 +259,32 @@
 
 
 
-`get_labels` <- function(x) {
+`to_labels` <- function(x) {
 
-    if (!is.element("haven_labelled", class(x))) {
+    if (!inherits(x, "haven_labelled")) {
         cat("\n")
         stop("The input should be a labelled vector.\n\n", call. = FALSE)
     }
-
-    # as_factor() alone is not good, if there is a tagged_na() value that
-    # does not have a label (but it is still a different missing value)
-
-    # x
-    # <labelled<double>[7]>
-    # [1]  1  2  3  4  5 .a NA
-
-    # Labels:
-    # value label
-    #     1  Good
-    #     5   Bad
-
-    # as.character(haven::as_factor(x, levels = "both"))
-    # [1] "[1] Good" "2"        "3"        "4"        "[5] Bad"  NA         NA
-
-    # while I am expecting:
-    # [1] "[1] Good" "2"        "3"        "4"        "[5] Bad"  ".a"         NA
-
-
-    tagged <- logical(length(x))
-
     if (is.double(x)) {
         tagged <- haven::is_tagged_na(x)
     }
+    else {
+        tagged <- logical(length(x))
+    }
     
-    tags <- paste0(".", haven::na_tag(x[tagged]))
-    
-    y <- as.character(haven::as_factor(x, levels = "both"))
+    labels <- names_values(x)
+    result <- suppressMessages(labelled::remove_labels(x))
 
-
-    misvals <- c()
-    
-    natag <- haven::na_tag(x)
-    tagged <- logical(length(x))
-
-    if (is.double(x)) {
-        tagged <- haven::is_tagged_na(x)
+    if (is.double(labels)) {
+        taglab <- haven::is_tagged_na(labels)
+        labels[taglab] <- haven::na_tag(labels[taglab])
     }
 
-
-    labtag <- which(grepl("\\[NA\\]", y))
-
-    if (length(labtag) > 0) {
-        for (i in seq(length(labtag))) {
-            y[labtag[i]] <- gsub("\\[NA\\]", natag[labtag[i]], y[labtag[i]])
-        }
+    if (any(tagged)) {
+        result[tagged] <- haven::na_tag(x[tagged])
     }
-
-    xlist <- strsplit(y, split = " ")
-    values <- gsub("\\[|\\]", "", unlist(lapply(xlist, "[[", 1)))
-    labels <- unlist(lapply(xlist, function(x) {
-        if (length(x) == 1) {
-            return(x)
-        }
-
-        return(paste(x[-1], collapse = " "))
-    }))
-
     
-    labels[is.na(labels) & tagged] <- tags
+    result[is.element(result, labels)] <- names(labels)[match(result[is.element(result, labels)], labels)]
     
-    return(labels)
+    return(result)
 }
