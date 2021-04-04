@@ -179,7 +179,7 @@
         stop("The input should be a labelled vector.\n\n", call. = FALSE)
     }
     
-    labels <- attr(x, "labels")
+    labels <- labelled::val_labels(x)
     tagged <- logical(length(labels))
     
     if (is.double(labels)) {
@@ -191,15 +191,17 @@
     
     utag <- c()
     if (is.double(x)) {
-        utag <- haven::na_tag(x)
-        utag <- utag[!is.na(utag)]
-        utag <- sort(unique(utag))
-        x <- x[!haven::is_tagged_na(x)]
+        if (any(haven::is_tagged_na(x))) {
+            utag <- haven::na_tag(x)
+            utag <- utag[!is.na(utag)]
+            utag <- sort(unique(utag))
+            x <- x[!haven::is_tagged_na(x)]
+        }
     }
 
     numtag <- c()
 
-    if (length(utag > 0)) {
+    if (length(utag) > 0) {
         numtag <- haven::tagged_na(utag)
         labtag <- c()
 
@@ -220,15 +222,18 @@
     x <- x[!duplicated(x)]
     xmis <- logical(length(x))
 
-    na_values <- attr(x, "na_values")
-    na_range <- attr(x, "na_range")
+    na_values <- labelled::na_values(x)
+    na_range <- labelled::na_range(x)
+
+    attrx <- attributes(x)
+    attributes(x) <- NULL
 
     if (!is.null(na_values)) {
         xmis <- xmis | is.element(x, na_values)
     }
     
     if (!is.null(na_range)) {
-        xmis <- xmis | x <= na_range[1] | x >= na_range[2]
+        xmis <- xmis | (x >= na_range[1] & x <= na_range[2])
     }
 
     xnotmis <- suppressMessages(sort(labelled::remove_labels(x[!xmis])))
@@ -245,9 +250,11 @@
 
 
     names(xnotmis) <- xnotmis
-    for (i in seq(length(xnotmis))) {
-        if (any(isel <- labels == xnotmis[i])) {
-            names(xnotmis)[i] <- names(labels)[isel]
+    if (length(xnotmis) > 0) {
+        for (i in seq(length(xnotmis))) {
+            if (any(isel <- labels == xnotmis[i])) {
+                names(xnotmis)[i] <- names(labels)[isel]
+            }
         }
     }
 
