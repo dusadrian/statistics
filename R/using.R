@@ -74,8 +74,8 @@
                 splitvar[xtag] <- paste0(".", ntag[xtag])
             }
 
-            if (is_tagged_na(val)) {
-                val <- paste0(".", na_tag(val))
+            if (haven::is_tagged_na(val)) {
+                val <- paste0(".", haven::na_tag(val))
             }
 
             selection <- selection | splitvar == val

@@ -9,7 +9,7 @@ importFrom("stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
            "dt", "fligner.test", "lm", "na.omit", "oneway.test",
            "pnorm", "pt", "relevel", "sd", "t.test", "var")
 
-export(
+export(.onAttach,
     anovaFK,
     daria,
     dariat,
