@@ -343,7 +343,7 @@
     else {
         attr(x, "na_values") <- value
     }
-    print(x)
+    
     x
 }
 
@@ -377,23 +377,4 @@
     }
 
     return(x)
-}
-
-
-`is.na.haven_labelled` <- function(x) {
-    miss <- NextMethod()
-    val <- x
-    attributes(val) <- NULL
-
-    na_values <- attr(x, "na_values", exact = TRUE)
-    if (!is.null(na_values)) {
-        miss <- miss | val %in% na_values
-    }
-
-    na_range <- attr(x, "na_range", exact = TRUE)
-    if (!is.null(na_range)) {
-        miss <- miss | (val >= na_range[1] & val <= na_range[2])
-    }
-
-    miss
 }
