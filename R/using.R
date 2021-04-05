@@ -65,7 +65,7 @@
         for (i in seq(ncol(slexp))) {
 
             val <- slexp[r, i]
-            splitvar <- data[, split.by[i]]
+            splitvar <- data[[split.by[i]]]
 
             if (is.element("haven_labelled", class(splitvar))) {
                 splitvar <- suppressMessages(labelled::remove_labels(splitvar))
@@ -82,6 +82,8 @@
                 }
             }
 
+            attributes(splitvar) <- NULL
+            attributes(val) <- NULL
             selection <- selection | splitvar == val
         }
 
@@ -116,15 +118,9 @@
 
             return(names(x))
         }
-        else {
-            if (is.double(x)) { # condition to have tagged_na values
-                xtag <- haven::is_tagged_na(x)
-                ntag <- haven::na_tag(x)
-            }
-
-            if (inherits(x, "haven_labelled")) {
-                return(names(val_labels(x)))
-            }
+        else if (inherits(x, "haven_labelled")) {
+            vallab <- attr(x, "labels", exact = TRUE)
+            return(names(vallab[is.element(vallab, x)]))
             
             return(x)
         }

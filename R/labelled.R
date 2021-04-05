@@ -10,7 +10,7 @@
     user_na <- match.arg(user_na)
     na_value = match.arg(na_value)
 
-    labels <- labelled::val_labels(x)
+    labels <- attr(x, "labels", exact = TRUE)
     na_values <- attr(x, "na_values", exact = TRUE)
     na_range <- attr(x, "na_range", exact = TRUE)
 
@@ -179,7 +179,7 @@
         stop("The input should be a labelled vector.\n\n", call. = FALSE)
     }
     
-    labels <- labelled::val_labels(x)
+    labels <- attr(x, "labels", exact = TRUE)
     tagged <- logical(length(labels))
     
     if (is.double(labels)) {
@@ -298,28 +298,28 @@
 
 
 `missing_values` <- function(x) {
-  UseMethod("missing_values")
+    UseMethod("missing_values")
 }
 
 
 `missing_values.default` <- function(x) {
-  # return nothing
-  NULL
+    # return nothing
+    NULL
 }
 
 
 `missing_values.haven_labelled` <- function(x) {
-  attr(x, "na_values", exact = TRUE)
+    attr(x, "na_values", exact = TRUE)
 }
 
 
 `missing_values.data.frame` <- function(x) {
-  lapply(x, missing_values)
+    lapply(x, missing_values)
 }
 
 
 `missing_values<-` <- function(x, value) {
-  UseMethod("missing_values<-")
+    UseMethod("missing_values<-")
 }
 
 
@@ -338,9 +338,12 @@
 
 `missing_values<-.haven_labelled` <- function(x, value) {
     if (is.null(value)) {
+        attr(x, "na_values") <- NULL
+    }
+    else {
         attr(x, "na_values") <- value
     }
-
+    print(x)
     x
 }
 
@@ -374,4 +377,23 @@
     }
 
     return(x)
+}
+
+
+`is.na.haven_labelled` <- function(x) {
+    miss <- NextMethod()
+    val <- x
+    attributes(val) <- NULL
+
+    na_values <- attr(x, "na_values", exact = TRUE)
+    if (!is.null(na_values)) {
+        miss <- miss | val %in% na_values
+    }
+
+    na_range <- attr(x, "na_range", exact = TRUE)
+    if (!is.null(na_range)) {
+        miss <- miss | (val >= na_range[1] & val <= na_range[2])
+    }
+
+    miss
 }
