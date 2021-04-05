@@ -76,8 +76,10 @@
                 }
             }
 
-            if (haven::is_tagged_na(val)) {
-                val <- paste0(".", haven::na_tag(val))
+            if (is.double(val)) {
+                if (haven::is_tagged_na(val)) {
+                    val <- paste0(".", haven::na_tag(val))
+                }
             }
 
             selection <- selection | splitvar == val
@@ -135,7 +137,7 @@
 `print.usage` <- function(x, ...) {
     # nms <- apply(sl, 1, function(x) paste(names(x), x, sep = ":", collapse = "; "))
     
-    nms <- apply(attr(x, "split"), 1, function(x) {
+    nms <- apply(attr(x, "split", exact = TRUE), 1, function(x) {
         paste(x, collapse = ", ")
     })
 
