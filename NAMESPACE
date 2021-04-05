@@ -22,6 +22,7 @@ export(.onAttach,
     hclr,
     histc,
     mbinom,
+    missing_values,
     sbinom,
     spooled,
     t_testAB,
@@ -33,7 +34,14 @@ export(.onAttach,
     to_labels,
     getName_statistics
 )
+export("missing_values<-")
 
 S3method(print, "anovaFK")
 S3method(print, "frtable")
 S3method(print, "usage")
+S3method("missing_values<-", data.frame)
+S3method("missing_values<-", default)
+S3method("missing_values<-", haven_labelled)
+S3method(missing_values, data.frame)
+S3method(missing_values, default)
+S3method(missing_values, haven_labelled)

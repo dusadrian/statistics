@@ -5,6 +5,8 @@
 \alias{names_values}
 \alias{to_labels}
 \alias{getName_statistics}
+\alias{missing_values}
+\alias{missing_values<-}
 
 \title{Internal functions}
 
