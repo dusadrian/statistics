@@ -1,6 +1,7 @@
 `frtable` <- function(x, values = TRUE) {
     
     cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
+
     if (length(cls) == 0 | !is.atomic(x)) {
         if (is.atomic(x)) {
             if (is.character(x)) {
@@ -24,7 +25,7 @@
     vals <- NULL
     vallab <- NULL
     
-    if (is.element("haven_labelled", cls)) {
+    if (inherits(x, "haven_labelled")) {
         # vallab <- to_labels(unique_labelled(x, sort = TRUE))
         # vallab <- vallab[!is.na(vallab)]
         # x <- factor(to_labels(x), levels = vallab)
@@ -78,10 +79,14 @@
         }
     }
     
-    rnms <- rownames(x)
+    irv <- c(194, 180)
+    tick <- unlist(strsplit(rawToChar(as.raw(irv)), split = ""))
+    rnms <- gsub(tick, "'", rownames(x))
+    
     if (values) {
+
         names(vallab)[unname(vallab) == names(vallab)] <- ""
-        rnms <- paste(names(vallab), vallab, sep = " ")
+        rnms <- paste(gsub(tick, "'", names(vallab)), vallab, sep = " ")
         if (identical(rownames(x)[nrow(x)], "NA")) {
             rnms <- c(rnms, "NA")
         }
