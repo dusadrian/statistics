@@ -133,6 +133,7 @@
     for (i in seq(length(x))) {
         cat(nms[i], "\n")
         cat("-----\n")
+        print(x[[i]])
         if (i < length(x)) {
             cat("\n")
         }
