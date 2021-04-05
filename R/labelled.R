@@ -222,18 +222,18 @@
     x <- x[!duplicated(x)]
     xmis <- logical(length(x))
 
-    na_values <- labelled::na_values(x)
-    na_range <- labelled::na_range(x)
+    navalues <- attr(x, "na_values")
+    narange <- attr(x, "na_range")
 
     attrx <- attributes(x)
     attributes(x) <- NULL
 
-    if (!is.null(na_values)) {
-        xmis <- xmis | is.element(x, na_values)
+    if (!is.null(navalues)) {
+        xmis <- xmis | is.element(x, navalues)
     }
     
-    if (!is.null(na_range)) {
-        xmis <- xmis | (x >= na_range[1] & x <= na_range[2])
+    if (!is.null(narange)) {
+        xmis <- xmis | (x >= narange[1] & x <= narange[2])
     }
 
     xnotmis <- suppressMessages(sort(labelled::remove_labels(x[!xmis])))
