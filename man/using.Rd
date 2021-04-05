@@ -52,7 +52,7 @@ using(df, frtable(Gender), split.by = Area)
 using(df, mean(Age), split.by = Gender)
 
 # same, but select cases from the urban area
-using(subset(df, Area == "Urban"), mean(Age), split.by = Gender)
+using(subset(df, Area == 1), mean(Age), split.by = Gender)
 
 # mean age by gender and area
 using(df, mean(Age), split.by = Area & Gender)
