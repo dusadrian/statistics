@@ -119,9 +119,11 @@
                 xtag <- haven::is_tagged_na(x)
                 ntag <- haven::na_tag(x)
             }
-            if (inherits("haven_labelled", x)) {
+
+            if (inherits(x, "haven_labelled")) {
                 return(names(val_labels(x)))
             }
+            
             return(x)
         }
     }))
