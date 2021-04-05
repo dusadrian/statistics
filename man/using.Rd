@@ -32,8 +32,8 @@ Adrian Dusa
 \examples{
 set.seed(123)
 df <- data.frame(
-    Area = factor(sample(c("Urban", "Rural"), 123, replace = TRUE)),
-    Gender = factor(sample(c("Male", "Female"), 123, replace = TRUE)),
+    Area = labelled(sample(1:2, 123, replace = TRUE), labels = c(Urban = 1, Rural = 2)),
+    Gender = labelled(sample(1:2, 123, replace = TRUE), labels = c(Male = 1, Female = 2)),
     Age = sample(18:90, 123, replace = TRUE),
     Children = sample(0:5, 123, replace = TRUE)
 )

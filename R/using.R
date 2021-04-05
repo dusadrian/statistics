@@ -69,9 +69,11 @@
 
             if (is.element("haven_labelled", class(splitvar))) {
                 splitvar <- suppressMessages(labelled::remove_labels(splitvar))
-                xtag <- haven::is_tagged_na(splitvar)
-                ntag <- haven::na_tag(splitvar)
-                splitvar[xtag] <- paste0(".", ntag[xtag])
+                if (is.double(splitvar)) {
+                    xtag <- haven::is_tagged_na(splitvar)
+                    ntag <- haven::na_tag(splitvar)
+                    splitvar[xtag] <- paste0(".", ntag[xtag])
+                }
             }
 
             if (haven::is_tagged_na(val)) {
@@ -109,6 +111,7 @@
                     }
                 }
             }
+
             return(names(x))
         }
         else {
@@ -116,9 +119,13 @@
                 xtag <- haven::is_tagged_na(x)
                 ntag <- haven::na_tag(x)
             }
+            if (inherits("haven_labelled", x)) {
+                return(names(val_labels(x)))
+            }
             return(x)
         }
     }))
+
     return(res)
 }
 
