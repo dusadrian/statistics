@@ -81,12 +81,13 @@
     
     irv <- c(194, 180)
     tick <- unlist(strsplit(rawToChar(as.raw(irv)), split = ""))
-    rnms <- gsub(tick, "'", rownames(x))
+    
+    rnms <- gsub(paste(tick, collapse = "|"), "'", rownames(x))
     
     if (values) {
 
         names(vallab)[unname(vallab) == names(vallab)] <- ""
-        rnms <- paste(gsub(tick, "'", names(vallab)), vallab, sep = " ")
+        rnms <- paste(gsub(paste(tick, collapse = "|"), "'", names(vallab)), vallab, sep = " ")
         if (identical(rownames(x)[nrow(x)], "NA")) {
             rnms <- c(rnms, "NA")
         }
