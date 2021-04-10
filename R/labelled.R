@@ -209,7 +209,7 @@
             labtag <- haven::na_tag(taglab)
         }
 
-        names(numtag) <- paste0("NA(", utag, ")"))
+        names(numtag) <- paste0("NA(", utag, ")")
     
         for (i in seq(length(utag))) {
             if (any(isel <- labtag == utag[i])) {

@@ -80,24 +80,6 @@ values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
 x <- labelled(values, labels = c("Good" = 1, "Bad" = 5, "Don't know" = tagged_na('a')))
 frtable(x)
 
-
-# And even a combination between tagged_na() and labelled()
-tagged <- tagged_na('a', 'b')
-values <- sample(c(1:5, -9, tagged), 215, replace = TRUE)
-labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tagged[1], NR = tagged[2])
-
-x <- labelled(values, labels = labels)
-na_values(x) <- c(-9, tagged)
-frtable(x)
-
-
-# An example containing all possible missing values, tagged / labelled or not
-tagged <- tagged_na('a', 'b', 'c')
-values <- sample(c(1:5, -9, tagged, NA), 215, replace = TRUE)
-x <- labelled(values, labels = labels)
-na_values(x) <- c(-9, tagged[1:2])
-frtable(x)
-
 }
 
 \keyword{functions}
