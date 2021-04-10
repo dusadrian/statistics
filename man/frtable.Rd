@@ -60,13 +60,13 @@ frtable(x)
 
 
 # Defining missing values
-missing_values(x) <- 9
+na_values(x) <- 9
 frtable(x)
 
 
 # Defined missing values with labels
 x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
-missing_values(x) <- 9
+na_values(x) <- 9
 frtable(x)
 
 
@@ -77,7 +77,7 @@ frtable(x, values = FALSE)
 # Using tagged_na values (similar to Stata or SAS)
 values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
 
-x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = tagged_na('a')))
+x <- labelled(values, labels = c("Good" = 1, "Bad" = 5, "Don't know" = tagged_na('a')))
 frtable(x)
 
 
@@ -87,7 +87,7 @@ values <- sample(c(1:5, -9, tagged), 215, replace = TRUE)
 labels <- c(Good = 1, Bad = 5, Refuse = -9, DK = tagged[1], NR = tagged[2])
 
 x <- labelled(values, labels = labels)
-missing_values(x) <- c(-9, tagged)
+na_values(x) <- c(-9, tagged)
 frtable(x)
 
 
@@ -95,7 +95,7 @@ frtable(x)
 tagged <- tagged_na('a', 'b', 'c')
 values <- sample(c(1:5, -9, tagged, NA), 215, replace = TRUE)
 x <- labelled(values, labels = labels)
-missing_values(x) <- c(-9, tagged[1:2])
+na_values(x) <- c(-9, tagged[1:2])
 frtable(x)
 
 }

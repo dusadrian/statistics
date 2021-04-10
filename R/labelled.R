@@ -209,7 +209,7 @@
             labtag <- haven::na_tag(taglab)
         }
 
-        names(numtag) <- paste0(".", utag)
+        names(numtag) <- paste0("NA(", utag, ")"))
     
         for (i in seq(length(utag))) {
             if (any(isel <- labtag == utag[i])) {
@@ -294,87 +294,4 @@
     result[is.element(result, labels)] <- names(labels)[match(result[is.element(result, labels)], labels)]
     
     return(result)
-}
-
-
-`missing_values` <- function(x) {
-    UseMethod("missing_values")
-}
-
-
-`missing_values.default` <- function(x) {
-    # return nothing
-    NULL
-}
-
-
-`missing_values.haven_labelled` <- function(x) {
-    attr(x, "na_values", exact = TRUE)
-}
-
-
-`missing_values.data.frame` <- function(x) {
-    lapply(x, missing_values)
-}
-
-
-`missing_values<-` <- function(x, value) {
-    UseMethod("missing_values<-")
-}
-
-
-`missing_values<-.default` <- function(x, value) {
-    attrx <- attributes(x)
-    if (!is.null(value)) {
-        x <- labelled::labelled(x, attrx$labels)
-        attr(x, "label") <- attrx$label
-        attr(x, "na_range") <- attrx$na_range
-        attr(x, "na_values") <- value
-    }
-    
-    # else do nothing
-    return(x)
-}
-
-`missing_values<-.haven_labelled` <- function(x, value) {
-    if (is.null(value)) {
-        attr(x, "na_values") <- NULL
-    }
-    else {
-        attr(x, "na_values") <- value
-    }
-    
-    x
-}
-
-`missing_values<-.data.frame` <- function(x, value) {
-    if (!is.list(value)) {
-        temp <- as.list(rep(1, ncol(x)))
-        names(temp) <- names(x)
-        value <- lapply(temp, function(x) {
-            x <- value
-        })
-    }
-
-    if (!all(names(value) %in% names(x))) {
-        stop("some variables not found in x")
-    }
-
-    for (var in names(value)) {
-        if (!is.null(value[[var]])) {
-            if (mode(x[[var]]) != mode(value[[var]])) {
-                stop("`x` and `value` must be same type", call. = FALSE, domain = "R-labelled")
-            }
-
-            if (typeof(x[[var]]) != typeof(value[[var]])) {
-                mode(value[[var]]) <- typeof(x[[var]])
-            }
-        }
-    }
-
-    for (var in names(value)) {
-        missing_values(x[[var]]) <- value[[var]]
-    }
-
-    return(x)
 }

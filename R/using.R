@@ -72,13 +72,13 @@
                 if (is.double(splitvar)) {
                     xtag <- haven::is_tagged_na(splitvar)
                     ntag <- haven::na_tag(splitvar)
-                    splitvar[xtag] <- paste0(".", ntag[xtag])
+                    splitvar[xtag] <- paste0("NA(", ntag[xtag], ")")
                 }
             }
 
             if (is.double(val)) {
                 if (haven::is_tagged_na(val)) {
-                    val <- paste0(".", haven::na_tag(val))
+                    val <- paste0("NA(", haven::na_tag(val), ")")
                 }
             }
 
@@ -108,7 +108,7 @@
 
                 for (i in seq(length(we))) {
                     if (xtag[we[i]]) {
-                        names(x)[we[i]] <- paste0(".", ntag[we[i]])
+                        names(x)[we[i]] <- paste0("NA(", ntag[we[i]], ")")
                     }
                     else {
                         names(x)[we[i]] <- x

@@ -26,9 +26,6 @@
     vallab <- NULL
     
     if (inherits(x, "haven_labelled")) {
-        # vallab <- to_labels(unique_labelled(x, sort = TRUE))
-        # vallab <- vallab[!is.na(vallab)]
-        # x <- factor(to_labels(x), levels = vallab)
         vallab <- names_values(x)
         x <- factor(to_labels(x), levels = names(vallab))
         misvals <- attr(vallab, "missing")
@@ -59,6 +56,8 @@
     return(res)
 }
 
+
+
 `print.frtable` <- function(x, force = FALSE, ...) {
     
     values <- attr(x, "values")
@@ -68,14 +67,14 @@
     if (is.double(vallab)) {
         navals <- haven::na_tag(vallab)
         if (any(!is.na(navals))) {
-            vallab[!is.na(navals)] <- paste0(".", navals[!is.na(navals)])
+            vallab[!is.na(navals)] <- paste0("NA(", navals[!is.na(navals)], ")")
         }
     }
 
     if (is.double(misvals)) {
         namis <- haven::na_tag(misvals)
         if (any(!is.na(namis))) {
-            misvals[!is.na(namis)] <- paste0(".", namis[!is.na(namis)])
+            misvals[!is.na(namis)] <- paste0("NA(", namis[!is.na(namis)], ")")
         }
     }
     
@@ -103,7 +102,12 @@
     
     
     max.nchar.cases <- max(nchar(encodeString(rnms)))
-    rnms <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), rnms)
+    # rnms <- sprintf(paste0("% ", max.nchar.cases, "s"), rnms)
+    for (i in seq(length(rnms))) {
+        if (nchar(rnms[i]) < max.nchar.cases) {
+            rnms[i] <- paste(c(rep(" ", max.nchar.cases - nchar(rnms[i])), rnms[i]), collapse = "", sep = "")
+        }
+    }
 
     if (is.null(names(misvals))) {
         names(misvals) <- misvals
