@@ -47,84 +47,60 @@
             return(levels(x))
         }
         else if (is.element("haven_labelled", class(x))) {
-            return(unique_labelled(x))
+            return(to_labels(sort_labelled(unique_labelled(x))))
         }
         else if (!is.factor(x)) {
             cat("\n")
             stop(simpleError(sprintf("The split.by variable %s should be a factor or a labelled variable.\n\n", sb)))
         }
-
     })
 
+
     names(sl) <- split.by
-    slexp <- expand.grid(sl)
+    noflevels <- unlist(lapply(sl, length))
+    mbase <- c(rev(cumprod(rev(noflevels))), 1)[-1]
+    orep  <- cumprod(rev(c(rev(noflevels)[-1], 1)))
+    retmat <- sapply(seq_len(length(sl)), function(x) {
+        rep.int(rep.int(seq_len(noflevels[x]) - 1, rep.int(mbase[x], noflevels[x])), orep[x]) + 1
+    })
+    
+    # slexp <- expand.grid(sl, stringsAsFactors = FALSE)
+
+    slexp <- retmat
+    for (i in seq(length(sl))) {
+        slexp[, i] <- sl[[i]][retmat[, i]]
+    }
+    
     res <- vector(mode = "list", length = nrow(slexp))
 
     for (r in seq(nrow(slexp))) {
-        selection <- logical(nrow(data))
-        for (i in seq(ncol(slexp))) {
+        selection <- rep(TRUE, nrow(data))
 
-            val <- slexp[r, i]
-            splitvar <- data[[split.by[i]]]
+        for (c in seq(ncol(slexp))) {
+            val <- slexp[r, c]
+            splitvar <- data[[split.by[c]]]
 
             if (is.element("haven_labelled", class(splitvar))) {
-                splitvar <- suppressMessages(labelled::remove_labels(splitvar))
-                if (is.double(splitvar)) {
-                    xtag <- haven::is_tagged_na(splitvar)
-                    ntag <- haven::na_tag(splitvar)
-                    splitvar[xtag] <- paste0("NA(", ntag[xtag], ")")
-                }
+                splitvar <- to_labels(splitvar)
             }
 
-            if (is.double(val)) {
-                if (haven::is_tagged_na(val)) {
-                    val <- paste0("NA(", haven::na_tag(val), ")")
-                }
-            }
-
-            attributes(splitvar) <- NULL
-            attributes(val) <- NULL
-            selection <- selection | splitvar == val
+            selection <- selection & (splitvar == val)
+            
         }
 
-        cdata <- subset(data, selection)
-
-        res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
+        if (sum(selection == 0)) {
+            res[[r]] <- NULL
+        }
+        else {
+            cdata <- subset(data, selection)
+            res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
+        }
     }
 
+    
 
     class(res) <- "usage"
-    attr(res, "split") <- expand.grid(lapply(sl, function(x) {
-
-        if (!is.null(names(x))) {
-            if (length(we <- which(names(x) == "")) > 0) {
-                xtag <- logical(length(x))
-                ntag <- x
-
-                if (is.double(x)) { # condition to have tagged_na values
-                    xtag <- haven::is_tagged_na(x)
-                    ntag <- haven::na_tag(x)
-                }
-
-                for (i in seq(length(we))) {
-                    if (xtag[we[i]]) {
-                        names(x)[we[i]] <- paste0("NA(", ntag[we[i]], ")")
-                    }
-                    else {
-                        names(x)[we[i]] <- x
-                    }
-                }
-            }
-
-            return(names(x))
-        }
-        else if (inherits(x, "haven_labelled")) {
-            vallab <- attr(x, "labels", exact = TRUE)
-            return(names(vallab[is.element(vallab, x)]))
-            
-            return(x)
-        }
-    }))
+    attr(res, "split") <- slexp
 
     return(res)
 }
@@ -140,7 +116,14 @@
     for (i in seq(length(x))) {
         cat(nms[i], "\n")
         cat("-----\n")
-        print(x[[i]])
+        
+        if (is.null(x[[i]])) {
+            cat("No data.\n")
+        }
+        else {
+            print(x[[i]])
+        }
+        
         if (i < length(x)) {
             cat("\n")
         }
