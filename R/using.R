@@ -38,22 +38,26 @@
         stop(simpleError("One or more split.by variables not found in the data.\n\n"))
     }
 
+    
 
     # split by levels
     sl <- lapply(split.by, function(sb) {
         x <- data[[sb]]
-
+        
         if (is.factor(x)) {
             return(levels(x))
         }
-        else if (is.element("haven_labelled", class(x))) {
-            return(to_labels(sort_labelled(unique_labelled(x))))
-        }
-        else if (!is.factor(x)) {
+        else {
+            if (inherits(x, "haven_labelled")) {
+                return(to_labels(unique_labelled(x, sort = TRUE)))
+            }
+        
             cat("\n")
             stop(simpleError(sprintf("The split.by variable %s should be a factor or a labelled variable.\n\n", sb)))
         }
+        
     })
+
 
 
     names(sl) <- split.by
@@ -70,6 +74,8 @@
     for (i in seq(length(sl))) {
         slexp[, i] <- sl[[i]][retmat[, i]]
     }
+
+    
     
     res <- vector(mode = "list", length = nrow(slexp))
 
@@ -80,15 +86,14 @@
             val <- slexp[r, c]
             splitvar <- data[[split.by[c]]]
 
-            if (is.element("haven_labelled", class(splitvar))) {
+            if (inherits(splitvar, "haven_labelled")) {
                 splitvar <- to_labels(splitvar)
             }
 
             selection <- selection & (splitvar == val)
-            
         }
-
-        if (sum(selection == 0)) {
+        
+        if (sum(selection) == 0) {
             res[[r]] <- NULL
         }
         else {
@@ -97,7 +102,6 @@
         }
     }
 
-    
 
     class(res) <- "usage"
     attr(res, "split") <- slexp

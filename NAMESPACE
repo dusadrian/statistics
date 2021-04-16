@@ -1,7 +1,7 @@
 
+import(admisc)
 import(haven)
 import(labelled)
-import(admisc)
 importFrom("grDevices", "dev.new", "hcl", "dev.cur")
 importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
            "par", "plot", "polygon", "segments", "text")
@@ -9,7 +9,8 @@ importFrom("stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
            "dt", "fligner.test", "lm", "na.omit", "oneway.test",
            "pnorm", "pt", "relevel", "sd", "t.test", "var")
 
-export(.onAttach,
+export(
+    .onAttach,
     anovaFK,
     daria,
     dariat,
@@ -26,14 +27,36 @@ export(.onAttach,
     spooled,
     t_testAB,
     using,
-
-    unique_labelled,
-    sort_labelled,
-    names_values,
-    to_labels,
-    getName_statistics
+    getName_statistics,
+        
+    .a,
+    .b,
+    .c,
+    .d,
+    .e,
+    .f,
+    .g,
+    .h,
+    .i,
+    .j,
+    .k,
+    .l,
+    .m,
+    .n,
+    .o,
+    .p,
+    .q,
+    .r,
+    .s,
+    .t,
+    .u,
+    .v,
+    .w,
+    .x,
+    .y,
+    .z
 )
 
-S3method(print, "anovaFK")
-S3method(print, "frtable")
-S3method(print, "usage")
+S3method(print, anovaFK)
+S3method(print, frtable)
+S3method(print, usage)

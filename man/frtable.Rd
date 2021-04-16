@@ -2,7 +2,7 @@
 \alias{frtable}
 \alias{fretable}
 
-\title{Frequency table}
+\title{Create a frequency table}
 
 \description{
 Presents the usual frequency distributions from a frequency table.

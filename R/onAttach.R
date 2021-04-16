@@ -1,36 +1,43 @@
 .onAttach <- function(...) {
-    core <- c("haven", "labelled", "admisc")
+    core <- c("admisc", "labelled", "haven")
     
     # code borrowed from package tidyverse
     
     # Attach the package from the same package library it was
     # loaded from before. https://github.com/tidyverse/tidyverse/issues/171
-    same_library <- function(pkg) {
-        loc <- if (pkg %in% loadedNamespaces()) dirname(getNamespaceInfo(pkg, "path"))
-        do.call(
-            "library",
-            list(pkg, lib.loc = loc, character.only = TRUE, warn.conflicts = FALSE)
+    load_library <- function(pkg) {
+        if (pkg %in% loadedNamespaces()) {
+            loc <- dirname(getNamespaceInfo(pkg, "path"))
+            do.call(
+                "library",
+                list(pkg, lib.loc = loc, character.only = TRUE, warn.conflicts = FALSE)
+            )
+        }
+    }
+    
+    not_yet_loaded <- core[!is.element(paste0("package:", core), search())]
+
+    if (length(not_yet_loaded) > 0) {
+
+        packageStartupMessage(
+            paste("Also attaching packages:", paste(not_yet_loaded, collapse = ", "))
+        )
+
+        suppressPackageStartupMessages(
+            lapply(not_yet_loaded, load_library)
         )
     }
 
-    core_unloaded <- function() {
-        search <- paste0("package:", core)
-        core[!search %in% search()]
+    env <- asNamespace("haven")
+    if (do.call("unlockEnvironment", list(env = env))) {
+        do.call("unlockBinding", list(sym = "format_tagged_na", env = env))
+        env$format_tagged_na <- function(x, digits = getOption("digits")) {
+            out <- format(vctrs::vec_data(x), digits = digits)
+            out[is_tagged_na(x)] <- paste0(".", na_tag(x)[is_tagged_na(x)])
+            format(out, justify = "right")
+        }
     }
-    
-    to_load <- core_unloaded()
-    if (length(to_load) == 0) {
-        return(invisible())
-    }
 
-    packageStartupMessage(
-        paste("Attaching packages:", paste(to_load, collapse = ", "))
-    )
-
-    suppressPackageStartupMessages(
-        lapply(to_load, same_library)
-    )
-
-    invisible()
+    return(invisible())
 
 }
