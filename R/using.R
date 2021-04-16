@@ -102,42 +102,46 @@
         }
     }
 
-    if (!all(unlist(lapply(res, is.atomic)))) {
-        attr(res, "split") <- slexp
-        class(res) <- "usage"
-        return(res)
+    if (all(unlist(lapply(res, is.atomic)))) {
+        result <- matrix(unlist(res), nrow = length(res), byrow = TRUE)
+        colnames(result) <- names(res[[1]])
+        rownames(result) <- apply(slexp, 1, function(x) paste(x, collapse = ", "))
+        res <- result
     }
-
-    result <- matrix(unlist(res), nrow = length(res), byrow = TRUE)
-    colnames(result) <- names(res[[1]])
-    rownames(result) <- apply(slexp, 1, function(x) paste(x, collapse = ", "))
+    else {
+        attr(res, "split") <- slexp
+    }
     
-    print(round(result, 1))
-
-    return(invisible(result))
+    class(res) <- "usage"
+    return(res)
 }
 
 
 `print.usage` <- function(x, ...) {
     # nms <- apply(sl, 1, function(x) paste(names(x), x, sep = ":", collapse = "; "))
-    
-    nms <- apply(attr(x, "split", exact = TRUE), 1, function(x) {
-        paste(x, collapse = ", ")
-    })
+    if (is.list(x)) {
+        nms <- apply(attr(x, "split", exact = TRUE), 1, function(x) {
+            paste(x, collapse = ", ")
+        })
 
-    for (i in seq(length(x))) {
-        cat(nms[i], "\n")
-        cat("-----\n")
-        
-        if (is.null(x[[i]])) {
-            cat("No data.\n")
+        for (i in seq(length(x))) {
+            cat(nms[i], "\n")
+            cat("-----\n")
+            
+            if (is.null(x[[i]])) {
+                cat("No data.\n")
+            }
+            else {
+                print(x[[i]])
+            }
+            
+            if (i < length(x)) {
+                cat("\n")
+            }
         }
-        else {
-            print(x[[i]])
-        }
-        
-        if (i < length(x)) {
-            cat("\n")
-        }
+    }
+    else if (is.matrix(x)) {
+        class(x) <- setdiff(class(x), "usage")
+        print(round(x, 1))
     }
 }
