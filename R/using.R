@@ -102,11 +102,19 @@
         }
     }
 
+    if (!all(unlist(lapply(res, is.atomic)))) {
+        attr(res, "split") <- slexp
+        class(res) <- "usage"
+        return(res)
+    }
 
-    class(res) <- "usage"
-    attr(res, "split") <- slexp
+    result <- matrix(unlist(res), nrow = length(res), byrow = TRUE)
+    colnames(result) <- names(res[[1]])
+    rownames(result) <- apply(slexp, 1, function(x) paste(x, collapse = ", "))
+    
+    print(round(result, 1))
 
-    return(res)
+    return(invisible(result))
 }
 
 
