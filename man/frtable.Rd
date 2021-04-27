@@ -43,7 +43,6 @@ just a sequence of numbers.
 
 
 \examples{
-library(labelled)
 
 # a pure categorical variable
 x <- factor(sample(letters[1:5], 215, replace = TRUE))
@@ -54,19 +53,20 @@ frtable(x)
 x <- sample(0:4, 215, replace = TRUE)
 frtable(x)
 
-values <- sample(c(1:5, 9), 215, replace = TRUE)
-x <- labelled(values, labels = c(Good = 1, Bad = 5))
+values <- sample(c(1:7, 99), 215, replace = TRUE)
+x <- labelled(values, labels = c("Good" = 1, "Bad" = 7))
 frtable(x)
 
 
 # Defining missing values
-na_values(x) <- 9
+missing_values(x) <- 99
 frtable(x)
 
 
 # Defined missing values with labels
-x <- labelled(values, labels = c(Good = 1, Bad = 5, DK = 9))
-na_values(x) <- 9
+values <- sample(c(1:7, 99), 215, replace = TRUE)
+x <- labelled(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = 99))
+missing_values(x) <- 99
 frtable(x)
 
 
@@ -74,10 +74,14 @@ frtable(x)
 frtable(x, values = FALSE)
 
 
-# Using tagged_na values (similar to Stata or SAS)
-values <- sample(c(1:5, tagged_na('a')), 215, replace = TRUE)
+# The value 99 is not considered when calculating an average
+mean(x, na.rm = TRUE)
 
-x <- labelled(values, labels = c("Good" = 1, "Bad" = 5, "Don't know" = tagged_na('a')))
+
+# Using tagged missing values (similar to Stata or SAS)
+values <- sample(c(1:7, .a), 215, replace = TRUE)
+
+x <- labelled(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = .a))
 frtable(x)
 
 }

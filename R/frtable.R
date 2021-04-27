@@ -64,18 +64,17 @@
     vallab <- attr(x, "vallab")
     misvals <- attr(vallab, "missing")
 
-    if (is.double(vallab)) {
-        navals <- haven::na_tag(vallab)
-        if (any(!is.na(navals))) {
-            vallab[!is.na(navals)] <- paste0("NA(", navals[!is.na(navals)], ")")
-        }
+    
+    if (any(has_tag(vallab))) {
+        navals <- get_tag(vallab)
+        # vallab[!is.na(navals)] <- paste0("NA(", navals[!is.na(navals)], ")")
+        vallab[!is.na(navals)] <- paste0(".", navals[!is.na(navals)])
     }
 
-    if (is.double(misvals)) {
-        namis <- haven::na_tag(misvals)
-        if (any(!is.na(namis))) {
-            misvals[!is.na(namis)] <- paste0("NA(", namis[!is.na(namis)], ")")
-        }
+    if (any(has_tag(misvals))) {
+        namis <- get_tag(misvals)
+        # misvals[!is.na(namis)] <- paste0("NA(", namis[!is.na(namis)], ")")
+        misvals[!is.na(namis)] <- paste0(".", namis[!is.na(namis)])
     }
     
     irv <- c(194, 180)
@@ -84,7 +83,6 @@
     rnms <- gsub(paste(tick, collapse = "|"), "'", rownames(x))
     
     if (values) {
-
         names(vallab)[unname(vallab) == names(vallab)] <- ""
         rnms <- paste(gsub(paste(tick, collapse = "|"), "'", names(vallab)), vallab, sep = " ")
         if (identical(rownames(x)[nrow(x)], "NA")) {

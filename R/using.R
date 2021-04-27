@@ -37,7 +37,6 @@
         cat("\n")
         stop(simpleError("One or more split.by variables not found in the data.\n\n"))
     }
-
     
 
     # split by levels
@@ -59,7 +58,6 @@
     })
 
 
-
     names(sl) <- split.by
     noflevels <- unlist(lapply(sl, length))
     mbase <- c(rev(cumprod(rev(noflevels))), 1)[-1]
@@ -74,8 +72,6 @@
     for (i in seq(length(sl))) {
         slexp[, i] <- sl[[i]][retmat[, i]]
     }
-
-    
     
     res <- vector(mode = "list", length = nrow(slexp))
 
@@ -101,11 +97,28 @@
             res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
         }
     }
-
+    
     if (all(unlist(lapply(res, is.atomic)))) {
-        result <- matrix(unlist(res), nrow = length(res), byrow = TRUE)
-        colnames(result) <- names(res[[1]])
+
+        # all are vectors (e.g. from summary) but lengths can differ
+        # if one subset has NAs and others not
+        lengths <- unlist(lapply(res, length))
+        result <- matrix(NA, nrow = length(res), ncol = max(lengths))
+        for (i in seq(length(res))) {
+            result[i, seq(length(res[[i]]))] <- res[[i]]
+        }
+        
+        for (i in seq(ncol(slexp))) {
+            slexp[, i] <- format(slexp[, i], justify = "right")
+        }
         rownames(result) <- apply(slexp, 1, function(x) paste(x, collapse = ", "))
+
+        if (max(lengths) == 1) {
+            colnames(result) <- as.character(as.list(expr)[[1]])
+        }
+        else {
+            colnames(result) <- names(res[[which.max(lengths)]])
+        }
         res <- result
     }
     else {
@@ -142,6 +155,27 @@
     }
     else if (is.matrix(x)) {
         class(x) <- setdiff(class(x), "usage")
-        print(round(x, 1))
+        
+        x[] <- gsub("NA", "", prettyNum(round(x, 3)))
+        
+        for (i in seq(ncol(x))) {
+            splitcol <- strsplit(x[, i], split = "[.]")
+            nchars <- unlist(lapply(lapply(splitcol, "[", 2), nchar))
+            if (!all(is.na(nchars))) {
+                maxnchar <- max(nchars, na.rm = TRUE)
+                x[, i] <- unlist(lapply(splitcol, function(x) {
+                    if (length(x) == 1) {
+                        x <- c(x, paste(c(rep("0", maxnchar)), collapse = ""))
+                    }
+                    else if (length(x) == 2) {
+                        x[2] <- paste(x[2], paste(rep("0", maxnchar - nchar(x[2])), collapse = ""), sep = "")
+                    }
+                    return(paste(x, collapse = "."))
+                }))
+            }
+        }
+        
+        colnames(x) <- format(colnames(x), justify = "right")
+        print(noquote(format(x, justify = "right", width = max(nchar(colnames(x))))))
     }
 }

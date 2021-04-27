@@ -1,6 +1,6 @@
 Package: statistics
-Version: 0.6
-Date: 2020-10-04
+Version: 0.7
+Date: 2021-04-18
 Title: Miscellanea functions for the Intro Stats class
 Authors@R: person(given = "Adrian", family = "Dusa",
                   role = c("aut", "cre", "cph"),
@@ -9,7 +9,7 @@ Authors@R: person(given = "Adrian", family = "Dusa",
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 LazyData: yes
-Imports: admisc (>= 0.15), vctrs, labelled, haven
+Imports: admisc (>= 0.15), vctrs, haven (>= 2.3.1), mixed
 Description: The majority of functions in this package are designed to facilitate
  undestanding the statistical concepts taught in the class (such as the functions to
  create graphics or areas under the normal curve), while some are designed to ease
