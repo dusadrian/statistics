@@ -1,6 +1,14 @@
 `histc` <-
 function(x, from, to, size = 15, ...) {
-    
+
+    if (!is.atomic(x) || !is.numeric(x)) {
+        cat("\n")
+        stop(simpleError("`x` should be a numerical vector.\n\n"))
+    }
+
+    x <- unclass(x)
+    x <- x[!is.na(x)]
+
     other.args <- list(...)
     funargs <- unlist(lapply(match.call(), deparse)[-1])
     if (dev.cur() == 1) {
