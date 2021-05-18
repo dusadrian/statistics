@@ -48,7 +48,7 @@
         }
         else {
             if (inherits(x, "haven_labelled")) {
-                return(to_labels(unique_labelled(x, sort = TRUE)))
+                return(to_labels(unique(x, sort = TRUE)))
             }
         
             cat("\n")
@@ -156,7 +156,14 @@
     else if (is.matrix(x)) {
         class(x) <- setdiff(class(x), "usage")
         
-        x[] <- gsub("NA", "", prettyNum(round(x, 3)))
+        if (ncol(x) == 1) {
+            x[] <- prettyNum(round(x, 3))
+        }
+        else if (ncol(x) > 1) {
+            # for instance summary() has an additional column to count NAs
+            # but not all groups might have NAs when using split.by
+            x[] <- gsub("NA", "", prettyNum(round(x, 3)))
+        }
         
         for (i in seq(ncol(x))) {
             splitcol <- strsplit(x[, i], split = "[.]")

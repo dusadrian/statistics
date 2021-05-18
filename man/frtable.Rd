@@ -59,14 +59,14 @@ frtable(x)
 
 
 # Defining missing values
-missing_values(x) <- 99
+na_values(x) <- 99
 frtable(x)
 
 
 # Defined missing values with labels
 values <- sample(c(1:7, 99), 215, replace = TRUE)
 x <- labelled(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = 99))
-missing_values(x) <- 99
+na_values(x) <- 99
 frtable(x)
 
 
@@ -75,7 +75,7 @@ frtable(x, values = FALSE)
 
 
 # The value 99 is not considered when calculating an average
-mean(x, na.rm = TRUE)
+mean(x)
 
 
 # Using tagged missing values (similar to Stata or SAS)
