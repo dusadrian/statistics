@@ -8,7 +8,6 @@ Authors@R: person(given = "Adrian", family = "Dusa",
                   comment = c(ORCID = "0000-0002-3525-9253"))
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
-LazyData: yes
 Imports: admisc (>= 0.15), declared
 Description: The majority of functions in this package are designed to facilitate
  undestanding the statistical concepts taught in the class (such as the functions to
