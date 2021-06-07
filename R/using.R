@@ -47,18 +47,21 @@
             return(levels(x))
         }
         else {
-            if (inherits(x, "haven_labelled")) {
-                return(to_labels(unique(x, sort = TRUE)))
+
+            
+            if (inherits(x, "declared")) {
+                return(sort(declared::to_labels(unique(x))))
             }
         
             cat("\n")
-            stop(simpleError(sprintf("The split.by variable %s should be a factor or a labelled variable.\n\n", sb)))
+            stop(simpleError(sprintf("The split.by variable %s should be a factor or a declared variable.\n\n", sb)))
         }
         
     })
 
 
     names(sl) <- split.by
+    
     noflevels <- unlist(lapply(sl, length))
     mbase <- c(rev(cumprod(rev(noflevels))), 1)[-1]
     orep  <- cumprod(rev(c(rev(noflevels)[-1], 1)))
@@ -82,17 +85,14 @@
             val <- slexp[r, c]
             splitvar <- data[[split.by[c]]]
 
-            if (inherits(splitvar, "haven_labelled")) {
-                splitvar <- to_labels(splitvar)
+            if (inherits(splitvar, "declared")) {
+                splitvar <- declared::to_labels(splitvar)
             }
 
             selection <- selection & (splitvar == val)
         }
         
-        if (sum(selection) == 0) {
-            res[[r]] <- NULL
-        }
-        else {
+        if (sum(selection) > 0) {
             cdata <- subset(data, selection)
             res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
         }
@@ -104,6 +104,7 @@
         # if one subset has NAs and others not
         lengths <- unlist(lapply(res, length))
         result <- matrix(NA, nrow = length(res), ncol = max(lengths))
+        
         for (i in seq(length(res))) {
             result[i, seq(length(res[[i]]))] <- res[[i]]
         }

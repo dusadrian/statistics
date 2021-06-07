@@ -13,7 +13,7 @@ frtable(x, values = TRUE)
 }
 
 \arguments{
-  \item{x}{A categorical variable, either a factor or a \code{labelled} variable}
+  \item{x}{A categorical variable, either a factor or a \code{declared} variable}
   \item{values}{Logical, print the values in the table rows}
 }
 
@@ -28,14 +28,12 @@ limit of 15 is used). An example of such variable can be the number of children,
 where each value can be interpreted as a class, containing a single value (for
 instance 0 meaning the category of people with no children).
 
-A special type of input variables are those of class \code{haven_labelled}, which
+A special type of input variables are those of class \code{declared}, which
 are not pure factors (categorical variables in R) but they are nevertheless
 intepreted as similar to factors, and allow producing frequency tables for.
-Importing data from SPSS using the package \pkg{haven} usually produces such
-variables.
 
 The argument \code{values} makes sense only when the input is of class
-\code{haven_labelled}, otherwise for regular (base R) factors the values are
+\code{declared}, otherwise for regular (base R) factors the values are
 just a sequence of numbers.
 }
 
@@ -54,35 +52,25 @@ x <- sample(0:4, 215, replace = TRUE)
 frtable(x)
 
 values <- sample(c(1:7, 99), 215, replace = TRUE)
-x <- labelled(values, labels = c("Good" = 1, "Bad" = 7))
+x <- declared(values, labels = c("Good" = 1, "Bad" = 7))
 frtable(x)
 
 
 # Defining missing values
-na_values(x) <- 99
+missing_values(x) <- 99
 frtable(x)
 
 
 # Defined missing values with labels
 values <- sample(c(1:7, 99), 215, replace = TRUE)
-x <- labelled(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = 99))
-na_values(x) <- 99
+x <- declared(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = 99))
+missing_values(x) <- 99
 frtable(x)
 
 
 # Printing without values
 frtable(x, values = FALSE)
 
-
-# The value 99 is not considered when calculating an average
-mean(x)
-
-
-# Using tagged missing values (similar to Stata or SAS)
-values <- sample(c(1:7, .a), 215, replace = TRUE)
-
-x <- labelled(values, labels = c("Good" = 1, "Bad" = 7, "Don't know" = .a))
-frtable(x)
 
 }
 

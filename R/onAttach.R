@@ -1,5 +1,5 @@
 .onAttach <- function(...) {
-    to_load <- c("admisc", "vctrs", "haven", "mixed")
+    to_load <- c("admisc", "declared")
     
     # code borrowed from package tidyverse
     

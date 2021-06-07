@@ -1,8 +1,6 @@
 
 import(admisc)
-import(vctrs)
-import(haven)
-import(mixed)
+import(declared)
 importFrom("grDevices", "dev.new", "hcl", "dev.cur")
 importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
            "par", "plot", "polygon", "segments", "text")

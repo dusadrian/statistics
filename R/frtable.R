@@ -1,7 +1,11 @@
 `frtable` <- function(x, values = TRUE) {
     
-    cls <- intersect(class(x), c("numeric", "integer", "factor", "haven_labelled"))
-
+    if (inherits(x, "haven_labelled_spss")) {
+        x <- declared::as_declared(x)
+    }
+    
+    cls <- intersect(class(x), c("numeric", "integer", "factor", "declared"))
+    
     if (length(cls) == 0 | !is.atomic(x)) {
         if (is.atomic(x)) {
             if (is.character(x)) {
@@ -25,9 +29,9 @@
     vals <- NULL
     vallab <- NULL
     
-    if (inherits(x, "haven_labelled")) {
-        vallab <- mixed::names_values(x)
-        x <- factor(to_labels(x), levels = names(vallab))
+    if (inherits(x, "declared")) {
+        vallab <- declared::names_values(x)
+        x <- factor(declared::to_labels(x), levels = names(vallab))
         misvals <- attr(vallab, "missing")
     }
     else {
@@ -63,61 +67,6 @@
     values <- attr(x, "values")
     vallab <- attr(x, "vallab")
     misvals <- attr(vallab, "missing")
-
-    tagged <- has_tag(vallab)
-    
-    if (any(tagged)) {
-        vallab[tagged] <- mixed::get_tag(vallab[tagged])
-        # tags <- lapply(as.list(mixed::get_tag(vallab[tagged])), function(x) {
-        #     if (!is.na(suppressWarnings(as.numeric(x)))) {
-        #         x <- as.numeric(x)
-        #     }
-        #     return(x)
-        # })
-
-        # vallab[!is.na(navals)] <- paste0("NA(", navals[!is.na(navals)], ")")
-        # vallab[!is.na(navals)] <- paste0(".", navals[!is.na(navals)])
-
-        # numtags <- unlist(lapply(tags, is.numeric))
-        # if (sum(numtags) > 0) {
-        #     vallab[which(tagged)[numtags]] <- unlist(tags[numtags])
-        #     tagged[which(tagged)[numtags]] <- FALSE
-        #     tags <- unlist(tags[!numtags])
-        # }
-
-        # if (any(tagged)) {
-        #     vallab[tagged] <- paste0("NA(", tags, ")")
-        # }
-
-    }
-
-    tagged <- has_tag(misvals)
-    if (any(tagged)) {
-        misvals[tagged] <- mixed::get_tag(misvals[tagged])
-        
-        # tags <- lapply(as.list(mixed::get_tag(misvals[tagged])), function(x) {
-        #     if (!is.na(suppressWarnings(as.numeric(x)))) {
-        #         x <- as.numeric(x)
-        #     }
-        #     return(x)
-        # })
-
-        # misvals[tagged] <- tags
-        
-        # misvals[!is.na(namis)] <- paste0("NA(", namis[!is.na(namis)], ")")
-        # misvals[!is.na(namis)] <- paste0(".", namis[!is.na(namis)])
-        
-        # numtags <- unlist(lapply(tags, is.numeric))
-        # if (sum(numtags) > 0) {
-        #     misvals[which(tagged)[numtags]] <- unlist(tags[numtags])
-        #     tagged[which(tagged)[numtags]] <- FALSE
-        #     tags <- unlist(tags[!numtags])
-        # }
-
-        # if (any(tagged)) {
-        #     misvals[tagged] <- paste0("NA(", tags, ")")
-        # }
-    }
     
     irv <- c(194, 180)
     tick <- unlist(strsplit(rawToChar(as.raw(irv)), split = ""))
