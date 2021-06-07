@@ -6,7 +6,7 @@
     # Attach the package from the same package library it was
     # loaded from before. https://github.com/tidyverse/tidyverse/issues/171
     load_library <- function(pkg) {
-        if (pkg %in% loadedNamespaces()) {
+        if (pkg %in% loadedNamespaces() && !is.element(pkg, .packages())) {
             loc <- dirname(getNamespaceInfo(pkg, "path"))
             do.call(
                 "library",
