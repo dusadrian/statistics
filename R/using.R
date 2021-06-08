@@ -68,7 +68,7 @@
 
 
     names(sl) <- split.by
-    
+
     noflevels <- unlist(lapply(sl, length))
     mbase <- c(rev(cumprod(rev(noflevels))), 1)[-1]
     orep  <- cumprod(rev(c(rev(noflevels)[-1], 1)))
@@ -102,12 +102,14 @@
 
             selection <- selection & (splitvar == val)
         }
-        
+
         if (sum(selection) > 0) {
             cdata <- subset(data, selection)
             res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
         }
     }
+
+    
     
     if (all(unlist(lapply(res, is.atomic)))) {
 
@@ -117,7 +119,9 @@
         result <- matrix(NA, nrow = length(res), ncol = max(lengths))
         
         for (i in seq(length(res))) {
-            result[i, seq(length(res[[i]]))] <- res[[i]]
+            if (!is.null(res[[i]])) {
+                result[i, seq(length(res[[i]]))] <- res[[i]]
+            }
         }
         
         for (i in seq(ncol(slexp))) {
@@ -132,6 +136,7 @@
             colnames(result) <- names(res[[which.max(lengths)]])
         }
         res <- result
+
     }
     else {
         attr(res, "split") <- slexp
