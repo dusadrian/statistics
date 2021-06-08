@@ -1,8 +1,18 @@
 `frtable` <- function(x, values = TRUE) {
     
-    if (inherits(x, "haven_labelled_spss")) {
+    if (inherits(x, "haven_labelled")) {
+        if (eval(parse(text = "any(haven::is_tagged_na(x))"))) {
+            cat("\n")
+            stop(simpleError("Tagged NAs are not supported.\n\n"))
+        }
+
+        if (!inherits(x, "haven_labelled_spss")) {
+            class(x) <- c("haven_labelled_spss", class(x))
+        }
+
         x <- declared::as_declared(x)
     }
+    
     
     cls <- intersect(class(x), c("numeric", "integer", "factor", "declared"))
     

@@ -38,19 +38,27 @@
         stop(simpleError("One or more split.by variables not found in the data.\n\n"))
     }
     
-
     # split by levels
     sl <- lapply(split.by, function(sb) {
         x <- data[[sb]]
+
+        if (inherits(x, "haven_labelled")) {
+            na_values <- attr(x, "na_values")
+            if (!is.null(na_values)) {
+                x <- x[!is.element(x, na_values)]
+                labels <- attr(x, "labels", exact = TRUE)
+                attr(x, "labels") <- labels[!is.element(labels, na_values)]
+            }
+            x <- labelled::to_factor(x)
+        }
         
         if (is.factor(x)) {
             return(levels(x))
         }
         else {
-
             
             if (inherits(x, "declared")) {
-                return(sort(declared::to_labels(unique(x))))
+                return(sort(declared::to_labels(unique(x[!is.na(x)]))))
             }
         
             cat("\n")
@@ -87,6 +95,9 @@
 
             if (inherits(splitvar, "declared")) {
                 splitvar <- declared::to_labels(splitvar)
+            }
+            else if (inherits(splitvar, "haven_labelled")) {
+                splitvar <- labelled::to_character(splitvar)
             }
 
             selection <- selection & (splitvar == val)
