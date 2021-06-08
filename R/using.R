@@ -43,13 +43,7 @@
         x <- data[[sb]]
 
         if (inherits(x, "haven_labelled")) {
-            na_values <- attr(x, "na_values")
-            if (!is.null(na_values)) {
-                x <- x[!is.element(x, na_values)]
-                labels <- attr(x, "labels", exact = TRUE)
-                attr(x, "labels") <- labels[!is.element(labels, na_values)]
-            }
-            x <- labelled::to_factor(x)
+            x <- declared::as_declared(x)
         }
         
         if (is.factor(x)) {
@@ -62,7 +56,7 @@
             }
         
             cat("\n")
-            stop(simpleError(sprintf("The split.by variable %s should be a factor or a declared variable.\n\n", sb)))
+            stop(simpleError(sprintf("The split.by variable %s should be a factor or a declared / labelled variable.\n\n", sb)))
         }
         
     })
@@ -93,11 +87,12 @@
             val <- slexp[r, c]
             splitvar <- data[[split.by[c]]]
 
+            if (inherits(splitvar, "haven_labelled")) {
+                splitvar <- declared::as_declared(splitvar)
+            }
+
             if (inherits(splitvar, "declared")) {
                 splitvar <- declared::to_labels(splitvar)
-            }
-            else if (inherits(splitvar, "haven_labelled")) {
-                splitvar <- labelled::to_character(splitvar)
             }
 
             selection <- selection & (splitvar == val)
