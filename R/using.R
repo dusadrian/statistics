@@ -45,16 +45,21 @@
         if (inherits(x, "haven_labelled")) {
             x <- declared::as_declared(x)
         }
+
+        if (inherits(x, "declared")) {
+            x <- sort(unique(x)) # that gets rid of the NAs because of sort()
+            labels <- value_labels(x)
+            labels <- labels[is.element(labels, x)]
+            attributes(x) <- NULL
+            names(x) <- x
+            names(x)[match(labels, x)] <- names(labels)
+            return(names(x))
+        }
         
         if (is.factor(x)) {
             return(levels(x))
         }
         else {
-            
-            if (inherits(x, "declared")) {
-                return(sort(declared::to_labels(unique(x[!is.na(x)]))))
-            }
-        
             cat("\n")
             stop(simpleError(sprintf("The split.by variable %s should be a factor or a declared / labelled variable.\n\n", sb)))
         }
