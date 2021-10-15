@@ -25,7 +25,6 @@ export(
     spooled,
     t_testAB,
     using,
-    getName_statistics,
    .onAttach
 
 )

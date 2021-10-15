@@ -1,6 +1,6 @@
 \name{statistics-internal}
 
-\alias{getName_statistics}
+
 
 \title{Internal functions}
 

@@ -35,14 +35,12 @@
         stop(simpleError("Unsuitable input.\n\n"))
     }
 
-    misvals <- NULL
     vals <- NULL
     vallab <- NULL
     
     if (inherits(x, "declared")) {
         vallab <- declared::names_values(x)
         x <- factor(declared::to_labels(x), levels = names(vallab))
-        misvals <- attr(vallab, "missing")
     }
     else {
         values <- FALSE
@@ -82,13 +80,16 @@
     tick <- unlist(strsplit(rawToChar(as.raw(irv)), split = ""))
     
     rnms <- gsub(paste(tick, collapse = "|"), "'", rownames(x))
+    first_missing <- 0
     
     if (values) {
         names(vallab)[unname(vallab) == names(vallab)] <- ""
         rnms <- paste(gsub(paste(tick, collapse = "|"), "'", names(vallab)), vallab, sep = " ")
+        
         if (identical(rownames(x)[nrow(x)], "NA")) {
             rnms <- c(rnms, "NA")
         }
+
         vallab <- vallab[is.element(vallab, misvals)]
         if (length(intersect(vallab, misvals)) > 0) {
             names(misvals)[is.element(misvals, vallab)] <- names(vallab)[is.element(vallab, misvals)]
@@ -96,6 +97,11 @@
 
         if (!is.null(names(misvals))) {
             misvals <- paste(names(misvals), misvals, sep = " ")
+            misvals <- gsub(paste(tick, collapse = "|"), "'", misvals)
+        }
+
+        if (any(is.element(rnms, misvals))) {
+            first_missing <- which(is.element(rnms, misvals))[1]
         }
     }
     
@@ -117,6 +123,7 @@
     # }
 
     misvals <- sprintf(paste("% ", max.nchar.cases, "s", sep = ""), names(misvals))
+    
 
     sums <- colSums(x[, 1:3])
 
@@ -141,19 +148,43 @@
         stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
-    cat(paste(rep(" ", max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)), collapse = ""),
-        ifelse(sums[1] < 1000, "fre    rel   per   cpd\n", " fre    rel   per   cpd\n"))
+    cat(
+        paste(
+            rep(
+                " ",
+                max.nchar.cases + ifelse(nchar(sums[1]) > 4, nchar(sums[1]) - 4, 0)
+            ),
+            collapse = ""
+        ),
+        ifelse(
+            sums[1] < 1000,
+            "fre    rel   per   cpd\n",
+            " fre    rel   per   cpd\n"
+        )
+    )
+
     cat(separator)
+
     for (i in seq(nrow(x))) {
-        if (is.element(rnms[i], misvals)) {
+        if (first_missing == i) {
             cat(miseparator)
-            misvals <- NULL
         }
         cat(rnms[i], fres[i], rel[i], per[i], cpd[i], "\n")
     }
+
     cat(separator)
+
     # cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", sprintf(paste("% ", max(4, nchar(sums[1])), "s", sep = ""), sums[1]), " 1.000 100.0\n", sep = "")
-    cat(paste(rep(" ", max.nchar.cases), sep = ""), " ", fres[length(fres)], " 1.000 100.0\n", sep = "")
+    cat(
+        paste(
+            rep(" ", max.nchar.cases),
+            sep = ""
+        ),
+        " ",
+        fres[length(fres)],
+        " 1.000 100.0\n",
+        sep = ""
+    )
 
 }
 

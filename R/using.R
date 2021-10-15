@@ -1,45 +1,45 @@
 # http://adv-r.had.co.nz/Computing-on-the-language.html
+# TODO: make use of the function split() to split by groups...!!
 
 `using` <- function(data, expr, split.by = NULL, ...) {
 
     expr <- substitute(expr)
     # select <- substitute(select)
-    split.by <- as.character(substitute(split.by))
+    split.by <- substitute(split.by)
+    sby <- as.character(split.by)
     
     # if (!is.null(select)) {
     #     data <- data[eval(expr = select, envir = data, enclos = parent.frame()), , drop = FALSE]
     # }
 
     
-    if (length(split.by) > 1) {
+    if (length(sby) > 1) {
         # if landing here, it means the split.by argument has more than one column
         # and this cannot possibly happen unless there is some way (other than using a comma)
         # to specify this, such as: c(A, B), or A & B, or A + B or something similar
 
-        if (is.element(split.by[1], c("c", "&", "+"))) {
-            split.by <- split.by[-1]
+        if (is.element(sby[1], c("c", "&", "+"))) {
+            sby <- sby[-1]
         }
         else {
             # for any other situations such as A ~ B
-            cat("\n")
-            stop(simpleError("Incorrect specification of the split.by argument.\n\n"))
+            admisc::stopError("Incorrect specification of the argument <split.by>.")
         }
     }
-    else if (length(split.by) == 1 & is.character(split.by)) {
-        split.by <- admisc::splitstr(split.by)
+    else if (length(sby) == 1 & is.character(sby)) {
+        sby <- admisc::splitstr(sby)
     }
 
-    if (is.null(split.by) || length(split.by) == 0) {
+    if (is.null(sby) || length(sby) == 0) {
         return(eval(expr = expr, envir = data, enclos = parent.frame()))
     }
 
-    if (!all(is.element(split.by, colnames(data)))) {
-        cat("\n")
-        stop(simpleError("One or more split.by variables not found in the data.\n\n"))
+    if (!all(is.element(sby, colnames(data)))) {
+        admisc::stopError("One or more split.by variables not found in the data.")
     }
     
     # split by levels
-    sl <- lapply(split.by, function(sb) {
+    sl <- lapply(sby, function(sb) {
         x <- data[[sb]]
 
         if (inherits(x, "haven_labelled")) {
@@ -60,20 +60,36 @@
             return(levels(x))
         }
         else {
-            cat("\n")
-            stop(simpleError(sprintf("The split.by variable %s should be a factor or a declared / labelled variable.\n\n", sb)))
+            admisc::stopError(
+                sprintf(
+                    "The split.by variable %s should be a factor or a declared / labelled variable.",
+                    sb
+                )
+            )
         }
         
     })
 
 
-    names(sl) <- split.by
+    names(sl) <- sby
 
     noflevels <- unlist(lapply(sl, length))
     mbase <- c(rev(cumprod(rev(noflevels))), 1)[-1]
-    orep  <- cumprod(rev(c(rev(noflevels)[-1], 1)))
+    
+    orep  <- cumprod(
+        rev(
+            c(rev(noflevels)[-1], 1)
+        )
+    )
+
     retmat <- sapply(seq_len(length(sl)), function(x) {
-        rep.int(rep.int(seq_len(noflevels[x]) - 1, rep.int(mbase[x], noflevels[x])), orep[x]) + 1
+        rep.int(
+            rep.int(
+                seq_len(noflevels[x]) - 1,
+                rep.int(mbase[x], noflevels[x])
+            ),
+            orep[x]
+        ) + 1
     })
     
     # slexp <- expand.grid(sl, stringsAsFactors = FALSE)
@@ -90,10 +106,10 @@
 
         for (c in seq(ncol(slexp))) {
             val <- slexp[r, c]
-            splitvar <- data[[split.by[c]]]
+            splitvar <- data[[sby[c]]]
 
             if (inherits(splitvar, "haven_labelled")) {
-                splitvar <- declared::as_declared(splitvar)
+                splitvar <- declared::as_declared(splitvar)     
             }
 
             if (inherits(splitvar, "declared")) {
@@ -104,13 +120,15 @@
         }
 
         if (sum(selection) > 0) {
-            cdata <- subset(data, selection)
-            res[[r]] <- eval(expr = expr, envir = cdata, enclos = parent.frame())
+            res[[r]] <- eval(
+                expr = expr,
+                envir = subset(data, selection),
+                enclos = parent.frame()
+            )
+            # res[[r]] <- with(subset(data, selection), eval(expr))
         }
     }
 
-    
-    
     if (all(unlist(lapply(res, is.atomic)))) {
 
         # all are vectors (e.g. from summary) but lengths can differ
