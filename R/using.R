@@ -166,7 +166,7 @@
 
         for (i in seq(length(x))) {
             cat(nms[i], "\n")
-            cat("-----\n")
+            cat(paste(c(rep("-", nchar(nms[i])), "\n"), collapse = ""))
             
             if (is.null(x[[i]])) {
                 cat("No data.\n")
