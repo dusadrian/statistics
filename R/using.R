@@ -1,41 +1,34 @@
 # http://adv-r.had.co.nz/Computing-on-the-language.html
-# TODO: make use of the function split() to split by groups...!!
 
 `using` <- function(data, expr, split.by = NULL, ...) {
 
-    expr <- substitute(expr)
-    # select <- substitute(select)
     split.by <- substitute(split.by)
-    sby <- as.character(split.by)
-    
+    sby <- all.vars(split.by)
+    nsby <- all.names(split.by)
+
+    if (length(setdiff(nsby, c("c", "+", "&", colnames(data)))) > 0) {
+        admisc::stopError("Incorrect specification of the argument <split.by>.")
+    }
+
+    expr <- substitute(expr)
+    vexpr <- all.vars(expr)
+
+    # capture the use of "all variables" in a formula, for instance lm(y ~ .)
+    if (any(vexpr == ".")) {
+        vexpr <- colnames(data)
+    }
+
+    data <- data[, unique(c(vexpr, sby)), drop = FALSE]
     # if (!is.null(select)) {
     #     data <- data[eval(expr = select, envir = data, enclos = parent.frame()), , drop = FALSE]
     # }
 
-    
-    if (length(sby) > 1) {
-        # if landing here, it means the split.by argument has more than one column
-        # and this cannot possibly happen unless there is some way (other than using a comma)
-        # to specify this, such as: c(A, B), or A & B, or A + B or something similar
-
-        if (is.element(sby[1], c("c", "&", "+"))) {
-            sby <- sby[-1]
-        }
-        else {
-            # for any other situations such as A ~ B
-            admisc::stopError("Incorrect specification of the argument <split.by>.")
-        }
-    }
-    else if (length(sby) == 1 & is.character(sby)) {
-        sby <- admisc::splitstr(sby)
-    }
-
-    if (is.null(sby) || length(sby) == 0) {
+    if (length(sby) == 0) {
         return(eval(expr = expr, envir = data, enclos = parent.frame()))
     }
 
     if (!all(is.element(sby, colnames(data)))) {
-        admisc::stopError("One or more split.by variables not found in the data.")
+        admisc::stopError("One or more split variables not found in the data.")
     }
     
     # split by levels
@@ -62,12 +55,11 @@
         else {
             admisc::stopError(
                 sprintf(
-                    "The split.by variable %s should be a factor or a declared / labelled variable.",
+                    "The split variable %s should be a factor or a declared / labelled variable.",
                     sb
                 )
             )
         }
-        
     })
 
 
