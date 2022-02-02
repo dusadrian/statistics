@@ -1,4 +1,5 @@
 # http://adv-r.had.co.nz/Computing-on-the-language.html
+# https://developer.r-project.org/nonstandard-eval.pdf
 
 `using` <- function(data, expr, split.by = NULL, ...) {
 
@@ -31,16 +32,16 @@
         admisc::stopError("One or more split variables not found in the data.")
     }
     
-    # split by levels
+    # split by (non-missing) levels
     sl <- lapply(sby, function(sb) {
         x <- data[[sb]]
 
-        if (inherits(x, "haven_labelled")) {
+        if (inherits(x, "haven_labelled_spss")) {
             x <- declared::as_declared(x)
         }
 
         if (inherits(x, "declared")) {
-            x <- sort(unique(x)) # that gets rid of the NAs because of sort()
+            x <- sort(unique(x)) # this gets rid of the NAs because of sort()
             labels <- value_labels(x)
             labels <- labels[is.element(labels, x)]
             attributes(x) <- NULL
@@ -100,7 +101,7 @@
             val <- slexp[r, c]
             splitvar <- data[[sby[c]]]
 
-            if (inherits(splitvar, "haven_labelled")) {
+            if (inherits(splitvar, "haven_labelled_spss")) {
                 splitvar <- declared::as_declared(splitvar)     
             }
 
@@ -209,7 +210,8 @@
             }
         }
         
-        colnames(x) <- format(colnames(x), justify = "right")
-        print(noquote(format(x, justify = "right", width = max(nchar(colnames(x))))))
+        maxwidth <- max(nchar(c(colnames(x), x)))
+        colnames(x) <- format(colnames(x), justify = "right", width = maxwidth)
+        print(noquote(format(x, justify = "right", width = maxwidth)))
     }
 }

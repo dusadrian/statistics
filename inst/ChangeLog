@@ -1,6 +1,5 @@
 Version 0.6
-  o new function fretable() to make a frequency table
-  o new function using() as a more flexible alternative to with()
+  o new function frtable() to make a frequency table
 
 Version 0.5
   o new function fmode() to calculate the mode of a variable
@@ -10,8 +9,6 @@ Version 0.5
 Version 0.4
   o t.testAB() and anovaFK() invisibly return a list of test results
   o argument "new" from function dbinoms() is now FALSE by default
-  o modified function hclr(), argument "h" did not return an error if the
-    value is outside the interval 0 - 360
 
 Version 0.3
   o new argument "zoom" for function dbinoms(); if TRUE, the drawing only zooms

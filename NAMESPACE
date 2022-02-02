@@ -16,19 +16,13 @@ export(
     dfcalc,
     fmode,
     frmode,
-    frtable,
-    fretable,
-    hclr,
     histc,
     mbinom,
     sbinom,
     spooled,
     t_testAB,
-    using,
    .onAttach
 
 )
 
 S3method(print, anovaFK)
-S3method(print, frtable)
-S3method(print, usage)

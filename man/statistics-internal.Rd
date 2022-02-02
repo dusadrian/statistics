@@ -1,7 +1,5 @@
 \name{statistics-internal}
 
-
-
 \title{Internal functions}
 
 \description{

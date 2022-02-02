@@ -1,16 +1,20 @@
 `frtable` <- function(x, values = TRUE) {
     
+    haven <- eval(parse(text = "requireNamespace('haven', quietly = TRUE)"))
+    
     if (inherits(x, "haven_labelled")) {
-        if (eval(parse(text = "any(haven::is_tagged_na(x))"))) {
-            cat("\n")
-            stop(simpleError("Tagged NAs are not supported.\n\n"))
+        if (haven) {
+            if (eval(parse(text = "any(haven::is_tagged_na(x))"))) {
+                cat("\n")
+                stop(simpleError("Tagged NAs are not supported.\n\n"))
+            }
         }
 
         if (!inherits(x, "haven_labelled_spss")) {
             class(x) <- c("haven_labelled_spss", class(x))
         }
 
-        x <- declared::as_declared(x)
+        x <- as_declared(x)
     }
     
     
@@ -26,7 +30,7 @@
             if (is.numeric(x) | is.integer(x)) {
                 if (length(unique(x)) > 15) {
                     cat("\n")
-                    stop(simpleError("This is an interval type variable with too many values.\n\n"))
+                    stop(simpleError("This looks like an interval type variable with too many values.\n\n"))
                 }
             }
         }
@@ -145,7 +149,7 @@
 
     if (nrow(x) > 100 & !force) {
         cat("\n")
-        stop(simpleError("Hmm... it looks like having lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
+        stop(simpleError("It looks like a lot of categories. If you really want to print it, use:\nprint(x, force = TRUE)\n\n"))
     }
 
     cat(
@@ -187,14 +191,3 @@
     )
 
 }
-
-
-
-
-`fretable` <- function(...) {
-    .Deprecated(msg = "Function fretable() is deprecated, and has been renamed to frtable()\n")
-    frtable(...)
-}
-
-
-#

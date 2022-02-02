@@ -1,6 +1,5 @@
 \name{frtable}
 \alias{frtable}
-\alias{fretable}
 
 \title{Create a frequency table}
 
