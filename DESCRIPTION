@@ -1,5 +1,5 @@
 Package: statistics
-Version: 0.8
+Version: 0.5
 Date: 2021-10-15
 Title: Miscellanea functions for the Intro Stats class
 Authors@R: person(given = "Adrian", family = "Dusa",

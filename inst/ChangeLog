@@ -1,8 +1,5 @@
-Version 0.6
-  o new function frtable() to make a frequency table
-
 Version 0.5
-  o new function fmode() to calculate the mode of a variable
+  o new function frmode() to calculate the mode of a variable
   o new function histc() to fraw a histogram with an added distribution
     density curve
 

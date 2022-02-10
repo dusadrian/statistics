@@ -1,7 +1,6 @@
 \name{frmode}
 
 \alias{frmode}
-\alias{fmode}
 
 \title{Calculates the (frequency) mode of a variable}
 

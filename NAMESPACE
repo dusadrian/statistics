@@ -14,7 +14,6 @@ export(
     dariat,
     dbinoms,
     dfcalc,
-    fmode,
     frmode,
     histc,
     mbinom,
