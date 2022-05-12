@@ -1,4 +1,4 @@
-\name{statistics-internal}
+\name{statistics internal functions}
 
 \title{Internal functions}
 

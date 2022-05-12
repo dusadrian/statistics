@@ -40,7 +40,10 @@ t_testAB(group1, group2)
 
 
 # or, if the variables are inside a dataset
-dataset <- data.frame(values = c(group1, group2), group = c(rep(1,11), rep(2,12)))
+dataset <- data.frame(
+  values = c(group1, group2),
+  group = c(rep(1,11), rep(2,12))
+)
 
 t_testAB(values ~ group, data = dataset)
 

@@ -47,10 +47,10 @@ groups <- as.factor(groups)
 
 anovaFK(values ~ groups)
 
-# acelasi lucru cu:
+# same thing with:
 anovaFK(values, groups)
 
-# daca variabilele se gasesc intr-un set de date
+# using a dataset
 my.data <- data.frame(values, groups)
 anovaFK(values ~ groups, data = my.data)
 

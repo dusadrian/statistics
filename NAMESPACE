@@ -14,14 +14,11 @@ export(
     dariat,
     dbinoms,
     dfcalc,
-    frmode,
     histc,
     mbinom,
     sbinom,
     spooled,
-    t_testAB,
-   .onAttach
-
+    t_testAB
 )
 
 S3method(print, anovaFK)

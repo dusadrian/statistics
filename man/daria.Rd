@@ -2,6 +2,7 @@
 \alias{daria}
 
 \title{Calculate and draw the area under the normal curve z}
+
 \description{
   The function "daria" - 'd'raws the 'area' under the normal curve for certain values of z.
 }
@@ -46,4 +47,3 @@ daria("over", 2, draw = TRUE)
 }
 
 \keyword{misc}
-
