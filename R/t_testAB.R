@@ -3,9 +3,19 @@ function(x, y = NULL,
          alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
          mu = 0, paired = FALSE, conf.level = 0.95, data) {
     
-    pmatching <- unique(c(match(alternative, c("!=", "<", ">")),
-                        match(alternative, c("two.sided", "less", "greater"))))
-    pmatching <- pmatching[!is.na(pmatching)]
+    if (is.element(alternative, c("two.sided", "!=", "two.tailed"))) {
+        pmatching <- 1
+    }
+    else if (is.element(alternative, c("less", "<", "lower"))) {
+        pmatching <- 2
+    }
+    else if (is.element(alternative, c("greater", ">", "higher"))) {
+        pmatching <- 3
+    }
+    else {
+        admisc::stopError("Unknown alternative hypothesis specification.")
+    }
+
     alternative <- c("two.sided", "less", "greater")[pmatching]
     
     if (!paired) {

@@ -10,7 +10,7 @@
 }
 
 \usage{
-t_testAB(x, y=NULL,
+t_testAB(x, y = NULL,
          alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
          mu = 0, paired = FALSE, conf.level = 0.95, data)
 }
@@ -18,14 +18,25 @@ t_testAB(x, y=NULL,
 \arguments{
   \item{x}{A numeric vector.}
   \item{y}{An optional numeric vector, corresponding to the second group.}
-  \item{alternative}{Character, for the alternative hypothesis. It can be "two.sided"
-    or "!=" for a two tailed test, "less" or "<" for a one tailed test on the left,
-    and "greater" or ">" for a one tailed test on the right.}
-  \item{var.equal}{Logical argument indicating whether to treat the two variances as being equal}
-  \item{mu}{A number indicating the true value of the mean (or difference in means if performing a two sample test).}
+  \item{alternative}{Character, for the alternative hypothesis.
+    See details below.}
+  \item{var.equal}{Logical argument indicating whether to treat the two
+    variances as being equal}
+  \item{mu}{A number indicating the true value of the mean (or difference in
+    means if performing a two sample test).}
   \item{paired}{Logical indicating whether to perform a paired t-test.}
   \item{conf.level}{Confidence level of the interval}
-  \item{data}{An optional matrix or a set of data containing the variables from a formula}
+  \item{data}{An optional matrix or a set of data containing the variables from
+    a formula}
+}
+
+\details{
+The argument \code{alternative} follows the standard in the base function
+\code{\bold{t.test}()}, and it can be "two.sided", "less" or "greater". In
+addition to those options, this function also allows for \code{"!="} and
+\code{"two.tailed"} for the bidirectional alternative hypothesis, as well as
+\code{"<"} and \code{"lower"} for the one tailed test on the left tail,
+and \code{">"} and \code{"higher"} for the right tailed test, respectively.
 }
 
 
