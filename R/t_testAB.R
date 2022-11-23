@@ -9,7 +9,7 @@ function(x, y = NULL,
     alternative <- c("two.sided", "less", "greater")[pmatching]
     
     if (!paired) {
-        homogeneity <- c("are not equal", "are equal")
+        homogeneity <- c("not equal", "equal")
         
         if (is.null(y)) {
             homogtest <- ansari.test(x, data = data, exact = FALSE)
@@ -22,7 +22,7 @@ function(x, y = NULL,
         var.equal <- ifelse(p.value > (1 - conf.level), TRUE, FALSE)
         cat (
             "\nThe Ansari-Bradley test for the homogeneity of variances has a value of\n",
-            paste("p =", round(p.value, 4), sep = ""),
+            paste("p = ", round(p.value, 4), sep = ""),
             " therefore the variances are ",
             homogeneity[var.equal + 1],
             "\n",

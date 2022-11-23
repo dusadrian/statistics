@@ -7,10 +7,10 @@
 \description{
 The function \code{dfcalc} is used only for two samples t test, when the group
 variations are NOT equal.
-For small and independent samples, and unknown but equal population variances, the
-variances of the two samples are used. As the sample variances are never equal, this
-function calculates their pooled variance based on the two standard deviations and
-their respective sample sizes.
+For small and independent samples, and unknown but equal population variances,
+the variances of the two samples are used. As the sample variances are never
+equal, this function calculates their pooled variance based on the two standard
+deviations and their respective sample sizes.
 }
 
 \usage{
@@ -49,4 +49,3 @@ spooled(group1, group2)
 }
 
 \keyword{misc}
-
