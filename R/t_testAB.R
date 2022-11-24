@@ -3,6 +3,10 @@ function(x, y = NULL,
          alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
          mu = 0, paired = FALSE, conf.level = 0.95, data) {
     
+    if (identical(alternative, c("two.sided", "less", "greater"))) {
+        alternative <- "two.sided"
+    }
+
     if (is.element(alternative, c("two.sided", "!=", "two.tailed"))) {
         pmatching <- 1
     }
