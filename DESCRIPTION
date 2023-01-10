@@ -1,7 +1,7 @@
 Package: statistics
-Version: 0.6
-Date: 2022-11-23
-Title: Miscellanea functions for an Intro Stats class
+Version: 0.7
+Date: 2023-01-10
+Title: Miscellanea Functions For an Intro Stats Class
 Authors@R: person(given = "Adrian", family = "Dusa",
                   role = c("aut", "cre", "cph"),
                   email = "dusa.adrian@unibuc.ro",
