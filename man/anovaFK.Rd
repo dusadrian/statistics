@@ -43,7 +43,6 @@ Declaring a variable as a factor is done using the command: \code{as.factor}
 
 values <- c(15, 8, 17, 7, 26, 12, 8, 11, 16, 9, 16, 24, 20, 19, 9, 17, 11, 8, 15, 6, 14)
 groups <- rep(1:3, each = 7)
-groups <- as.factor(groups)
 
 anovaFK(values ~ groups)
 
@@ -51,8 +50,8 @@ anovaFK(values ~ groups)
 anovaFK(values, groups)
 
 # using a dataset
-my.data <- data.frame(values, groups)
-anovaFK(values ~ groups, data = my.data)
+vgdf <- data.frame(values, groups)
+using(vgdf, anovaFK(values ~ groups))
 
 }
 

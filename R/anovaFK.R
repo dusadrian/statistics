@@ -1,5 +1,4 @@
-`anovaFK` <-
-function(x, y = NULL, data) {
+`anovaFK` <- function(x, y = NULL, data) {
     
     m <- match.call()
 
@@ -10,12 +9,13 @@ function(x, y = NULL, data) {
         if (missing(x) || length(x) != 3) {
             stop("The formula is incorrect.\n\n", call. = FALSE)
         }
-        name_values_x <- deparse(substitute(x)[[2]])
-        name_group_y  <- deparse(substitute(x)[[3]])
+
+        name_values_x <- all.vars(substitute(x)[[2]])[1]
+        name_group_y  <- all.vars(substitute(x)[[3]])[1]
         
         if (missing(data)) {
-            values_x <- get(name_values_x, envir = parent.frame())
-            group_y  <- get(name_group_y, envir = parent.frame())
+            values_x <- admisc::recreate(substitute(x)[[2]])
+            group_y  <- admisc::recreate(substitute(x)[[3]])
             if (is.character(group_y)) {
                 group_y <- as.factor(group_y)
             }
@@ -44,8 +44,7 @@ function(x, y = NULL, data) {
     if (!is.factor(group_y)) {
         group_y <- as.factor(group_y)
     }
-    
-    
+
     
     if (homog_test$p.value > 0.05) {
         
@@ -53,7 +52,7 @@ function(x, y = NULL, data) {
             test <- aov(values_x ~ group_y)
         }
         else {
-            testdf <- data.frame(values_x = values_x, group_y = group_y)
+            testdf <- na.omit(data.frame(values_x = values_x, group_y = group_y))
             colnames(testdf) <- c(name_values_x, name_group_y)
             test <- eval(parse(text = paste("aov(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
         }
@@ -68,7 +67,7 @@ function(x, y = NULL, data) {
             test <- oneway.test(values_x ~ group_y)
         }
         else {
-            testdf <- data.frame(values_x = values_x, group_y = group_y)
+            testdf <- na.omit(data.frame(values_x = values_x, group_y = group_y))
             colnames(testdf) <- c(name_values_x, name_group_y)
             test <- eval(parse(text = paste("oneway.test(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
         }
@@ -91,11 +90,11 @@ function(x, y = NULL, data) {
 
 `print.anovaFK` <- function(x, ...) {
     homog_test <- attr(x, "homog_test")
-    homogeneity <- c("do not have equal variation (using Welch approximation).", "have equal variation.")
+    homogeneity <- c("do not have equal variation.", "have equal variation.")
     
     var_equal <- ifelse(homog_test$p.value > 0.05, TRUE, FALSE)
-    cat ("\nThe Fligner-Killeen test for the homogeneity of variances has a value of\n",
-         paste("p = ", round(homog_test$p.value, 4), sep = ""), " so the groups ",
+    cat ("\nThe Fligner-Killeen test for the homogeneity of variances has a ",
+         paste("p-value = ", round(homog_test$p.value, 4), sep = ""), " so the groups ",
          homogeneity[var_equal + 1], "\n\n", sep = "")
 
     if (var_equal) {
