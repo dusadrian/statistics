@@ -59,10 +59,11 @@
         
     }
     else {
-        output_table <- matrix("", nrow=2, ncol=5)
+        output_table <- as.data.frame(matrix(NA, nrow = 2, ncol = 5))
         rownames(output_table) <- c("group", "Residuals")
         colnames(output_table) <- c("Df", "Sum Sq", "Mean Sq", "F value", "Pr(>F)")
-        tabel <- anova(lm(values_x ~ group_y))
+        tabel <- anova(lm(values_x ~ as.factor(group_y)))
+        tblaov <- aov(values_x ~ as.factor(group_y))
         if (is.null(name_group_y)) {
             test <- oneway.test(values_x ~ group_y)
         }
@@ -71,13 +72,18 @@
             colnames(testdf) <- c(name_values_x, name_group_y)
             test <- eval(parse(text = paste("oneway.test(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
         }
+
         
-        output_table[ , 1] <- tabel$Df
+        output_table[ , 1] <- test$parameter
         output_table[ , 2] <- round(tabel$Sum, 2)
         output_table[ , 3] <- round(tabel$Mean, 2)
         output_table[1, 4] <- round(test$statistic, 4)
         output_table[1, 5] <- round(test$p.value, 4)
-        
+
+        output_table[1, 3] <- output_table[1, 4] * output_table[2, 3]
+        output_table[1, 2] <- output_table[1, 3] * output_table[1, 1]
+        output_table[2, 4] <- ""
+        output_table[2, 5] <- ""
 
         attr(test, "output_table") <- output_table
     }
