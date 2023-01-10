@@ -63,16 +63,15 @@
         rownames(output_table) <- c("group", "Residuals")
         colnames(output_table) <- c("Df", "Sum Sq", "Mean Sq", "F value", "Pr(>F)")
         tabel <- anova(lm(values_x ~ as.factor(group_y)))
-        tblaov <- aov(values_x ~ as.factor(group_y))
+        
         if (is.null(name_group_y)) {
-            test <- oneway.test(values_x ~ group_y)
+            test <- oneway.test(values_x ~ as.factor(group_y))
         }
         else {
-            testdf <- na.omit(data.frame(values_x = values_x, group_y = group_y))
+            testdf <- na.omit(data.frame(values_x = values_x, group_y = as.factor(group_y)))
             colnames(testdf) <- c(name_values_x, name_group_y)
             test <- eval(parse(text = paste("oneway.test(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
         }
-
         
         output_table[ , 1] <- test$parameter
         output_table[ , 2] <- round(tabel$Sum, 2)
