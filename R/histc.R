@@ -2,8 +2,7 @@
 function(x, from, to, size = 15, ...) {
 
     if (!is.atomic(x) || !is.numeric(x)) {
-        cat("\n")
-        stop(simpleError("`x` should be a numerical vector.\n\n"))
+        admisc::stopError(simpleError("`x` should be a numerical vector.\n\n"))
     }
 
     x <- unclass(x)

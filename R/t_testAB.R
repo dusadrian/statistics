@@ -35,7 +35,7 @@ function(x, y = NULL,
         p.value <- homogtest$p.value
         var.equal <- ifelse(p.value > (1 - conf.level), TRUE, FALSE)
         cat (
-            "\nThe Ansari-Bradley test for the homogeneity of variances has a value of\n",
+            "\nThe Ansari-Bradley test for the homogeneity of variances has a value of",
             paste("p = ", round(p.value, 4), sep = ""),
             " therefore the variances are ",
             homogeneity[var.equal + 1],
@@ -70,6 +70,10 @@ function(x, y = NULL,
         return(invisible(list("t.test" = test)))
     }
     else {
-        return(invisible(list("Homogeneity of variances" = homogtest, "t.test" = test)))
+        return(
+            invisible(
+                list("Homogeneity of variances" = homogtest, "t.test" = test)
+            )
+        )
     }
 }

@@ -7,7 +7,7 @@
     
     if (is.null(y)) {
         if (missing(x) || length(x) != 3) {
-            stop("The formula is incorrect.\n\n", call. = FALSE)
+            admisc::stopError("The formula is incorrect.")
         }
 
         name_values_x <- all.vars(substitute(x)[[2]])[1]
@@ -52,9 +52,24 @@
             test <- aov(values_x ~ group_y)
         }
         else {
-            testdf <- na.omit(data.frame(values_x = values_x, group_y = group_y))
+            testdf <- na.omit(
+                data.frame(values_x = values_x, group_y = group_y)
+            )
+
             colnames(testdf) <- c(name_values_x, name_group_y)
-            test <- eval(parse(text = paste("aov(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
+            
+            test <- eval(
+                parse(
+                    text = paste(
+                        "aov(",
+                        name_values_x,
+                        " ~ ",
+                        name_group_y,")",
+                        sep = ""
+                    )
+                ),
+                envir = testdf
+            )
         }
         
     }
@@ -68,9 +83,25 @@
             test <- oneway.test(values_x ~ as.factor(group_y))
         }
         else {
-            testdf <- na.omit(data.frame(values_x = values_x, group_y = as.factor(group_y)))
+            testdf <- na.omit(
+                data.frame(values_x = values_x, group_y = as.factor(group_y))
+            )
+            
             colnames(testdf) <- c(name_values_x, name_group_y)
-            test <- eval(parse(text = paste("oneway.test(", name_values_x, " ~ ", name_group_y,")", sep = "")), envir = testdf)
+            
+            test <- eval(
+                parse(
+                    text = paste(
+                        "oneway.test(",
+                        name_values_x,
+                        " ~ ",
+                        name_group_y,
+                        ")",
+                        sep = ""
+                    )
+                ),
+                envir = testdf
+            )
         }
         
         output_table[ , 1] <- test$parameter
@@ -98,9 +129,19 @@
     homogeneity <- c("do not have equal variation.", "have equal variation.")
     
     var_equal <- ifelse(homog_test$p.value > 0.05, TRUE, FALSE)
-    cat ("\nThe Fligner-Killeen test for the homogeneity of variances has a ",
-         paste("p-value = ", round(homog_test$p.value, 4), sep = ""), " so the groups ",
-         homogeneity[var_equal + 1], "\n\n", sep = "")
+    
+    cat(
+        "\nThe Fligner-Killeen test for the homogeneity of variances has a ",
+        paste(
+            "p-value = ",
+            round(homog_test$p.value, 4),
+            sep = ""
+        ),
+        " so the groups ",
+        homogeneity[var_equal + 1],
+        "\n\n",
+        sep = ""
+    )
 
     if (var_equal) {
         cat("ANOVA table\n\n")

@@ -14,37 +14,60 @@ function (x, y, n1, n2) {
     
     if (sum(verificari) == 4) {
         if (sum(verificari[1:2]) == 0) {
-            cat("\n")
-            stop(paste(erori[3:6][verificari[1:4]], collapse="\n       "), "\n\n", call. = FALSE)
+            admisc::stopError(
+                paste(
+                    erori[3:6][verificari[1:4]],
+                    collapse = "\n       "
+                )
+            )
         }
         else {
-            cat("\n")
-            stop(paste(erori[1:2][verificari[1:2]], collapse="\n       "), "\n\n", call. = FALSE)
+            admisc::stopError(
+                paste(
+                    erori[1:2][verificari[1:2]],
+                    collapse = "\n       "
+                )
+            )
         }
     }
     else if (sum(verificari) == 3) {
         if (length(x) == 1) {
-            cat("\n")
-            stop(paste(c(paste("If", x, "is the standard deviation for the first group, then:"),
-                       erori[4:6]), collapse="\n       "), "\n\n", call. = FALSE)
+            admisc::stopError(
+                paste(
+                    c(
+                        paste(
+                            "If",
+                            x,
+                            "is the standard deviation for the first group, then:"
+                        ),
+                        erori[4:6]
+                    ),
+                    collapse = "\n       "
+                )
+            )
         }
         else {
-            cat("\n")
-            stop(erori[2], "\n\n", call. = FALSE)
+            admisc::stopError(erori[2])
         }
     }
     else if (sum(verificari) == 2) {
         if (missing(x) | missing(y)) {
-            cat("\n")
-            stop(paste(erori[1:2][verificari[1:2]], collapse="\n       "), "\n\n", call. = FALSE)
+            admisc::stopError(
+                paste(
+                    erori[1:2][verificari[1:2]],
+                    collapse = "\n       "
+                )
+            )
         }
         else if (all(length(x) == 1, length(y) == 1)) {
-            cat("\n")
-            stop(paste(erori[5:6], collapse="\n       "), "\n\n", call. = FALSE)
+            admisc::stopError(
+                paste(erori[5:6], collapse = "\n       ")
+            )
         }
         else if (any(length(x) == 1, length(y) == 1)) {
-            cat("\n")
-            stop(erori[7:8][which(length(x) == 1, length(y) == 1)], "\n\n", call. = FALSE)
+            admisc::stopError(
+                erori[7:8][which(c(length(x) == 1, length(y) == 1))]
+            )
         }
         else {
             var1 <- var(x)
@@ -54,8 +77,12 @@ function (x, y, n1, n2) {
         }
     }
     else if (sum(verificari) == 1) {
-        cat("\n")
-        stop(paste(erori[3:6][verificari[1:4]], collapse="\n       "), "\n\n", call. = FALSE)
+        admisc::stopError(
+            paste(
+                erori[3:6][verificari[1:4]],
+                collapse = "\n       "
+            )
+        )
     }
     else {
         var1 <- x^2
@@ -64,4 +91,3 @@ function (x, y, n1, n2) {
     
     return(sqrt(((n1 - 1)*var1 + (n2 - 1)*var2)/(n1 + n2 - 2)))
 }
-

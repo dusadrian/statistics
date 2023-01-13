@@ -3,42 +3,34 @@ function(x, size, prob, log = FALSE, draw = FALSE,
         zoom = FALSE, new = FALSE, text = FALSE) {
     
     if (all(missing(x))) {
-        cat("\n")
-        stop("The number of favorable outcomes was not specified.\n\n", call. = FALSE)
+        admisc::stopError("The number of favorable outcomes was not specified.")
     }
     
     if (!all(is.numeric(x))) {
-        cat("\n")
-        stop("The number of favorable outcomes should be a number or a numeric vector.\n\n", call. = FALSE)
+        admisc::stopError("The number of favorable outcomes should be a number or a numeric vector.")
     }
     
     if (missing(size)) {
-        cat("\n")
-        stop("The number of trials were not specified.\n\n", call. = FALSE)
-        }
+        admisc::stopError("The number of trials were not specified.")
+    }
     
     if (!is.numeric(size) | size < 2) {
-        cat("\n")
-        stop("The number of trials is incorrect.\n\n", call. = FALSE)
-        }
+        admisc::stopError("The number of trials is incorrect.")
+    }
     
     if (missing(prob)) {
-        cat("\n")
-        stop("The probability of success was not specified.\n\n", call. = FALSE)
-        }
+        admisc::stopError("The probability of success was not specified.")
+    }
     
     if (!is.numeric(prob) | prob < 0 | prob > 1) {
-        cat("\n")
-        stop("The probability of success should be a number between 0 and 1.\n\n", call. = FALSE)
-        }
+        admisc::stopError("The probability of success should be a number between 0 and 1.")
+    }
     
     if (!missing(size) & !all(missing(x))) {
         if (any(x > size)) {
-            cat("\n")
-            stop("The number of favorable outcomes cannot exceed the number of trials.\n\n", call. = FALSE)
+            admisc::stopError("The number of favorable outcomes cannot exceed the number of trials.")
         } else if (any(x < 0)) {
-            cat("\n")
-            stop("The number of favorable outcomes cannot be negative.\n\n", call. = FALSE)
+            admisc::stopError("The number of favorable outcomes cannot be negative.")
         }
     }
     
@@ -81,4 +73,3 @@ function(x, size, prob, log = FALSE, draw = FALSE,
     
     return(sum(y2[is.element(seq(0, size), x)]))
 }
-
