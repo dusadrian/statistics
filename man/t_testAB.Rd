@@ -10,9 +10,11 @@
 }
 
 \usage{
-t_testAB(x, y = NULL,
-         alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
-         mu = 0, paired = FALSE, conf.level = 0.95, data)
+t_testAB(
+  x, y = NULL,
+  alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
+  mu = 0, paired = FALSE, conf.level = 0.95, data = NULL
+)
 }
 
 \arguments{
@@ -32,10 +34,10 @@ t_testAB(x, y = NULL,
 
 \details{
 The argument \code{alternative} follows the standard in the base function
-\code{\bold{t.test}()}, and it can be "two.sided", "less" or "greater". In
-addition to those options, this function also allows for \code{"!="} and
-\code{"two.tailed"} for the bidirectional alternative hypothesis, as well as
-\code{"<"} and \code{"lower"} for the one tailed test on the left tail,
+\bold{\code{t.test}()}, and it can be \code{"two.sided"}, \code{"less"} or
+\code{"greater"}. In addition to those options, this function also allows for
+\code{"!="} and \code{"two.tailed"} for the bidirectional alternative hypothesis,
+as well as \code{"<"} and \code{"lower"} for the one tailed test on the left tail,
 and \code{">"} and \code{"higher"} for the right tailed test, respectively.
 }
 
