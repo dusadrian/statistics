@@ -36,7 +36,7 @@
         p.value <- homogtest$p.value
         var.equal <- p.value > (1 - conf.level)
         cat (
-            "\nThe Ansari-Bradley test for the homogeneity of variances has a value of",
+            "\nThe Ansari-Bradley test for the homogeneity of variances has a value of ",
             paste("p = ", round(p.value, 4), sep = ""),
             " therefore the variances are ",
             homogeneity[var.equal + 1],
