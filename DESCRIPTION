@@ -1,16 +1,15 @@
 Package: statistics
-Version: 0.7
-Date: 2023-01-10
+Version: 0.8
 Title: Miscellanea Functions For an Intro Stats Class
 Authors@R: person(given = "Adrian", family = "Dusa",
-                  role = c("aut", "cre", "cph"),
-                  email = "dusa.adrian@unibuc.ro",
-                  comment = c(ORCID = "0000-0002-3525-9253"))
+role = c("aut", "cre", "cph"),
+email = "dusa.adrian@unibuc.ro",
+comment = c(ORCID = "0000-0002-3525-9253"))
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 Imports: admisc (>= 0.25), declared (> 0.15)
 Description: The majority of functions in this package are designed to facilitate
- undestanding the statistical concepts taught in the class (such as the functions to
- create graphics or areas under the normal curve), while some are designed to ease
- calculations for the lab exercises (for instance the degrees of freedom or the
- pooled variation for two independent samples).
+undestanding the statistical concepts taught in the class (such as the functions to
+create graphics or areas under the normal curve), while some are designed to ease
+calculations for the lab exercises (for instance the degrees of freedom or the
+pooled variation for two independent samples).
