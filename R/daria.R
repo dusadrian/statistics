@@ -130,7 +130,7 @@ function (area, z1, z2, draw = FALSE) {
         Positron <- grepl("Positron", names(dev.cur()))
 
         tick_length <- ifelse(Positron|RStudio, 0.02, 0.015)
-        label_offset <- ifelse (Positron|RStudio, 0.1, -1.2)
+        label_offset <- ifelse (Positron|RStudio, -1, -1.2)
 
 
         ticklabels <- c(-4:0, paste("+", as.character(1:4), sep = ""))

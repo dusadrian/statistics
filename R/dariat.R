@@ -111,7 +111,7 @@ function (area, t1, t2, df, draw = FALSE) {
         Positron <- grepl("Positron", names(dev.cur()))
 
         tick_length <- ifelse(Positron|RStudio, 0.02, 0.015)
-        label_offset <- ifelse (Positron|RStudio, 0.1, -1.2)
+        label_offset <- ifelse (Positron|RStudio, -1, -1.2)
 
 
         ticklabels <- c(-4:0, paste("+", as.character(1:4), sep = ""))
@@ -125,8 +125,8 @@ function (area, t1, t2, df, draw = FALSE) {
             line = label_offset
         )
 
+        segments(-4, 0, 4, 0) # draws the horizontal axis
         segments(-4:4, y0 = 0, x1 = -4:4, y1 = -tick_length * (par("usr")[4] - par("usr")[3]))
-        segments(-4, 0, 4, 0)
     }
     return(area)
 }
