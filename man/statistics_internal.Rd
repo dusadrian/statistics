@@ -1,4 +1,5 @@
 \name{statistics internal functions}
+\alias{internal}
 
 \title{Internal functions}
 
