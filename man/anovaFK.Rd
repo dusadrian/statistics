@@ -29,7 +29,7 @@ If the degrees of freedom are not what they should be (\eqn{k - 1}, and \eqn{n -
 respectively) something must be wrong. Specifically, the grouping variable should be
 declared as a factor (in case it is not already character), otherwise it is considered
 metric and a regression model is applied instead of ANOVA.
-                                                            
+
 Declaring a variable as a factor is done using the command: \code{as.factor}
 }
 
@@ -51,8 +51,31 @@ anovaFK(values, groups)
 
 # using a dataset
 vgdf <- data.frame(values, groups)
-using(vgdf, anovaFK(values ~ groups))
+using(
+  vgdf,
+  anovaFK(values ~ groups)
+)
 
+# class example
+cls <- data.frame(
+  values = c(
+    22, 27, 32, 30, 29, 27, 33, 24, 24, 30,
+    28, 22, 24, 18,21, 26, 25, 20, 24, 28,
+    20, 28, 31, 26, 26, 30, 21, 25, 29, 27
+  ),
+  groups = rep(1:3, each = 10)
+)
+
+using(
+  cls,
+  anovaFK(values ~ groups)
+)
+
+# post-hoc test, ex. Bonferroni
+using(
+  cls,
+  pairwise.t.test(values, groups, p.adj='bonferroni')
+)
 }
 
 \keyword{misc}
