@@ -71,16 +71,16 @@
         )
     }
 
-    # print(test)
+    print(test)
 
-    # if (paired) {
-    #     return(invisible(list("t.test" = test)))
-    # }
-    # else {
-    #     return(
-    #         invisible(
-    #             list("Homogeneity of variances" = homogtest, "t.test" = test)
-    #         )
-    #     )
-    # }
+    if (paired) {
+        return(invisible(list("t.test" = test)))
+    }
+    else {
+        return(
+            invisible(
+                list("Homogeneity of variances" = homogtest, "t.test" = test)
+            )
+        )
+    }
 }
