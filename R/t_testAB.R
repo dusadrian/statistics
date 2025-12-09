@@ -1,8 +1,10 @@
 `t_testAB` <- function(
     x, y = NULL,
-    alternative = c("two.sided", "less", "greater"), var.equal = FALSE,
-    mu = 0, paired = FALSE, conf.level = 0.95, data = NULL
+    alternative = c("two.sided", "less", "greater"),
+    data = NULL, ...
 ) {
+
+    dots <- list(...)
 
     if (identical(alternative, c("two.sided", "less", "greater"))) {
         alternative <- "two.sided"
@@ -14,69 +16,76 @@
     else if (is.element(alternative, c("less", "<", "lower"))) {
         pmatching <- 2
     }
-    else if (is.element(alternative, c("greater", ">", "higher"))) {
+    else if (is.element(alternative, c("greater", ">", "higher", "upper"))) {
         pmatching <- 3
     }
     else {
         admisc::stopError("Unknown alternative hypothesis specification.")
     }
 
+    conf.level <- dots$conf.level
+    if (is.null(conf.level)) {
+        conf.level <- 0.95
+    } else {
+        if (!admisc::possibleNumeric(conf.level)) {
+            admisc::stopError("The confidence level should be numeric.")
+        }
+
+        conf.level <- admisc::asNumeric(conf.level)
+
+        if (conf.level < 0 | conf.level > 1) {
+            admisc::stopError("The confidence level should be in the interval [0 - 1].")
+        }
+    }
+
     alternative <- c("two.sided", "less", "greater")[pmatching]
 
-    if (!paired) {
+    var.equal <- dots$var.equal
+
+    if (is.null(var.equal) && !isTRUE(dots$paired)) {
         homogeneity <- c("not equal", "equal")
 
         if (is.null(y)) {
             homogtest <- ansari.test(x, data = data, exact = FALSE)
-        }
-        else {
+        } else {
             homogtest <- ansari.test(x, y, exact = FALSE)
         }
 
         p.value <- homogtest$p.value
         var.equal <- p.value > (1 - conf.level)
         cat (
-            "\nThe Ansari-Bradley test for the homogeneity of variances has a value of ",
-            paste("p = ", round(p.value, 4), sep = ""),
-            " therefore the variances are ",
+            "\nThe homogeneity of variances test has a p-value of ",
+            round(p.value, 4),
+            ", variances are ",
             homogeneity[var.equal + 1],
-            "\n",
+            ".\n",
             sep = ""
         )
     }
 
+    callist <- list(x, y)
+
     if (is.null(y)) {
-        callist <- list(
-            formula = x,
-            alternative = alternative,
-            conf.level = conf.level,
-            var.equal = var.equal,
-            data = data
-        )
-
-        if (paired) {
-            callist$paired <- TRUE
+        callist <- list(formula = x)
+        if (isTRUE(dots$paired)) {
+            admisc::stopError("Cannot use 'paired' in formula method.")
         }
-
-        test <- do.call("t.test", callist)
-
     } else {
-        test <- t.test(
-            x,
-            y,
-            alternative = alternative,
-            conf.level = conf.level,
-            paired = paired,
-            var.equal = var.equal
-        )
+        callist$paired <- isTRUE(dots$paired)
     }
+
+    callist$alternative <- dots$alternative
+    callist$conf.level <- dots$conf.level
+    callist$var.equal <- isTRUE(var.equal)
+    callist$data <- data
+    test <- do.call("t.test", callist)
 
     print(test)
 
-    if (paired) {
+    if (isTRUE(callist$paired)) {
         return(invisible(list("t.test" = test)))
     }
-    else {
+    else if (is.null(dots$var.equal)) {
         return(
             invisible(
                 list("Homogeneity of variances" = homogtest, "t.test" = test)
