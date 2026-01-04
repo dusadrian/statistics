@@ -24,9 +24,11 @@ export(
     mbinom,
     sbinom,
     spooled,
+    subjects,
     t_testAB,
     t.testAB
 )
 
 S3method(print, "ttestAB")
 S3method(print, "anovaFK")
+S3method(subjects, "default")

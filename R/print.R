@@ -1,6 +1,7 @@
 print.ttestAB <- function(x, ...) {
     homogtest <- x$homogtest
     ttest <- x$ttest
+    ttestWelch <- x$ttestWelch
     paired <- x$paired
     var.equal <- x$var.equal
     conf.level <- x$conf.level
@@ -11,23 +12,27 @@ print.ttestAB <- function(x, ...) {
         homogeneity <- c("not equal", "equal")
         var.equal <- p.value > (1 - conf.level)
 
-        cat (
+        cat(paste0(
             "\nThe homogeneity of variances test has a p-value of ",
             round(p.value, 4),
             ", variances are ",
             homogeneity[var.equal + 1],
-            ".\n",
-            sep = ""
-        )
+            ".\n"
+        ))
     }
 
-    print(ttest)
+    if (isTRUE(var.equal)) {
+        print(ttest)
+    } else {
+        print(ttestWelch)
+    }
+
     cat("\n")
 }
 
 
 `print.anovaFK` <- function(x, ...) {
-    homog_test <- x$homog_test
+    p.value <- x$homog_test$p.value
     homogeneity <- c("do not have equal variation.", "have equal variation.")
     dots <- list(...)
 
@@ -46,21 +51,15 @@ print.ttestAB <- function(x, ...) {
         }
     }
 
-    var_equal <- homog_test$p.value > 1 - conf.level
+    var_equal <- p.value > 1 - conf.level
 
-    cat(
-        "\nThe Fligner-Killeen test for the homogeneity of variances has a ",
-        paste(
-            "p-value = ",
-            round(homog_test$p.value, 4),
-            sep = ""
-        ),
+    cat(paste0(
+        "\nThe homogeneity of variances test has a p-value of ",
+        round(p.value, 4),
         ", groups have ",
-        ifelse(var_equal, "", "un"),
-        "equal variations.",
-        "\n\n",
-        sep = ""
-    )
+        ifelse(var_equal, "equal variation", "unequal variations"),
+        ".\n\n"
+    ))
 
     if (var_equal) {
         cat("ANOVA table\n\n")

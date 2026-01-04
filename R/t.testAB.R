@@ -5,6 +5,7 @@
 ) {
 
     dots <- list(...)
+    paired <- isTRUE(dots$paired)
 
     if (identical(alternative, c("two.sided", "less", "greater"))) {
         alternative <- "two.sided"
@@ -42,7 +43,9 @@
 
     var.equal <- dots$var.equal
 
-    if (is.null(var.equal) && !isTRUE(dots$paired)) {
+    homogtest <- NULL
+
+    if (is.null(var.equal) && !paired) {
         homogeneity <- c("not equal", "equal")
 
         if (is.null(y)) {
@@ -56,22 +59,28 @@
 
     if (is.null(y)) {
         callist <- list(formula = x)
-        if (isTRUE(dots$paired)) {
+        if (paired) {
             admisc::stopError("Cannot use 'paired' in formula method.")
         }
     } else {
-        callist$paired <- isTRUE(dots$paired)
+        callist$paired <- paired
     }
 
     callist$alternative <- dots$alternative
     callist$conf.level <- dots$conf.level
-    callist$var.equal <- isTRUE(var.equal)
+    callist$var.equal <- TRUE
     callist$data <- data
+    ttest <- do.call("t.test", callist)
+
+    callist$var.equal <- FALSE
+    ttestWelch <- do.call("t.test", callist)
+
 
     result <- list(
         homogtest = homogtest,
-        ttest = do.call("t.test", callist),
-        paired = isTRUE(callist$paired),
+        ttest = ttest,
+        ttestWelch = ttestWelch,
+        paired = paired,
         var.equal = var.equal,
         conf.level = conf.level
     )

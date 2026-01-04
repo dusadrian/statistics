@@ -1,5 +1,5 @@
 \name{statistics internal functions}
-\alias{internal}
+\alias{subjects}
 
 \title{Internal functions}
 
