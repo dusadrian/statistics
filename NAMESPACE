@@ -1,12 +1,18 @@
 
 import(admisc)
 import(declared)
-importFrom("grDevices", "dev.new", "hcl", "dev.cur")
-importFrom("graphics", "axis", "barplot", "curve", "hist", "lines",
-           "par", "plot", "polygon", "segments", "text")
-importFrom("stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
-           "dt", "fligner.test", "lm", "na.omit", "oneway.test",
-           "pnorm", "pt", "relevel", "sd", "t.test", "var")
+importFrom(
+    "grDevices", "dev.new", "hcl", "dev.cur"
+)
+importFrom(
+    "graphics", "axis", "barplot", "curve", "hist", "lines",
+    "par", "plot", "polygon", "segments", "text"
+)
+importFrom(
+    "stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
+    "dt", "fligner.test", "lm", "na.omit", "oneway.test",
+    "pnorm", "pt", "relevel", "sd", "t.test", "var"
+)
 
 export(
     anovaFK,
@@ -18,7 +24,9 @@ export(
     mbinom,
     sbinom,
     spooled,
-    t_testAB
+    t_testAB,
+    t.testAB
 )
 
-S3method(print, anovaFK)
+S3method(print, "ttestAB")
+S3method(print, "anovaFK")

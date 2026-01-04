@@ -1,4 +1,4 @@
-`t_testAB` <- function(
+`t.testAB` <- function(
     x, y = NULL,
     alternative = c("two.sided", "less", "greater"),
     data = NULL, ...
@@ -50,17 +50,6 @@
         } else {
             homogtest <- ansari.test(x, y, exact = FALSE)
         }
-
-        p.value <- homogtest$p.value
-        var.equal <- p.value > (1 - conf.level)
-        cat (
-            "\nThe homogeneity of variances test has a p-value of ",
-            round(p.value, 4),
-            ", variances are ",
-            homogeneity[var.equal + 1],
-            ".\n",
-            sep = ""
-        )
     }
 
     callist <- list(x, y)
@@ -78,18 +67,19 @@
     callist$conf.level <- dots$conf.level
     callist$var.equal <- isTRUE(var.equal)
     callist$data <- data
-    test <- do.call("t.test", callist)
 
-    print(test)
+    result <- list(
+        homogtest = homogtest,
+        ttest = do.call("t.test", callist),
+        paired = isTRUE(callist$paired),
+        var.equal = var.equal,
+        conf.level = conf.level
+    )
 
-    if (isTRUE(callist$paired)) {
-        return(invisible(list("t.test" = test)))
-    }
-    else if (is.null(dots$var.equal)) {
-        return(
-            invisible(
-                list("Homogeneity of variances" = homogtest, "t.test" = test)
-            )
-        )
-    }
+    class(result) <- "ttestAB"
+    return(result)
+}
+
+`t_testAB` <- function(...) {
+    t.testAB(...)
 }

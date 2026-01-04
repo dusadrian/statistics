@@ -1,4 +1,5 @@
-\name{t_testAB}
+\name{t.testAB}
+\alias{t.testAB}
 \alias{t_testAB}
 
 \title{Student's t test with a preliminary test for the homogeneity of variances}
@@ -10,7 +11,7 @@
 }
 
 \usage{
-t_testAB(
+\method{t}{testAB}(
   x, y = NULL,
   alternative = c("two.sided", "less", "greater"),
   data = NULL, ...
@@ -51,7 +52,7 @@ Another argument of interest could be the logical \code{paired}, indicating if t
 group1 <- c(13, 14,  9, 12,  8, 10,  5, 10,  9, 12, 16)
 group2 <- c(16, 18, 11, 19, 14, 17, 13, 16, 17, 18, 22, 12)
 
-t_testAB(group1, group2)
+t.testAB(group1, group2)
 
 
 # or, if the variables are inside a dataset
@@ -61,11 +62,11 @@ dataset <- data.frame(
 )
 
 # using a formula
-t_testAB(values ~ group, data = dataset)
+t.testAB(values ~ group, data = dataset)
 
 using(
   dataset,
-  t_testAB(values ~ group)
+  t.testAB(values ~ group)
 )
 
 }

@@ -23,8 +23,8 @@ standard deviation using the t distribution etc.
     \tabular{ll}{
     Package: \tab statistics\cr
     Type: \tab Package\cr
-    Version: \tab 0.10\cr
-    Date: \tab 2025-12-09\cr
+    Version: \tab 0.11\cr
+    Date: \tab 2026-01-04\cr
     License: \tab GPL-v3\cr
     }
 }
