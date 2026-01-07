@@ -91,18 +91,19 @@
         admisc::stopError("The input should be a numeric value representing the test subject ID.")
     }
 
+    cat("\n")
     cat("For each of the following subjects:\n")
     cat("- Formulate a research question, involving the two variables.\n")
     cat("- Establish the variables' measurement levels.\n")
     cat("- Choose the appropriate statistical test to answer the research question.\n")
     cat("- State the null and alternative hypotheses.\n")
-    cat("- Perform the test and interpret the results.\n\n")
+    cat("- Perform the test and interpret the results.\n")
 
     for (i in x) {
         cat(paste0(
             "\nSubject ID: ", i,
             "\n  - Dataset: ", data$dataset[i],
-            "\n  - Variables: ", data$iv_name[i], ", ", data$dv_name[i], "\n"
+            "\n  - Variables: ", data$iv_name[i], ", ", data$dv_name[i], "\n\n"
         ))
     }
 }
