@@ -24,7 +24,6 @@ export(
     mbinom,
     sbinom,
     spooled,
-    subjects,
     t_testAB,
     t.testAB
 )
