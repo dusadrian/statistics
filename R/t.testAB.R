@@ -66,7 +66,7 @@
         callist$paired <- paired
     }
 
-    callist$alternative <- dots$alternative
+    callist$alternative <- alternative
     callist$conf.level <- dots$conf.level
     callist$var.equal <- TRUE
     callist$data <- data
