@@ -1,5 +1,5 @@
 Package: statistics
-Version: 0.11
+Version: 0.12
 Title: Miscellanea Functions For Intro Stats Classes
 Authors@R: person(
   given = "Adrian", family = "Dusa",
@@ -9,8 +9,9 @@ Authors@R: person(
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
 Imports: admisc (>= 0.25), declared (> 0.15)
-Description: The majority of functions in this package are designed to facilitate
-  understanding the statistical concepts taught in the class (such as the functions to
-  create graphics or areas under the normal curve), while some are designed to ease
-  calculations for the lab exercises (for instance the degrees of freedom or the
-  pooled variation for two independent samples).
+Description: Utilities for introductory statistics labs: plot tail or interval
+  areas for the normal or t distributions, highlight binomial probabilities, and
+  summarise discrete random variables. Calculate pooled standard deviations and
+  Welch-Satterthwaite degrees of freedom, and run teaching-friendly tests such as
+  Fligner-Killeen plus one-way ANOVA, and t tests with an Ansari-Bradley variance
+  check alongside pooled and Welch variants.

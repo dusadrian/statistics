@@ -5,16 +5,16 @@
 \docType{package}
 
 \title{
-A package containing useful functions to teach introductory statistics.
+Utility functions for an intro stats class.
 }
 
 \description{
-For discreet random variables, draws and calculates the probability of a certain number of
-favourable outcomes out of a number of repetition of an experiment. For a continous random
-variable, the graphics represents a normal curve with the area to the left or to the right
-of a certain z or t value, or between two such values.
-The package also contains functions to calculate the degrees of freedom and the pooled
-standard deviation using the t distribution etc.
+Plot tail or interval areas for the normal or t distributions, and draw binomial
+distributions with highlighted outcome probabilities. Summarise discrete random
+variables via their mean and standard deviation. Compute pooled standard deviations
+and Welch-Satterthwaite degrees of freedom, then run teaching-friendly tests such as
+a Fligner-Killeen variance check plus one-way ANOVA, and t tests that pair an
+Ansari-Bradley variance check with both pooled and Welch variants.
 }
 
 \seealso{dnorm, pnorm, dbinom}
@@ -23,8 +23,8 @@ standard deviation using the t distribution etc.
     \tabular{ll}{
     Package: \tab statistics\cr
     Type: \tab Package\cr
-    Version: \tab 0.11\cr
-    Date: \tab 2026-01-04\cr
+    Version: \tab 0.12\cr
+    Date: \tab 2026-03-31\cr
     License: \tab GPL-v3\cr
     }
 }

@@ -1,5 +1,9 @@
+Version 0.12
+  o updated package description
+  o plots now restore the original graphical parameters
+  o homogeneity of variances tests report only their p-value.
+
 Version 0.11
-  o new function frmode() to calculate the mode of a variable
   o new function histc() to fraw a histogram with an added distribution
     density curve
   o t.testAB() and anovaFK() have dedicated print methods
