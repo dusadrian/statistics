@@ -9,14 +9,11 @@ print.ttestAB <- function(x, ...) {
 
     if (is.null(var.equal) && !paired) {
         p.value <- homogtest$p.value
-        homogeneity <- c("not equal", "equal")
         var.equal <- p.value > (1 - conf.level)
 
         cat(paste0(
             "\nThe homogeneity of variances test has a p-value of ",
             round(p.value, 4),
-            ", variances are ",
-            homogeneity[var.equal + 1],
             ".\n"
         ))
     }
@@ -33,7 +30,6 @@ print.ttestAB <- function(x, ...) {
 
 `print.anovaFK` <- function(x, ...) {
     p.value <- x$homog_test$p.value
-    homogeneity <- c("do not have equal variation.", "have equal variation.")
     dots <- list(...)
 
     conf.level <- dots$conf.level
@@ -56,8 +52,6 @@ print.ttestAB <- function(x, ...) {
     cat(paste0(
         "\nThe homogeneity of variances test has a p-value of ",
         round(p.value, 4),
-        ", groups have ",
-        ifelse(var_equal, "equal variation", "unequal variations"),
         ".\n\n"
     ))
 

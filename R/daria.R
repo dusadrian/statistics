@@ -1,21 +1,15 @@
 `daria` <-
 function (area, z1, z2, draw = FALSE) {
 
-    if (missing(area) | is.numeric(area)) {
+    if (missing(area) || !is.character(area)) {
         cat("\n")
         admisc::stopError("Unspecified area.")
-    } else if (area == "exact" | area == "e") {
-        cat("\n")
-        cat("The area of an exact value, out of an infinity of other values, is\ninfinitely small, practically equal to zero.")
-        return()
-    } else if (
-        !is.element(
-            area,
-            c("r", "o", "a", "right", "over", "above", "l", "u", "left", "under", "b", "between")
-        )
-    ) {
-        admisc::stopError("The specified area is incorrect.")
     }
+
+    area <- tryCatch(
+        match.arg(area, c("right", "over", "above", "left", "under", "between")),
+        error = function(e) admisc::stopError("The specified area is incorrect.")
+    )
 
     if (missing(z1)) {
         admisc::stopError("The value of z was not specified.")
@@ -27,9 +21,11 @@ function (area, z1, z2, draw = FALSE) {
             }
         }
 
-    if (is.element(area, c("b", "between")) & !missing(z1) & missing(z2)) {
+    if (identical(area, "between") & !missing(z1) & missing(z2)) {
         admisc::stopError("The second z value was not specified.")
-        }
+    }
+
+    result <- NA_real_
 
     if (!missing(z2)) {
         if (z2 > 0) {
@@ -39,7 +35,35 @@ function (area, z1, z2, draw = FALSE) {
         }
     }
 
+    if (is.element(area, c("right", "over", "above"))) {
+        result <- 1 - pnorm(z1)
+        if (abs(z1) > 4) {z1 <- 4*sign(z1)}
+    } else if (is.element(area, c("under", "left"))) {
+        result <- pnorm(z1)
+        if (abs(z1) > 4) {
+            z1 <- 4*sign(z1)
+        }
+
+    } else if (identical(area, "between")) {
+        if (z1 > z2) {
+            sz <- z1; z1 <- z2; z2 <- sz
+        }
+
+        result <- pnorm(z2) - pnorm(z1)
+        if (abs(z1) > 4) {
+            z1 <- 4*sign(z1)
+        }
+
+        if (abs(z2) > 4) {
+            z2 <- 4*sign(z2)
+        }
+
+    }
+
     if (draw) {
+        old_par <- par(no.readonly = TRUE)
+        on.exit(par(old_par), add = TRUE)
+
         if (dev.cur() == 1) {
             dev.new(width = 30/2.54, height = 21/2.54)
         }
@@ -60,58 +84,32 @@ function (area, z1, z2, draw = FALSE) {
             ylim = c(0, max(y)),
             bty = "n"
         )
-    }
 
-    if (is.element(area, c("r", "o", "a", "right", "over", "above"))) {
-        area <- 1 - pnorm(z1)
-        if (abs(z1) > 4) {z1 <- 4*sign(z1)}
-        xdreapta <- seq(z1, 4, 0.001)
-        ydreapta <- dnorm(xdreapta)
-        if (draw) {
+        if (is.element(area, c("right", "over", "above"))) {
+            xright <- seq(z1, 4, 0.001)
+            yright <- dnorm(xright)
             polygon(
-                c(xdreapta, rev(xdreapta)),
-                c(rep(0, length(xdreapta)), rev(ydreapta)),
+                c(xright, rev(xright)),
+                c(rep(0, length(xright)), rev(yright)),
                 border = NA,
                 col = "#79a74c"
             )
             segments(z1, 0, z1, dnorm(z1))
-            }
-    } else if (is.element(area, c("u", "l", "under", "left"))) {
-        area <- pnorm(z1)
-        if (abs(z1) > 4) {
-            z1 <- 4*sign(z1)
-        }
+        } else if (is.element(area, c("under", "left"))) {
+            xleft <- seq(-4, z1, 0.001)
+            yleft <- dnorm(xleft)
 
-        xstanga <- seq(-4, z1, 0.001)
-        ystanga <- dnorm(xstanga)
-
-        if (draw) {
             polygon(
-                c(xstanga, rev(xstanga)),
-                c(rep(0, length(xstanga)), rev(ystanga)),
+                c(xleft, rev(xleft)),
+                c(rep(0, length(xleft)), rev(yleft)),
                 border = NA,
                 col = "#79a74c"
             )
 
             segments(z1, 0, z1, dnorm(z1))
-        }
-    } else if (is.element(area, c("b", "between"))) {
-        if (z1 > z2) {
-            sz <- z1; z1 <- z2; z2 <- sz
-        }
-
-        area <- pnorm(z2) - pnorm(z1)
-        if (abs(z1) > 4) {
-            z1 <- 4*sign(z1)
-        }
-
-        if (abs(z2) > 4) {
-            z2 <- 4*sign(z2)
-        }
-
-        xintre <- seq(z1, z2, 0.001)
-        yintre <- dnorm(xintre)
-        if (draw) {
+        } else if (identical(area, "between")) {
+            xintre <- seq(z1, z2, 0.001)
+            yintre <- dnorm(xintre)
             polygon(
                 c(xintre, rev(xintre)),
                 c(rep(0,length(xintre)), rev(yintre)),
@@ -122,9 +120,6 @@ function (area, z1, z2, draw = FALSE) {
             segments(z1, 0, z1, dnorm(z1))
             segments(z2, 0, z2, dnorm(z2))
         }
-    }
-
-    if (draw) {
 
         RStudio <- identical(names(dev.cur()), "RStudioGD")
         Positron <- grepl("Positron", names(dev.cur()))
@@ -148,5 +143,5 @@ function (area, z1, z2, draw = FALSE) {
         segments(-4, 0, 4, 0)
     }
 
-    return(area)
+    return(result)
 }

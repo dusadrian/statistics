@@ -10,10 +10,12 @@ function(x, from, to, size = 15, ...) {
 
     other.args <- list(...)
     funargs <- unlist(lapply(match.call(), deparse)[-1])
+    old_par <- par(no.readonly = TRUE)
+    on.exit(par(old_par), add = TRUE)
     if (dev.cur() == 1) {
         dev.new(width = (size + 1)/2.54, height = (size + 1)/2.54)
     }
-    
+
     par(mar = c(4, 4, 2, 0))
     testh <- hist(x, plot = FALSE)
     bdiff <- diff(testh$breaks[1:2])
