@@ -1,4 +1,4 @@
-print.ttestAB <- function(x, ...) {
+print.ttesthv <- function(x, ...) {
     homogtest <- x$homogtest
     ttest <- x$ttest
     ttestWelch <- x$ttestWelch
@@ -7,7 +7,7 @@ print.ttestAB <- function(x, ...) {
     conf.level <- x$conf.level
 
 
-    if (is.null(var.equal) && !paired) {
+    if (is.null(var.equal) && !paired && !is.null(homogtest)) {
         p.value <- homogtest$p.value
         var.equal <- p.value > (1 - conf.level)
 
@@ -16,6 +16,10 @@ print.ttestAB <- function(x, ...) {
             round(p.value, 4),
             ".\n"
         ))
+    }
+
+    if (is.null(var.equal)) {
+        var.equal <- TRUE
     }
 
     if (isTRUE(var.equal)) {
@@ -28,34 +32,24 @@ print.ttestAB <- function(x, ...) {
 }
 
 
-`print.anovaFK` <- function(x, ...) {
+`print.anovahv` <- function(x, ...) {
     p.value <- x$homog_test$p.value
-    dots <- list(...)
+    var.equal <- x$var.equal
+    conf.level <- x$conf.level
 
-    conf.level <- dots$conf.level
-    if (is.null(conf.level)) {
-        conf.level <- 0.95
-    } else {
-        if (!admisc::possibleNumeric(conf.level)) {
-            admisc::stopError("The confidence level should be numeric.")
-        }
-
-        conf.level <- admisc::asNumeric(conf.level)
-
-        if (conf.level < 0 | conf.level > 1) {
-            admisc::stopError("The confidence level should be in the interval [0 - 1].")
-        }
+    if (is.null(var.equal)) {
+        var.equal <- p.value > 1 - conf.level
     }
 
-    var_equal <- p.value > 1 - conf.level
+    if (is.null(x$var.equal)) {
+        cat(paste0(
+            "\nThe homogeneity of variances test has a p-value of ",
+            round(p.value, 4),
+            ".\n\n"
+        ))
+    }
 
-    cat(paste0(
-        "\nThe homogeneity of variances test has a p-value of ",
-        round(p.value, 4),
-        ".\n\n"
-    ))
-
-    if (var_equal) {
+    if (isTRUE(var.equal)) {
         cat("ANOVA table\n\n")
         print(summary(x$test))
         cat("\n\n")

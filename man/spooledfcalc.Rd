@@ -6,7 +6,7 @@
 
 \description{
 The function \code{dfcalc} is used only for two samples t test, when the group
-variations are NOT equal.
+variations are \bold{not} equal.
 For small and independent samples, and unknown but equal population variances,
 the variances of the two samples are used. As the sample variances are never
 equal, this function calculates their pooled variance based on the two standard

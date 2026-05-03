@@ -3,9 +3,9 @@
 
 \title{Calculate and draw the area under the t distribution}
 \description{
-  A function similar to "daria", with the only difference it uses the t instead of the
-  z distribution. In addition, the function expects an additional parameter for the
-  degrees of freedom. 
+  A function similar to \code{daria}, with the only difference it uses the t instead of the
+  normal z distribution. In addition, the function expects an additional parameter for the
+  degrees of freedom.
 }
 \usage{
 dariat(area, t1, t2, df, draw = FALSE)
@@ -28,8 +28,7 @@ In the argument \bold{\code{area}}, the function accepts:
 
 \code{"b"} and \code{"between"} for the area between two z values.
 
-z values smaller than -4 and greater than +4 are truncated to these values, since the area
-to the left and to the right of these values is practically equal to zero.
+z values smaller than -4 and greater than +4 are truncated to these values.
 }
 
 \author{Adrian Dusa}

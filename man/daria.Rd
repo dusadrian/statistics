@@ -27,8 +27,7 @@ In the argument \bold{\code{area}}, the function accepts:
 
 \code{"b"} and \code{"between"} for the area between two z values.
 
-z values smaller than -4 and greater than +4 are truncated to these values, since the area
-to the left and to the right of these values is practically equal to zero.
+z values smaller than -4 and greater than +4 are truncated to these values.
 }
 
 \author{Adrian Dusa}
@@ -36,7 +35,7 @@ to the left and to the right of these values is practically equal to zero.
 \seealso{\code{\link{pnorm}}, \code{\link{qnorm}}}
 
 \examples{
-daria("between", -1.96, 1.96) 
+daria("between", -1.96, 1.96)
 
 daria("over", -1)
 

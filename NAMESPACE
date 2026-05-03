@@ -1,33 +1,51 @@
 
 import(admisc)
 import(declared)
-importFrom(
-    "grDevices", "dev.new", "hcl", "dev.cur"
-)
-importFrom(
-    "graphics", "axis", "barplot", "curve", "hist", "lines",
-    "par", "plot", "polygon", "segments", "text"
-)
-importFrom(
-    "stats", "anova", "ansari.test", "aov", "dbinom", "dnorm",
-    "dt", "fligner.test", "lm", "na.omit", "oneway.test",
-    "pnorm", "pt", "relevel", "sd", "t.test", "var"
-)
-
-export(
-    anovaFK,
-    daria,
-    dariat,
-    dbinoms,
-    dfcalc,
-    histc,
-    mbinom,
-    sbinom,
-    spooled,
-    t_testAB,
-    t.testAB
-)
-
-S3method(print, "ttestAB")
-S3method(print, "anovaFK")
-S3method(subjects, "default")
+importFrom(grDevices,dev.new)
+importFrom(grDevices,hcl)
+importFrom(grDevices,dev.cur)
+importFrom(graphics,axis)
+importFrom(graphics,barplot)
+importFrom(graphics,curve)
+importFrom(graphics,hist)
+importFrom(graphics,lines)
+importFrom(graphics,par)
+importFrom(graphics,plot)
+importFrom(graphics,polygon)
+importFrom(graphics,segments)
+importFrom(graphics,text)
+importFrom(stats,anova)
+importFrom(stats,ansari.test)
+importFrom(stats,aov)
+importFrom(stats,dbinom)
+importFrom(stats,dnorm)
+importFrom(stats,dt)
+importFrom(stats,fligner.test)
+importFrom(stats,lm)
+importFrom(stats,na.omit)
+importFrom(stats,oneway.test)
+importFrom(stats,pnorm)
+importFrom(stats,pt)
+importFrom(stats,relevel)
+importFrom(stats,sd)
+importFrom(stats,t.test)
+importFrom(stats,var)
+export(anovahv)
+export(anovaFK)
+export(daria)
+export(dariat)
+export(dbinoms)
+export(dfcalc)
+export(histc)
+export(mbinom)
+export(sbinom)
+export(spooled)
+export(t.testAB)
+export(t.testhv)
+S3method(print,ttesthv)
+S3method(print,anovahv)
+S3method(anovahv,default)
+S3method(anovahv,formula)
+S3method(t.testhv,default)
+S3method(t.testhv,formula)
+S3method(t.testhv,Pair)

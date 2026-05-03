@@ -1,12 +1,12 @@
 .onAttach <- function(...) {
     to_load <- c("admisc", "declared")
-    
+
     # code borrowed from package tidyverse
-    
+
     # Attach the package from the same package library it was
     # loaded from before. https://github.com/tidyverse/tidyverse/issues/171
     load_library <- function(pkg) {
-        if (pkg %in% loadedNamespaces() && !is.element(pkg, .packages())) {
+        if (is.element(pkg, loadedNamespaces()) && !is.element(pkg, .packages())) {
             loc <- dirname(getNamespaceInfo(pkg, "path"))
             do.call(
                 "library",
@@ -14,7 +14,7 @@
             )
         }
     }
-    
+
     not_yet_loaded <- to_load[!is.element(paste0("package:", to_load), search())]
 
     if (length(not_yet_loaded) > 0) {

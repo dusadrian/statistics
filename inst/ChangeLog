@@ -1,3 +1,10 @@
+Version 0.13
+  o function t.testAB() renamed to t.testhv()
+  o function anovaFK() renamed to anovahv() where "hv" stands for
+    "homogeneity of variance" testing.
+  o function t.testhv() is now generic, detecting declared categorical
+    variables, formulas and even Pair() class extensions.
+
 Version 0.12
   o updated package description
   o plots now restore the original graphical parameters
@@ -6,16 +13,16 @@ Version 0.12
 Version 0.11
   o new function histc() to fraw a histogram with an added distribution
     density curve
-  o t.testAB() and anovaFK() have dedicated print methods
+  o t.testhv() and anovahv() have dedicated print methods
   o argument "new" from function dbinoms() is now FALSE by default
   o new argument "zoom" for function dbinoms(); if TRUE, the drawing only zooms
     on the values with a positive probability
   o new function hclr() pentru a genera culori din gama HCL (Hue Chroma Luminance)
-  o function t.testAB() now also accepts a formula in the first argument
-  o new function anovaFK() using the Fligner-Killeen test to verify the
+  o function t.testhv() now also accepts a formula in the first argument
+  o new function anovahv() using the Fligner-Killeen test to verify the
     homogeneity of variance assumption
   o new function dfcalc() to calculate degrees of freedom
-  o new function t.testAB() using the Ansari-Bradley test to verify the
+  o new function t.testhv() using the Ansari-Bradley test to verify the
     homogeneity of variance assumption
   o new function spooled() to calculate the pooled variance
 
