@@ -23,8 +23,8 @@ Ansari-Bradley variance check with both pooled and Welch variants.
     \tabular{ll}{
     Package: \tab statistics\cr
     Type: \tab Package\cr
-    Version: \tab 0.13\cr
-    Date: \tab 2026-05-01\cr
+    Version: \tab 0.14\cr
+    Date: \tab 2026-05-12\cr
     License: \tab GPL-v3\cr
     }
 }
