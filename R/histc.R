@@ -10,6 +10,7 @@ function(x, from, to, size = 15, ...) {
 
     other.args <- list(...)
     funargs <- unlist(lapply(match.call(), deparse)[-1])
+    has_user_ylim <- ("ylim" %in% names(other.args))
     old_par <- par(no.readonly = TRUE)
     on.exit(par(old_par), add = TRUE)
     if (dev.cur() == 1) {
@@ -42,8 +43,20 @@ function(x, from, to, size = 15, ...) {
         tohist$xlim <- c(from, to)
         
         h <- suppressWarnings(eval(as.call(tohist)))
-        
-        tohist$ylim <- c(0, max(h$counts)*1.1)
+
+        xfit <- seq(from, to, length = 100)
+        x_sd <- stats::sd(x)
+        yfit <- if (!is.finite(x_sd) || x_sd <= 0) {
+            rep(0, length(xfit))
+        }
+        else {
+            stats::dnorm(xfit, mean = mean(x), sd = x_sd) * bdiff * length(x)
+        }
+
+        if (!has_user_ylim) {
+            ymax <- max(c(h$counts, yfit), na.rm = TRUE)
+            tohist$ylim <- c(0, ymax * 1.1)
+        }
         tohist$xlab <- xlab
         tohist$main <- maintitle
         tohist$axes <- FALSE
@@ -53,7 +66,20 @@ function(x, from, to, size = 15, ...) {
     }
     else {
         h <- suppressWarnings(eval(as.call(tohist)))
-        tohist$ylim <- c(0, max(h$counts)*1.1)
+
+        xfit <- seq(min(h$breaks), max(h$breaks), length = 100)
+        x_sd <- stats::sd(x)
+        yfit <- if (!is.finite(x_sd) || x_sd <= 0) {
+            rep(0, length(xfit))
+        }
+        else {
+            stats::dnorm(xfit, mean = mean(x), sd = x_sd) * bdiff * length(x)
+        }
+
+        if (!has_user_ylim) {
+            ymax <- max(c(h$counts, yfit), na.rm = TRUE)
+            tohist$ylim <- c(0, ymax * 1.1)
+        }
         tohist$xlab <- xlab
         tohist$main <- maintitle
         tohist$axes <- FALSE
@@ -63,8 +89,6 @@ function(x, from, to, size = 15, ...) {
     }
     
     text(h$mids, h$counts, h$counts, pos = 3, cex = 0.9)
-    xfit <- seq(ifelse(missing(from), min(h$breaks), from), ifelse(missing(to), max(h$breaks), to), length = 100)
-    yfit <- dnorm(xfit, mean = mean(x), sd = sd(x))*bdiff*length(x)
     lines(xfit, yfit, col = "darkblue", lwd = 2)
     if (!missing(from) & !missing(to)) {
         axis(1, at = seq(from, to, by = bdiff))

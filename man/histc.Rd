@@ -7,6 +7,8 @@
 \description{
 Draws a histogram with a normal curve that approximates the
 distribution.
+When \code{ylim} is not provided, it is chosen to accommodate both the
+histogram bars and the superimposed curve.
 }
 
 \usage{
