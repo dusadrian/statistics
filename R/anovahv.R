@@ -49,7 +49,9 @@
     m$conf.level <- NULL
 
     mf <- eval(m, parent.frame())
-    mf_names <- names(mf)
+    mf_names <- vapply(
+        names(mf), admisc::getName, character(1)
+    )
     dname <- paste(mf_names, collapse = " by ")
     names(mf) <- NULL
 
@@ -79,6 +81,10 @@
     }
 
     conf.level <- .anovahv_conf_level(conf.level)
+
+    if (is.declared(values)) {
+        values <- drop_na(values)
+    }
 
     if (is.declared(group)) {
         group <- as.factor(group)
