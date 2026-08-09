@@ -1,3 +1,8 @@
+Version 0.14
+  o multiple improvements to function anovahv()
+  o new argument "numsum" to function anovahv()
+  o fixes histogram height in function histc()
+
 Version 0.13
   o function t.testAB() renamed to t.testhv()
   o function anovaFK() renamed to anovahv() where "hv" stands for

@@ -1,5 +1,5 @@
 Package: statistics
-Version: 0.15
+Version: 0.14
 Title: Miscellanea Functions For Intro Stats Classes
 Authors@R: person(
   given = "Adrian", family = "Dusa",
@@ -8,7 +8,7 @@ Authors@R: person(
   comment = c(ORCID = "0000-0002-3525-9253"))
 Depends: R (>= 3.5.0)
 License: GPL (>= 3)
-Imports: admisc (>= 0.25), declared (> 0.15)
+Imports: admisc (>= 0.25), declared (> 0.25)
 Description: Utilities for introductory statistics labs: plot tail or interval
   areas for the normal or t distributions, highlight binomial probabilities, and
   summarise discrete random variables. Calculate pooled standard deviations and

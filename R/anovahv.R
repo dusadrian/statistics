@@ -4,7 +4,7 @@
 
 
 `anovahv.default` <- function(
-    x, y, var.equal = NULL, conf.level = 0.95, ...
+    x, y, var.equal = NULL, conf.level = 0.95, numsum = FALSE, ...
 ) {
 
     if (missing(y)) {
@@ -16,6 +16,7 @@
         group = y,
         var.equal = var.equal,
         conf.level = conf.level,
+        numsum = numsum,
         dname = paste(deparse1(substitute(x)), "by", deparse1(substitute(y)))
     )
 
@@ -25,7 +26,7 @@
 
 `anovahv.formula` <- function(
     formula, data, subset, na.action = na.omit,
-    var.equal = NULL, conf.level = 0.95,
+    var.equal = NULL, conf.level = 0.95, numsum = FALSE,
     ...
 ) {
 
@@ -47,6 +48,15 @@
     m$... <- NULL
     m$var.equal <- NULL
     m$conf.level <- NULL
+    m$numsum <- NULL
+
+    summary_mf <- NULL
+    if (isTRUE(numsum)) {
+        summary_call <- m
+        summary_call$na.action <- quote(stats::na.pass)
+        summary_mf <- eval(summary_call, parent.frame())
+        names(summary_mf) <- NULL
+    }
 
     mf <- eval(m, parent.frame())
     mf_names <- vapply(
@@ -62,9 +72,12 @@
         group = mf[[-response]],
         var.equal = var.equal,
         conf.level = conf.level,
+        numsum = numsum,
         dname = dname,
         values_name = mf_names[response],
-        group_name = mf_names[-response]
+        group_name = mf_names[-response],
+        summary_values = if (is.null(summary_mf)) NULL else summary_mf[[response]],
+        summary_group = if (is.null(summary_mf)) NULL else summary_mf[[-response]]
     )
 
     return(result)
@@ -72,15 +85,34 @@
 
 
 `.anovahv_fit` <- function(
-    values, group, var.equal = NULL, conf.level = 0.95, dname = NULL,
-    values_name = "values_x", group_name = "group_y"
+    values, group, var.equal = NULL, conf.level = 0.95, numsum = FALSE,
+    dname = NULL, values_name = "values_x", group_name = "group_y",
+    summary_values = NULL, summary_group = NULL
 ) {
 
     if (!is.null(var.equal) && !is.logical(var.equal)) {
         admisc::stopError("The 'var.equal' argument should be logical or NULL.")
     }
 
+    if (!is.logical(numsum) || length(numsum) != 1L || is.na(numsum)) {
+        admisc::stopError("The 'numsum' argument should be TRUE or FALSE.")
+    }
+
     conf.level <- .anovahv_conf_level(conf.level)
+
+    numerical_summaries <- NULL
+    if (numsum) {
+        if (is.null(summary_values)) {
+            summary_values <- values
+        }
+        if (is.null(summary_group)) {
+            summary_group <- group
+        }
+        numerical_summaries <- .anovahv_numsum(
+            summary_values,
+            summary_group
+        )
+    }
 
     # unnecessary for declared >= 0.27 but protects against using
     # earlier versions of declared package
@@ -132,11 +164,35 @@
     result$test <- test
     result$welch <- welch
     result$output_table <- output_table
+    result$numsum <- numerical_summaries
     result$var.equal <- var.equal
     result$conf.level <- conf.level
     result$data.name <- dname
 
     class(result) <- c("anovahv", class(test))
+
+    return(result)
+}
+
+
+`.anovahv_numsum` <- function(values, group) {
+
+    if (is.declared(group)) {
+        group <- as.factor(group)
+    }
+    else if (!is.factor(group)) {
+        group <- as.factor(group)
+    }
+
+    result <- do.call(
+        rbind,
+        lapply(
+            split(values, group),
+            wmeasures,
+            what = c("mean", "sd", "n", "NA")
+        )
+    )
+    class(result) <- c("wmeasures", class(result))
 
     return(result)
 }

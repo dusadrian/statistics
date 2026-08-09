@@ -16,12 +16,12 @@
 anovahv(x, ...)
 
 \method{anovahv}{default}(
-  x, y, var.equal = NULL, conf.level = 0.95, ...
+  x, y, var.equal = NULL, conf.level = 0.95, numsum = FALSE, ...
 )
 
 \method{anovahv}{formula}(
   formula, data, subset, na.action = na.omit,
-  var.equal = NULL, conf.level = 0.95,
+  var.equal = NULL, conf.level = 0.95, numsum = FALSE,
   ...
 )
 }
@@ -51,6 +51,10 @@ anovahv(x, ...)
   \item{conf.level}{Numeric value between 0 and 1. When
   \code{var.equal = NULL}, the homogeneity test is evaluated against
   \code{1 - conf.level}.}
+
+  \item{numsum}{Logical. If \code{TRUE}, calculate and print the mean,
+  standard deviation, number of valid values and number of missing values for
+  each category of the grouping variable.}
 
   \item{...}{Additional arguments passed to methods.}
 }
@@ -87,6 +91,8 @@ contains:
   \item \code{test}: the classical ANOVA model produced by \code{aov};
   \item \code{welch}: the Welch one-way test produced by \code{oneway.test};
   \item \code{output_table}: a compact Welch approximation table;
+  \item \code{numsum}: the grouped numerical summaries requested with
+  \code{numsum = TRUE}, or \code{NULL};
   \item \code{var.equal} and \code{conf.level}: the analysis settings.
 }
 }
@@ -108,6 +114,9 @@ groups <- rep(1:3, each = 7)
 
 anovahv(values, groups)
 anovahv(values ~ groups)
+
+# Include numerical summaries for every group
+anovahv(values, groups, numsum = TRUE)
 
 # Force a specific output, bypassing the variance decision
 anovahv(values, groups, var.equal = TRUE)

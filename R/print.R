@@ -59,4 +59,10 @@ print.ttesthv <- function(x, ...) {
         print(noquote(x$output_table))
         cat("\n")
     }
+
+    if (!is.null(x$numsum)) {
+        cat("Numerical summaries\n\n")
+        print(x$numsum, startend = FALSE)
+        cat("\n\n")
+    }
 }

@@ -17,6 +17,16 @@ default_result <- anovahv(
     analysis_data$values,
     analysis_data$groups
 )
+summary_formula_result <- anovahv(
+    values ~ groups,
+    data = analysis_data,
+    numsum = TRUE
+)
+summary_default_result <- anovahv(
+    analysis_data$values,
+    analysis_data$groups,
+    numsum = TRUE
+)
 
 stopifnot(
     inherits(formula_result, "aov"),
@@ -30,7 +40,40 @@ stopifnot(
     identical(
         unname(formula_result$welch$p.value),
         unname(default_result$welch$p.value)
+    ),
+    is.null(formula_result$numsum),
+    identical(
+        unclass(summary_formula_result$numsum),
+        unclass(summary_default_result$numsum)
+    ),
+    identical(
+        unclass(summary_formula_result$numsum),
+        structure(
+            c(6, 7, sqrt(10), sqrt(10), 5, 5, 1, 1),
+            dim = c(2L, 4L),
+            dimnames = list(c("A", "B"), c("mean", "sd", "n", "NA"))
+        )
     )
+)
+
+summary_output <- capture.output(print(summary_formula_result))
+
+stopifnot(
+    any(grepl("Numerical summaries", summary_output, fixed = TRUE)),
+    any(grepl("mean", summary_output, fixed = TRUE)),
+    any(grepl("NA", summary_output, fixed = TRUE)),
+    which(grepl("ANOVA table", summary_output, fixed = TRUE))[1L] <
+        which(grepl("Numerical summaries", summary_output, fixed = TRUE))[1L]
+)
+
+numsum_error <- try(
+    anovahv(analysis_data$values, analysis_data$groups, numsum = "yes"),
+    silent = TRUE
+)
+
+stopifnot(
+    inherits(numsum_error, "try-error"),
+    grepl("The 'numsum' argument should be TRUE or FALSE.", numsum_error)
 )
 
 
