@@ -19,6 +19,9 @@ default_result <- anovahv(
 )
 
 stopifnot(
+    inherits(formula_result, "aov"),
+    inherits(formula_result, "lm"),
+    identical(class(formula_result), c("anovahv", "aov", "lm")),
     identical(formula_result$output_table, complete_result$output_table),
     identical(
         formula_result$homog_test$p.value,
@@ -28,6 +31,18 @@ stopifnot(
         unname(formula_result$welch$p.value),
         unname(default_result$welch$p.value)
     )
+)
+
+
+stopifnot(
+    identical(TukeyHSD(formula_result), TukeyHSD(formula_result$test)),
+    identical(anova(formula_result), anova(formula_result$test)),
+    identical(coef(formula_result), coef(formula_result$test)),
+    identical(residuals(formula_result), residuals(formula_result$test)),
+    identical(fitted(formula_result), fitted(formula_result$test)),
+    identical(model.frame(formula_result), model.frame(formula_result$test)),
+    identical(predict(formula_result), predict(formula_result$test)),
+    inherits(summary(formula_result), "summary.aov")
 )
 
 

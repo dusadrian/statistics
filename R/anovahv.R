@@ -82,6 +82,8 @@
 
     conf.level <- .anovahv_conf_level(conf.level)
 
+    # unnecessary for declared >= 0.27 but protects against using
+    # earlier versions of declared package
     if (is.declared(values)) {
         values <- drop_na(values)
     }
@@ -123,17 +125,18 @@
     output_table[2, 4] <- ""
     output_table[2, 5] <- ""
 
-    result <- list(
-        homog_test = homog_test,
-        test = test,
-        welch = welch,
-        output_table = output_table,
-        var.equal = var.equal,
-        conf.level = conf.level,
-        data.name = dname
-    )
+    # Keep the fitted ANOVA model as the result's underlying object. This lets
+    # methods for "aov" and "lm" work without an anovahv-specific adapter.
+    result <- test
+    result$homog_test <- homog_test
+    result$test <- test
+    result$welch <- welch
+    result$output_table <- output_table
+    result$var.equal <- var.equal
+    result$conf.level <- conf.level
+    result$data.name <- dname
 
-    class(result) <- "anovahv"
+    class(result) <- c("anovahv", class(test))
 
     return(result)
 }

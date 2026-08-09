@@ -76,7 +76,12 @@ interfaces.
 }
 
 \value{
-An object of class \code{"anovahv"}, containing:
+An object inheriting from classes \code{"anovahv"}, \code{"aov"} and
+\code{"lm"}. The underlying object is the classical ANOVA model, allowing
+standard model generics such as \code{summary()}, \code{TukeyHSD()},
+\code{predict()}, \code{residuals()} and \code{fitted()} to dispatch to their
+existing \code{"aov"} or \code{"lm"} methods. For compatibility, it also
+contains:
 \itemize{
   \item \code{homog_test}: the Fligner-Killeen homogeneity of variances test;
   \item \code{test}: the classical ANOVA model produced by \code{aov};
@@ -144,6 +149,9 @@ using(
   cls,
   anovahv(values ~ groups)
 )
+
+result <- anovahv(values ~ groups, data = cls)
+TukeyHSD(result)
 
 # Post-hoc test, for example Bonferroni
 using(
