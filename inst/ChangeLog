@@ -1,4 +1,4 @@
-Version 0.14
+Version 0.16
   o multiple improvements to function anovahv()
   o new argument "numsum" to function anovahv()
   o fixes histogram height in function histc()
