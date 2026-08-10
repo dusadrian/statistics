@@ -61,7 +61,7 @@ print.ttesthv <- function(x, ...) {
     }
 
     if (!is.null(x$numsum)) {
-        cat("Numerical summaries\n\n")
+        cat("Numerical summaries\n")
         print(x$numsum, startend = FALSE)
         cat("\n\n")
     }
