@@ -1,4 +1,4 @@
-Version 0.14.2
+Version 0.15
   o anovahv() uses the supplied observations consistently for fitting and
     summaries, and reports Welch F, degrees of freedom and p without rounding
     the stored result.
@@ -9,6 +9,8 @@ Version 0.14.2
   o daria() and dariat() calculate upper tails directly. These functions and
     dbinoms() print small positive probabilities as "< 0.0001" and retain
     their numeric value for calculations.
+
+Version 0.14
   o dfcalc() and spooled() validate summary inputs and use scaled arithmetic.
   o multiple improvements to function anovahv()
   o new argument "numsum" to function anovahv()
