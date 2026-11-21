@@ -1,68 +1,34 @@
-`dfcalc` <-
-function(x, y, n1, n2) {
+.sample_sd <- function(x) {
+    s <- sd(x)
+    if (is.na(s) || (s > 0 && is.finite(s))) return(s)
+    scale <- max(abs(x))
+    if (scale == 0 || !is.finite(scale)) return(s)
+    sd(x / scale) * scale
+}
 
-    errors <- c(
-        "The first variable was not specified",
-        "The second variable was not specified",
-        "The standard deviation for the first group (sd1) was not specified",
-        "The standard deviation for the second group (sd2) was not specified",
-        "The sample size for the first group (n1) was not specified",
-        "The sample size for the second group (n2) was not specified",
-        "The first argument should be a group with multiple values",
-        "The second argument should be a group with multiple values"
-    )
+.sample_summaries <- function(x, y, n1, n2) {
+    if (missing(x) || missing(y)) stop("Supply both samples or both standard deviations.")
+    if (missing(n1) && missing(n2)) {
+        if (!is.numeric(x) || !is.numeric(y) || !is.null(dim(x)) || !is.null(dim(y)) ||
+            min(length(x), length(y)) < 2L) stop("Supply two numeric samples of at least two values.")
+        return(list(s = c(.sample_sd(x), .sample_sd(y)), n = as.double(c(length(x), length(y)))))
+    }
+    if (missing(n1) || missing(n2)) stop("Supply both sample sizes.")
+    if (!is.numeric(n1) || !is.numeric(n2) || length(n1) != 1L || length(n2) != 1L) {
+        stop("Supply one sample size per group.")
+    }
+    n <- as.double(c(n1, n2))
+    if (any(!is.finite(n) | n < 2 | n != floor(n))) stop("Sample sizes must be integers of at least two.")
+    if (!is.numeric(x) || !is.numeric(y) || length(x) != 1L || length(y) != 1L ||
+        any(!is.finite(c(x, y)) | c(x, y) < 0)) stop("Supply two finite, nonnegative standard deviations.")
+    list(s = c(x, y), n = n)
+}
 
-    verificari <- c(missing(x), missing(y), missing(n1), missing(n2))
-
-    if (sum(verificari) == 4) {
-        if (sum(verificari[1:2]) == 0) {
-            admisc::stopError(paste(errors[3:6][verificari[1:4]], collapse = "\n       "), "")
-        }
-        else {
-            admisc::stopError(paste(errors[1:2][verificari[1:2]], collapse = "\n       "), "")
-        }
-    }
-    else if (sum(verificari) == 3) {
-        if (length(x) == 1) {
-            admisc::stopError(
-                paste(
-                    c(
-                        paste("If", x, "is the standard deviation for the first group, then:"),
-                        errors[4:6]
-                    ),
-                    collapse = "\n       "
-                ),
-                ""
-            )
-        }
-        else {
-            admisc::stopError(errors[2], "")
-        }
-    }
-    else if (sum(verificari) == 2) {
-        if (missing(x) | missing(y)) {
-            admisc::stopError(paste(errors[1:2][verificari[1:2]], collapse = "\n       "), "")
-        }
-        else if (all(length(x) == 1, length(y) == 1)) {
-            admisc::stopError(paste(errors[5:6], collapse = "\n       "), "")
-        }
-        else if (any(length(x) == 1, length(y) == 1)) {
-            admisc::stopError(errors[7:8][which(length(x) == 1, length(y) == 1)], "")
-        }
-        else {
-            var1 <- var(x)
-            n1 <- length(x)
-            var2 <- var(y)
-            n2 <- length(y)
-        }
-    }
-    else if (sum(verificari) == 1) {
-        admisc::stopError(paste(errors[3:6][verificari[1:4]], collapse = "\n       "), "")
-    }
-    else {
-        var1 <- x^2
-        var2 <- y^2
-    }
-
-    return((var1/n1 + var2/n2)^2 / ((var1/n1)^2/(n1-1) + (var2/n2)^2/(n2-1)))
+dfcalc <- function(x, y, n1, n2) {
+    groups <- .sample_summaries(x, y, n1, n2)
+    se <- groups$s / sqrt(groups$n)
+    if (anyNA(se)) return(NA_real_)
+    if (max(se) == 0) return(NaN)
+    weights <- (se / max(se))^2
+    1 / sum((weights / sum(weights))^2 / (groups$n - 1))
 }

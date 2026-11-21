@@ -123,3 +123,58 @@ stopifnot(
     df.residual(qualified_formula_result$test) == 14L,
     length(qualified_formula_result$test$na.action) == 0L
 )
+
+# Expressions and a sampled subset must be evaluated only once in the supplied data.
+d <- data.frame(v = c(1, 3, 5, 2, 3, 10, 13, 14, 30),
+    g = factor(rep(LETTERS[1:3], each = 3)))
+v <- c(1, 2, 3, 2, 4, 6, 3, 6, 9)
+fit <- anovahv(log(v) ~ g, d, var.equal = FALSE)
+reference <- oneway.test(log(v) ~ g, d)
+stopifnot(identical(fit$selected, fit$welch),
+    identical(fit$welch$p.value, reference$p.value),
+    identical(fit$model[[1L]], log(d$v)),
+    identical(fit$output_table[[1L]], unname(reference$statistic)),
+    identical(fit$output_table[[2L]], unname(reference$parameter[1L])),
+    identical(fit$output_table[[3L]], unname(reference$parameter[2L])),
+    identical(fit$output_table[[4L]], reference$p.value),
+    identical(update(fit)$output_table, fit$output_table))
+
+contrast_data <- d
+contrasts(contrast_data$g) <- contr.sum(3)
+stopifnot(identical(coef(anovahv(v ~ g, contrast_data)), coef(aov(v ~ g, contrast_data))))
+
+calls <- 0L
+draw_rows <- function() {
+    calls <<- calls + 1L
+    sample.int(nrow(d), 8L)
+}
+set.seed(47)
+sampled <- anovahv(log(v) ~ g, d, subset = draw_rows(), numsum = TRUE)
+stopifnot(calls == 1L, isTRUE(all.equal(unname(sampled$numsum[, "mean"]),
+    as.vector(tapply(sampled$model[[1L]], sampled$model[[2L]], mean)))))
+
+names(d)[2L] <- "study arm"
+d[[2L]] <- as.integer(d[[2L]])
+fit <- anovahv(log(v) ~ `study arm`, d)
+newdata <- d[c(8L, 1L), , drop = FALSE]
+simple <- data.frame(y = log(d$v), arm = factor(d[[2L]]))
+stopifnot(isTRUE(all.equal(TukeyHSD(fit)[[1L]], TukeyHSD(aov(y ~ arm, simple))[[1L]])))
+stopifnot(isTRUE(all.equal(unname(predict(fit, newdata)), unname(fitted(fit)[c(8L, 1L)]))))
+d$v[2L] <- NA
+aligned <- anovahv(v ~ `study arm`, d, na.action = na.exclude)
+stopifnot(length(resid(aligned)) == nrow(d), is.na(resid(aligned)[2L]))
+
+stopifnot(inherits(try(anovahv(1:8, c("A", "B")), silent = TRUE), "try-error"),
+    inherits(try(anovahv(1:8, rep(1:2, 4), weights = 1:8), silent = TRUE), "try-error"))
+single <- data.frame(v = c(3, 4:8), g = factor(c(1, rep(2, 5))))
+fit <- anovahv(v ~ g, single, var.equal = TRUE)
+stopifnot(is.null(fit$welch), identical(fit$selected, fit$test),
+    isTRUE(all.equal(unname(coef(fit)), unname(coef(aov(v ~ g, single))))),
+    inherits(try(anovahv(v ~ g, single, var.equal = FALSE), silent = TRUE), "try-error"))
+stopifnot(inherits(try(anovahv(v ~ g, single, var.equal = c(setting = FALSE)),
+    silent = TRUE), "try-error"))
+for (pooled in c(FALSE, TRUE)) {
+    fit <- anovahv(c(1:6, 101:106), rep(letters[1:2], each = 6), var.equal = pooled)
+    displayed <- capture.output(returned <- print(fit))
+    stopifnot(any(grepl("< 0.0001", displayed, fixed = TRUE)), identical(returned, fit))
+}

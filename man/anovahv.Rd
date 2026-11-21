@@ -41,7 +41,8 @@ anovahv(x, ...)
   \item{subset}{An optional vector specifying a subset of observations.}
 
   \item{na.action}{A function specifying how missing values should be handled
-  by the formula method.}
+  by the formula method. The default omits incomplete observations.
+  With \code{na.exclude}, fitted values and residuals retain missing-row positions.}
 
   \item{var.equal}{Logical or \code{NULL}. If \code{TRUE}, the classical ANOVA
   table is printed. If \code{FALSE}, the Welch approximation table is printed.
@@ -56,15 +57,16 @@ anovahv(x, ...)
   standard deviation, number of valid values and number of missing values for
   each category of the grouping variable.}
 
-  \item{...}{Additional arguments passed to methods.}
+  \item{...}{Arguments passed to the selected method. Unsupported arguments give an error.}
 }
 
 \details{
 The function is a teaching-oriented wrapper around \code{\link[stats]{aov}},
 \code{\link[stats]{lm}}, \code{\link[stats]{oneway.test}} and
-\code{\link[stats]{fligner.test}}. It always stores both the classical ANOVA
-result and the Welch approximation result. The print method chooses which one
-to display.
+\code{\link[stats]{fligner.test}}. The classical and Welch analyses use the same observations. Welch ANOVA
+requires at least two observations and positive variance in every group.
+When Welch is unavailable, the automatic choice displays the classical result
+and explains the limitation. An explicit request for Welch gives an error.
 
 The argument \code{var.equal} follows the same general idea as in
 \code{\link{t.testhv}}. If it is left as \code{NULL}, the function performs a
@@ -89,8 +91,11 @@ contains:
 \itemize{
   \item \code{homog_test}: the Fligner-Killeen homogeneity of variances test;
   \item \code{test}: the classical ANOVA model produced by \code{aov};
-  \item \code{welch}: the Welch one-way test produced by \code{oneway.test};
-  \item \code{output_table}: a compact Welch approximation table;
+  \item \code{welch}: the Welch one-way test, or \code{NULL} when unavailable;
+  \item \code{output_table}: a one-row numeric table with the Welch F statistic,
+  numerator and denominator degrees of freedom, and full-precision p-value
+  when Welch is available;
+  \item \code{selected}: the classical model or Welch test shown by \code{print()}.
   \item \code{numsum}: the grouped numerical summaries requested with
   \code{numsum = TRUE}, or \code{NULL};
   \item \code{var.equal} and \code{conf.level}: the analysis settings.

@@ -1,335 +1,127 @@
-`t.testhv` <- function(x, ...) {
+t.testhv <- function(x, ...) {
     UseMethod("t.testhv")
 }
 
-
-`t.testhv.default` <- function(
-    x, y = NULL,
-    alternative = c("two.sided", "less", "greater"),
-    mu = 0, paired = FALSE, var.equal = NULL, conf.level = 0.95,
-    ...
+t.testhv.default <- function(
+    x, y = NULL, alternative = c("two.sided", "less", "greater"),
+    mu = 0, paired = FALSE, var.equal = NULL, conf.level = 0.95, ...
 ) {
-
-    args <- .ttesthv_args(
-        alternative = alternative,
-        conf.level = conf.level
-    )
-
-    alternative <- args$alternative
-    conf.level <- args$conf.level
-    dname <- deparse1(substitute(x))
-
-    if (!is.null(y) && !paired && .is_declared_categorical(y)) {
-        dname <- paste(
-            dname,
-            "by",
-            deparse1(substitute(y))
-        )
-        group <- as.factor(y)
-        x <- .ttesthv_values(x)
-
-        if (nlevels(group) != 2L) {
-            admisc::stopError("The grouping variable must have exactly 2 levels.")
-        }
-
-        DATA <- split(x, group)
-
-        result <- t.testhv(
-            DATA[[1L]],
-            DATA[[2L]],
-            alternative = alternative,
-            mu = mu,
-            var.equal = var.equal,
-            conf.level = conf.level,
-            ...
-        )
-
-        if (length(result$ttest$estimate) == 2L) {
-            names(result$ttest$estimate) <- paste("mean in group", levels(group))
-            names(result$ttest$null.value) <- paste(
-                "difference in means between",
-                paste("group", levels(group), collapse = " and ")
-            )
-        }
-
-        if (length(result$ttestWelch$estimate) == 2L) {
-            names(result$ttestWelch$estimate) <- paste("mean in group", levels(group))
-            names(result$ttestWelch$null.value) <- paste(
-                "difference in means between",
-                paste("group", levels(group), collapse = " and ")
-            )
-        }
-
-        result$ttest$data.name <- dname
-        result$ttestWelch$data.name <- result$ttest$data.name
-
-        return(result)
-    }
-
-    x <- .ttesthv_values(x)
-
-    if (!is.null(y)) {
-        dname <- paste(
-            dname,
-            "and",
-            deparse1(substitute(y))
-        )
-        y <- .ttesthv_values(y)
-    }
-
-    homogtest <- NULL
-
-    if (is.null(var.equal) && !paired && !is.null(y)) {
-        homogtest <- ansari.test(x, y, exact = FALSE)
-    }
-
-    callist <- list(
-        x = x,
-        y = y,
-        alternative = alternative,
-        mu = mu,
-        paired = paired,
-        conf.level = conf.level,
-        var.equal = TRUE
-    )
-
-    if (is.null(y)) {
-        callist$y <- NULL
-        callist$paired <- NULL
-    }
-
-    ttest <- do.call("t.test", callist)
-
-    callist$var.equal <- FALSE
-    ttestWelch <- do.call("t.test", callist)
-
-    ttest$data.name <- dname
-    ttestWelch$data.name <- dname
-
-    result <- list(
-        homogtest = homogtest,
-        ttest = ttest,
-        ttestWelch = ttestWelch,
-        paired = paired,
-        var.equal = var.equal,
-        conf.level = conf.level
-    )
-
-    class(result) <- "ttesthv"
-
-    return(result)
-}
-
-
-`t.testhv.formula` <- function(
-    formula, data, subset, na.action = na.pass, ...
-) {
-
-    if (missing(formula) || length(formula) != 3L) {
-        admisc::stopError("The formula is incorrect.")
-    }
-
-    if ("paired" %in% ...names()) {
-        admisc::stopError("Cannot use 'paired' in formula method.")
-    }
-
-    dots <- list(...)
-
-    args <- .ttesthv_args(
-        alternative = getElement(dots, "alternative"),
-        conf.level = getElement(dots, "conf.level")
-    )
-
-    mu <- getElement(dots, "mu")
-    if (is.null(mu)) {
-        mu <- 0
-    }
-
-    var.equal <- getElement(dots, "var.equal")
-
-    oneSampleOrPaired <- FALSE
-
-    if (length(attr(terms(formula[-2L]), "term.labels")) != 1L) {
-        if (formula[[3L]] == 1L) {
-            oneSampleOrPaired <- TRUE
-        }
-        else {
-            admisc::stopError("The formula is incorrect.")
-        }
-    }
-
-    m <- match.call(expand.dots = FALSE)
-
-    if (is.matrix(eval(m$data, parent.frame()))) {
-        m$data <- as.data.frame(data)
-    }
-
-    m[[1L]] <- quote(stats::model.frame)
-    m$... <- NULL
-
-    mf <- eval(m, parent.frame())
-    dname <- paste(names(mf), collapse = " by ")
-    names(mf) <- NULL
-
-    response <- attr(attr(mf, "terms"), "response")
-    respVar <- mf[[response]]
-
-    if (oneSampleOrPaired) {
-        result <- t.testhv(
-            respVar,
-            alternative = args$alternative,
-            mu = mu,
-            var.equal = var.equal,
-            conf.level = args$conf.level
-        )
-    }
-    else {
-        group <- mf[[-response]]
-        respVar <- .ttesthv_values(respVar)
-
-        if (is.declared(group)) {
-            group <- as.factor(group)
-        }
-        else if (!is.factor(group)) {
-            group <- factor(group)
-        }
-
-        if (nlevels(group) != 2L) {
-            admisc::stopError("The grouping variable must have exactly 2 levels.")
-        }
-
-        DATA <- split(respVar, group)
-
-        result <- t.testhv(
-            DATA[[1L]],
-            DATA[[2L]],
-            alternative = args$alternative,
-            mu = mu,
-            var.equal = var.equal,
-            conf.level = args$conf.level
-        )
-
-        if (length(result$ttest$estimate) == 2L) {
-            names(result$ttest$estimate) <- paste("mean in group", levels(group))
-            names(result$ttest$null.value) <- paste(
-                "difference in means between",
-                paste("group", levels(group), collapse = " and ")
-            )
-        }
-
-        if (length(result$ttestWelch$estimate) == 2L) {
-            names(result$ttestWelch$estimate) <- paste("mean in group", levels(group))
-            names(result$ttestWelch$null.value) <- paste(
-                "difference in means between",
-                paste("group", levels(group), collapse = " and ")
-            )
-        }
-    }
-
-    result$ttest$data.name <- dname
-    result$ttestWelch$data.name <- dname
-
-    return(result)
-}
-
-
-`t.testhv.Pair` <- function(
-    x,
-    alternative = c("two.sided", "less", "greater"),
-    mu = 0, var.equal = NULL, conf.level = 0.95,
-    ...
-) {
-
-    result <- t.testhv(
-        x = x[, 1L],
-        y = x[, 2L],
-        alternative = alternative,
-        mu = mu,
-        paired = TRUE,
-        var.equal = var.equal,
-        conf.level = conf.level,
-        ...
-    )
-
-    return(result)
-}
-
-
-`.ttesthv_args` <- function(
-    alternative = c("two.sided", "less", "greater"),
-    conf.level = 0.95
-) {
-
-    if (is.null(alternative)) {
-        alternative <- c("two.sided", "less", "greater")
-    }
-
-    if (is.null(conf.level)) {
-        conf.level <- 0.95
-    }
-
-    if (identical(alternative, c("two.sided", "less", "greater"))) {
+    .check_dots(...)
+    .check_flag(paired, "paired")
+    .check_flag(var.equal, "var.equal", allow_null = TRUE)
+    conf.level <- .conf_level(conf.level)
+    choices <- c("two.sided" = "two.sided", "!=" = "two.sided", "two.tailed" = "two.sided",
+        "less" = "less", "<" = "less", "lower" = "less",
+        "greater" = "greater", ">" = "greater", "higher" = "greater", "upper" = "greater")
+    if (is.null(alternative) || identical(alternative, c("two.sided", "less", "greater"))) {
         alternative <- "two.sided"
     }
+    if (length(alternative) != 1L || !alternative %in% names(choices)) {
+        stop("Unknown alternative hypothesis specification.", call. = FALSE)
+    }
+    alternative <- unname(choices[alternative])
+    dname <- .expr_name(substitute(x))
+    if (!paired && !is.null(y) && (is.factor(y) || is.character(y) ||
+        (is.declared(y) && any(grepl("categorical|nominal|ordinal", measurement(y)))))) {
+        return(.ttest_groups(x, y, paste(dname, "by", .expr_name(substitute(y))),
+            alternative = alternative, mu = mu, var.equal = var.equal, conf.level = conf.level))
+    }
+    if (!is.numeric(x) || !is.null(dim(x)) ||
+        (!is.null(y) && (!is.numeric(y) || !is.null(dim(y))))) {
+        stop("Supply numeric sample vectors.", call. = FALSE)
+    }
+    if (!is.null(y)) dname <- paste(dname, "and", .expr_name(substitute(y)))
+    if (paired && is.null(y)) stop("Supply both samples for a paired t test.", call. = FALSE)
+    if (is.declared(x)) x <- as.numeric(x)
+    if (is.declared(y)) y <- as.numeric(y)
 
-    if (is.element(alternative, c("two.sided", "!=", "two.tailed"))) {
-        pmatching <- 1
+    independent <- !paired && !is.null(y)
+    homog <- NULL
+    if (independent && is.null(var.equal)) homog <- ansari.test(x, y, exact = FALSE)
+    pooled <- tryCatch(t.test(x, y, alternative = alternative, mu = mu, paired = paired,
+        var.equal = TRUE, conf.level = conf.level), error = identity)
+    if (inherits(pooled, "error") && (!independent || isTRUE(var.equal))) stop(pooled)
+    welch <- pooled
+    if (independent) {
+        welch <- tryCatch(t.test(x, y, alternative = alternative, mu = mu,
+            conf.level = conf.level), error = identity)
     }
-    else if (is.element(alternative, c("less", "<", "lower"))) {
-        pmatching <- 2
+    reason <- NULL
+    if (inherits(welch, "error")) {
+        if (isFALSE(var.equal) || inherits(pooled, "error")) stop(welch)
+        reason <- paste("Welch's t test is unavailable:", conditionMessage(welch))
+        welch <- NULL
     }
-    else if (is.element(alternative, c("greater", ">", "higher", "upper"))) {
-        pmatching <- 3
-    }
-    else {
-        admisc::stopError("Unknown alternative hypothesis specification.")
-    }
-
-    if (!admisc::possibleNumeric(conf.level)) {
-        admisc::stopError("The confidence level should be numeric.")
-    }
-
-    conf.level <- admisc::asNumeric(conf.level)
-
-    if (conf.level < 0 | conf.level > 1) {
-        admisc::stopError("The confidence level should be in the interval [0 - 1].")
-    }
-
-    return(list(
-        alternative = c("two.sided", "less", "greater")[pmatching],
-        conf.level = conf.level
-    ))
+    if (inherits(pooled, "error")) pooled <- NULL
+    if (!is.null(pooled)) pooled$data.name <- dname
+    if (!is.null(welch)) welch$data.name <- dname
+    use_pooled <- !independent || (!is.null(pooled) &&
+        .select_pooled(var.equal, homog$p.value, conf.level, is.null(welch)))
+    structure(list(homogtest = homog, ttest = pooled, ttestWelch = welch,
+        selected = if (use_pooled) pooled else welch, welch_unavailable = reason,
+        paired = paired, var.equal = var.equal, conf.level = conf.level), class = "ttesthv")
 }
 
-
-`.is_declared_categorical` <- function(x) {
-
-    if (!is.declared(x)) {
-        return(FALSE)
+.ttest_groups <- function(x, group, dname, ...) {
+    if (!is.numeric(x) || !is.null(dim(x))) stop("Supply a numeric response vector.", call. = FALSE)
+    if (length(x) != length(group)) {
+        stop("Supply one group label for each observation.", call. = FALSE)
     }
-
-    measurement <- measurement(x)
-
-    return(
-        any(
-            grepl(
-                "categorical|nominal|ordinal",
-                measurement
-            )
-        )
-    )
+    group <- droplevels(as.factor(group))
+    if (nlevels(group) != 2L) stop("The grouping variable must have exactly two observed levels.",
+        call. = FALSE)
+    # The design is already determined. Use numeric responses in both samples.
+    if (is.declared(x)) x <- as.numeric(x)
+    samples <- split(x, group)
+    result <- t.testhv(samples[[1L]], samples[[2L]], ...)
+    for (name in c("ttest", "ttestWelch", "selected")) {
+        if (is.null(result[[name]])) next
+        names(result[[name]]$estimate) <- paste("mean in group", levels(group))
+        names(result[[name]]$null.value) <- paste("difference in means between",
+            paste("group", levels(group), collapse = " and "))
+        result[[name]]$data.name <- dname
+    }
+    result
 }
 
-
-`.ttesthv_values` <- function(x) {
-
-    if (is.declared(x)) {
-        attributes(x) <- NULL
+t.testhv.formula <- function(formula, data, subset, na.action = na.pass, ...,
+    alternative = "two.sided", mu = 0, var.equal = NULL, conf.level = 0.95) {
+    if ("paired" %in% names(substitute(list(...)))) {
+        stop("Use Pair(before, after) ~ 1 for a paired formula test.", call. = FALSE)
     }
-
-    return(x)
+    .check_dots(...)
+    if (is.null(mu)) mu <- 0
+    original <- match.call()
+    m <- original[c(1L, match(c("formula", "data", "subset"), names(original), 0L))]
+    m[[1L]] <- quote(stats::model.frame)
+    if (!missing(data)) m$data <- if (is.matrix(data)) as.data.frame(data) else data
+    m$na.action <- na.action
+    frame <- eval(m, parent.frame())
+    if (length(formula) == 3L && isTRUE(all.equal(formula[[3L]], 1))) {
+        result <- t.testhv(frame[[1L]], alternative = alternative, mu = mu,
+            var.equal = var.equal, conf.level = conf.level)
+        for (name in c("ttest", "ttestWelch", "selected")) {
+            result[[name]]$data.name <- names(frame)[1L]
+        }
+        return(result)
+    }
+    if (length(formula) != 3L || length(frame) != 2L) {
+        stop("Use 'values ~ group', 'values ~ 1' or 'Pair(before, after) ~ 1'.",
+            call. = FALSE)
+    }
+    .ttest_groups(frame[[1L]], frame[[2L]], paste(names(frame), collapse = " by "),
+        alternative = alternative, mu = mu, var.equal = var.equal, conf.level = conf.level)
 }
 
-`t.testAB` <- function(...)  {
+t.testhv.Pair <- function(
+    x, alternative = c("two.sided", "less", "greater"),
+    mu = 0, var.equal = NULL, conf.level = 0.95, ...
+) {
+    if (missing(alternative)) alternative <- "two.sided"
+    t.testhv(x[, 1L], x[, 2L], alternative = alternative, mu = mu,
+        paired = TRUE, var.equal = var.equal, conf.level = conf.level, ...)
+}
+
+t.testAB <- function(...) {
     t.testhv(...)
 }

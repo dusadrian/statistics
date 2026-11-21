@@ -8,15 +8,18 @@
   degrees of freedom.
 }
 \usage{
-dariat(area, t1, t2, df, draw = FALSE)
+dariat(area, t1, t2, df, draw = FALSE, format = NULL)
 }
 
 \arguments{
   \item{area}{The required area}
-  \item{t1}{First t value, in the interval +/- 4}
-  \item{t2}{Second t value, in the interval +/- 4}
+  \item{t1}{First t value}
+  \item{t2}{Second t value}
   \item{df}{Degrees of freedom}
-  \item{draw}{Logical; if TRUE, draw the area}
+  \item{draw}{Logical. Draw the requested area when true.}
+  \item{format}{With the default \code{NULL}, a positive probability below 0.0001
+  prints as \code{"< 0.0001"}. Use \code{FALSE} for a plain numeric value or
+  \code{TRUE} for a character label.}
 }
 
 \details{
@@ -28,7 +31,13 @@ In the argument \bold{\code{area}}, the function accepts:
 
 \code{"b"} and \code{"between"} for the area between two z values.
 
-z values smaller than -4 and greater than +4 are truncated to these values.
+The drawing extends from -5 to 5 for fewer than 21 degrees of freedom and from -4 to 4 otherwise. The probability uses the supplied cutoffs.
+}
+
+\value{
+A numeric probability with its full calculated precision. Small positive results
+have a print method for classroom display. With \code{format = TRUE},
+the return value is a character label.
 }
 
 \author{Adrian Dusa}
@@ -36,6 +45,11 @@ z values smaller than -4 and greater than +4 are truncated to these values.
 \seealso{\code{\link{pt}}, \code{\link{qt}}}
 
 \examples{
+# A probability small enough to describe as practically zero
+p <- dariat("over", 20, df = 100)
+p              # prints < 0.0001
+log(p)         # uses the full numeric probability
+
 # for 100 degrees of freedom
 dariat("between", -1.96, 1.96, df = 100)
 

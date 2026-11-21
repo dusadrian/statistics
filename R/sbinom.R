@@ -1,22 +1,12 @@
-`sbinom` <-
-function(x) {
-    if (ncol(x) > 2) {
-        admisc::stopError("The table has more than two columns.")
-    }
-    
-    if (!is.numeric(x[, 1])) {
-        admisc::stopError("The first column should be numeric.")
-    }
-    
-    if (!is.numeric(x[, 2])) {
-        admisc::stopError("The second column should be numeric.")
-    }
-    
-    if (sum(x[, 2] != 1)) {
-        px <- proportions(x[, 2])
-    } else {
-        px <- x[, 2]
-    }
-    
-    return(sqrt(sum((x[, 1] - sum(x[, 1]*px))^2*px)))
+sbinom <- function(x) {
+    weights <- .discrete_weights(x)
+    keep <- weights > 0
+    values <- x[keep, 1L]
+    weights <- weights[keep]
+    values <- values - (min(values)/2 + max(values)/2)
+    scale <- max(abs(values))
+    if (scale == 0) return(0)
+    values <- values / scale
+    center <- sum(values * weights)
+    scale * sqrt(sum((values - center)^2 * weights))
 }

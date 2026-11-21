@@ -15,8 +15,8 @@ dbinoms(x, size, prob, log = FALSE, draw = FALSE,
 }
 
 \arguments{
-  \item{x}{Number of favourable outcomes: a value or a vector of values}
-  \item{size}{Number of repetitions}
+  \item{x}{One or more integer outcomes. Repeated values count once.}
+  \item{size}{Nonnegative integer number of trials, including a single Bernoulli trial.}
   \item{prob}{Probability of success}
   \item{log}{Logical; if TRUE, the probability is returned as log(p)}
   \item{draw}{Logical; if TRUE, draws the binomial distribution}
@@ -26,11 +26,21 @@ dbinoms(x, size, prob, log = FALSE, draw = FALSE,
   \item{text}{Logical; if TRUE, display the probability above each bar}
 }
 
+\value{The numeric probability of the requested set of outcomes. Positive
+probabilities below 0.0001 print as \code{"< 0.0001"} and retain their full
+calculated precision. With \code{log = TRUE}, the result is the numeric
+natural logarithm. The empty set has probability zero. Bars always show probabilities.}
+
 \author{Adrian Dusa}
 
 \seealso{\code{\link{dbinom}}}
 
 \examples{
+# All 20 tosses of a fair coin come up heads
+p <- dbinoms(20, 20, 0.5)
+p                             # prints < 0.0001
+dbinoms(20, 20, 0.5, log = TRUE)
+
 # 8 repetitions, with a 0.5 probability of success, calculate the
 # probability of obtaining between 2 and 4 favourable outcomes
 dbinoms(2:4, 8, 0.5)

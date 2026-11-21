@@ -1,75 +1,43 @@
-`dbinoms` <-
-function(x, size, prob, log = FALSE, draw = FALSE,
+dbinoms <- function(x, size, prob, log = FALSE, draw = FALSE,
         zoom = FALSE, new = FALSE, text = FALSE) {
-    
-    if (all(missing(x))) {
-        admisc::stopError("The number of favorable outcomes was not specified.")
+    if (!is.numeric(size) || length(size) != 1L || !is.finite(size) ||
+        size < 0 || size != floor(size)) stop("Supply a nonnegative integer trial count.")
+    if (!is.numeric(prob) || length(prob) != 1L || !is.finite(prob) ||
+        prob < 0 || prob > 1) stop("Supply a probability between zero and one.")
+    if (!is.numeric(x) || any(!is.finite(x) | x < 0 | x > size | x != floor(x))) {
+        stop("Outcomes must be whole numbers between zero and the trial count.")
     }
-    
-    if (!all(is.numeric(x))) {
-        admisc::stopError("The number of favorable outcomes should be a number or a numeric vector.")
+    .check_flag(log, "log")
+    .check_flag(draw, "draw")
+    .check_flag(zoom, "zoom")
+    .check_flag(new, "new")
+    .check_flag(text, "text")
+    x <- unique(x)
+    mass <- dbinom(x, size, prob, log = log)
+    if (!log) {
+        result <- min(1, sum(mass))
+    } else if (!length(mass) || all(mass == -Inf)) {
+        result <- -Inf
+    } else {
+        peak <- max(mass)
+        result <- min(0, peak + log(sum(exp(mass - peak))))
     }
-    
-    if (missing(size)) {
-        admisc::stopError("The number of trials were not specified.")
-    }
-    
-    if (!is.numeric(size) | size < 2) {
-        admisc::stopError("The number of trials is incorrect.")
-    }
-    
-    if (missing(prob)) {
-        admisc::stopError("The probability of success was not specified.")
-    }
-    
-    if (!is.numeric(prob) | prob < 0 | prob > 1) {
-        admisc::stopError("The probability of success should be a number between 0 and 1.")
-    }
-    
-    if (!missing(size) & !all(missing(x))) {
-        if (any(x > size)) {
-            admisc::stopError("The number of favorable outcomes cannot exceed the number of trials.")
-        } else if (any(x < 0)) {
-            admisc::stopError("The number of favorable outcomes cannot be negative.")
-        }
-    }
-    
-    y <- y2 <- dbinom(0:size, size, prob, log=log)
-    vector.culori <- rep("white", length(y))
-    
-    if (!draw) {
-        focus <- FALSE
-    }
-    else {
-        axaX <- 0:size
+    if (draw) {
+        outcomes <- 0:size
+        heights <- dbinom(outcomes, size, prob)
         if (zoom) {
-            preamici <- y < 0.0001
-            y <- y[!preamici]
-            vector.culori <- rep("white", length(y))
-            axaX <- axaX[!preamici]
+            keep <- heights > 0
+            outcomes <- outcomes[keep]
+            heights <- heights[keep]
         }
-        
-        if (new) {
-            dev.new(width=30/2.54, height=21/2.54)
+        if (new) dev.new(width = 30/2.54, height = 21/2.54)
+        selected <- outcomes %in% x
+        centers <- barplot(heights, names.arg = outcomes, ylim = c(0, max(heights) * 1.1),
+            col = ifelse(selected, "#79a74c", "white"), space = 0)
+        if (text && any(selected)) {
+            text(centers[selected], heights[selected],
+                vapply(heights[selected], .format_probability, character(1)), pos = 3, cex = 0.8)
         }
-        
-        bare <- barplot(y) # , space=0
-        colorate <- is.element(axaX, x)
-        vector.culori[colorate] <- "#79a74c" # green
-        
-        barplot(y, names.arg = axaX, ylim = c(0, max(y)*1.05), col = vector.culori, space=0)
-        
-        if (text) {
-            text(bare[colorate], y[colorate], round(y[colorate], digits = 3), pos = 3, cex = 0.8)
-        }
-        
-        suma <- round(sum(y2[is.element(seq(0, size), x)]), digits = 3)
-        
-        # text(rep(max(bare)*ifelse(prob < 0.4, 0.8, 0.2), 4), max(y)*seq(0.95, 0.8, -0.05),
-        #     c("The probability is", suma, "or", paste(suma*100, "%", sep = "")),
-        #     col = rep(c("black", "#cb2626"), 2))
-        
     }
-    
-    return(sum(y2[is.element(seq(0, size), x)]))
+    if (log) result else .probability_result(result)
 }

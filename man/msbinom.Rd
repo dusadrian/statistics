@@ -2,10 +2,10 @@
 \alias{mbinom}
 \alias{sbinom}
 
-\title{Calculates the mean and the standard deviation of a discreet random variable}
+\title{Calculates the mean and the standard deviation of a discrete random variable}
 
 \description{
-  The function expects a tabel (a data frame or a matrix) with just two columns:
+  The function expects a table (a data frame or a matrix) with just two columns:
   the first containing the values of a random variable, and the associated
   probabilities in the second column.
 }
@@ -20,8 +20,9 @@ sbinom(x)
 }
 
 \details{
-  If the sum of the probabilities on the second columns is not equal to 1, the function
-  interprets them as absolute values and recalculates the relative frequencies.
+  The second column can contain probabilities or frequencies. Weights must
+  be finite and nonnegative with a positive total. They are normalized before
+  calculating the distribution mean or population standard deviation.
 }
 
 \author{Adrian Dusa}

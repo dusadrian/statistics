@@ -25,7 +25,8 @@
 )
 
 \method{t.testhv}{formula}(
-  formula, data, subset, na.action = na.pass, ...
+  formula, data, subset, na.action = na.pass, ...,
+  alternative = "two.sided", mu = 0, var.equal = NULL, conf.level = 0.95
 )
 
 \method{t.testhv}{Pair}(
@@ -40,7 +41,7 @@
   \item{x}{A numeric vector, a \code{Pair} object for paired tests, or the first
   argument dispatched by the generic method.}
 
-  \item{y}{An optional second numeric vector. If \code{y} is a categorical
+  \item{y}{An optional second numeric vector. If \code{y} is a factor, character vector, or categorical
   object of class \code{"declared"}, it is treated as a grouping variable and
   \code{x} is split into two samples.}
 
@@ -91,10 +92,14 @@ or the Welch test otherwise. Users can still set \code{var.equal = TRUE} or
 \code{var.equal = FALSE} to mimic the explicit behavior of
 \code{\link[stats]{t.test}}.
 
-Internally, both the pooled-variance and Welch tests are computed and stored in
-the result object. The print method decides which one to display, based on
-\code{var.equal} and, when \code{var.equal = NULL}, the p-value of the
-homogeneity test.
+The Ansari-Bradley test compares scale under a common-location assumption.
+A difference in group locations can affect this diagnostic. When that assumption
+is inappropriate, \code{var.equal = FALSE} requests Welch's test directly.
+
+Use \code{result$selected} to retrieve the test shown by \code{print(result)}.
+Both independent-sample results are stored when calculable. For example, a
+sample of size one can contribute to a pooled test while Welch is unavailable.
+A one-sample or paired analysis has a single test result.
 
 The \code{alternative} argument accepts the same standard values as
 \code{\link[stats]{t.test}}: \code{"two.sided"}, \code{"less"} and
@@ -109,7 +114,7 @@ groups. The default method also supports the shortcut
 categorical variable with exactly two levels.
 
 Paired t tests can be requested either with two numeric vectors and
-\code{paired = TRUE}, or by supplying a \code{Pair} object. In the formula
+\code{paired = TRUE}, or by supplying a \code{Pair} object (available in R 4.0 and later). In the formula
 method, paired tests should be written as \code{Pair(before, after) ~ 1};
 \code{paired = TRUE} is deliberately rejected in formula calls.
 }
@@ -119,8 +124,9 @@ An object of class \code{"ttesthv"}, containing:
 \itemize{
   \item \code{homogtest}: the Ansari-Bradley homogeneity of variances test, or
   \code{NULL} when it is not relevant;
-  \item \code{ttest}: the pooled-variance Student t test;
-  \item \code{ttestWelch}: the Welch t test;
+  \item \code{ttest}: the pooled-variance Student t test when available;
+  \item \code{ttestWelch}: the Welch t test when available;
+  \item \code{selected}: the test shown by the print method;
   \item \code{paired}, \code{var.equal} and \code{conf.level}: the corresponding
   analysis settings.
 }
@@ -144,7 +150,7 @@ t.testhv(group1, group2, var.equal = FALSE)
 t.testhv(group1, group2, var.equal = TRUE)
 
 
-# Formula interface
+# Compare groups in a data frame (numeric group codes are also supported)
 dataset <- data.frame(
   values = c(group1, group2),
   group = c(rep(1, 11), rep(2, 12))
@@ -173,10 +179,10 @@ before <- c(8, 7, 6, 9, 10)
 after <- c(7, 6, 7, 6, 8)
 
 t.testhv(before, after, paired = TRUE)
-t.testhv(Pair(before, after))
+if (getRversion() >= "4.0.0") t.testhv(Pair(before, after))
 
 paired_data <- data.frame(before = before, after = after)
-t.testhv(Pair(before, after) ~ 1, data = paired_data)
+if (getRversion() >= "4.0.0") t.testhv(Pair(before, after) ~ 1, data = paired_data)
 }
 
 \keyword{misc}

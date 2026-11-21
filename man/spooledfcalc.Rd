@@ -2,15 +2,14 @@
 \alias{dfcalc}
 \alias{spooled}
 
-\title{Calculates the degrees of freedom and the pooled variation for a t test}
+\title{Welch degrees of freedom and pooled standard deviation}
 
 \description{
-The function \code{dfcalc} is used only for two samples t test, when the group
-variations are \bold{not} equal.
-For small and independent samples, and unknown but equal population variances,
-the variances of the two samples are used. As the sample variances are never
-equal, this function calculates their pooled variance based on the two standard
-deviations and their respective sample sizes.
+Calculate Welch-Satterthwaite degrees of freedom with \code{dfcalc}, or the
+pooled sample standard deviation assuming equal variances with \code{spooled}.
+Supply two raw samples or two standard deviations and their sample sizes.
+Missing observations in a raw sample propagate to the result. Welch degrees
+of freedom are undefined when both sample variances are zero.
 }
 
 \usage{
@@ -19,8 +18,8 @@ spooled(x, y, n1, n2)
 }
 
 \arguments{
-  \item{x}{The values of the standard deviation for the first group}
-  \item{y}{The values of the standard deviation for the second group}
+  \item{x}{Raw sample or nonnegative standard deviation for the first group}
+  \item{y}{Raw sample or nonnegative standard deviation for the second group}
   \item{n1}{Size of the first group}
   \item{n2}{Size of the second group}
 }

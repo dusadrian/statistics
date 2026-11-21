@@ -1,22 +1,17 @@
-`mbinom` <-
-function(x) {
-    if (ncol(x) > 2) {
-        admisc::stopError("The table has more than two columns.")
+.discrete_weights <- function(x) {
+    if (!(is.matrix(x) || is.data.frame(x)) || ncol(x) != 2L || nrow(x) == 0L) {
+        stop("Supply a two-column table of outcomes and probabilities or frequencies.")
     }
-    
-    if (!is.numeric(x[, 1])) {
-        admisc::stopError("The first column should be numeric.")
+    weights <- x[, 2L]
+    if (!is.numeric(x[, 1L]) || any(!is.finite(x[, 1L]))) stop("Outcomes must be finite numbers.")
+    if (!is.numeric(weights) || any(!is.finite(weights) | weights < 0) || !any(weights > 0)) {
+        stop("Weights must be finite and nonnegative with a positive total.")
     }
-    
-    if (!is.numeric(x[, 2])) {
-        admisc::stopError("The second column should be numeric.")
-    }
-    
-    if (sum(x[, 2] != 1)) {
-        px <- proportions(x[, 2])
-    } else {
-        px <- x[, 2]
-    }
-    
-    return(sum(x[, 1]*px))
+    weights <- weights / max(weights)
+    weights / sum(weights)
+}
+
+mbinom <- function(x) {
+    weights <- .discrete_weights(x)
+    sum(x[, 1L] * weights)
 }

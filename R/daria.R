@@ -1,147 +1,57 @@
-`daria` <-
-function (area, z1, z2, draw = FALSE) {
+daria <- function(area, z1, z2, draw = FALSE, format = NULL) {
+    .distribution_area(area, z1, z2, draw, format, pnorm, dnorm, 4)
+}
 
-    if (missing(area) || !is.character(area)) {
-        cat("\n")
-        admisc::stopError("Unspecified area.")
+.distribution_area <- function(area, first, second, draw, format, cdf, density, limit) {
+    if (missing(area) || !is.character(area) || length(area) != 1L || is.na(area)) {
+        stop("Supply a tail or interval name.", call. = FALSE)
     }
-
-    area <- tryCatch(
-        match.arg(area, c("right", "over", "above", "left", "under", "between")),
-        error = function(e) admisc::stopError("The specified area is incorrect.")
-    )
-
-    if (missing(z1)) {
-        admisc::stopError("The value of z was not specified.")
+    area <- match.arg(area, c("right", "over", "above", "left", "under", "between"))
+    .check_flag(draw, "draw")
+    .check_flag(format, "format", allow_null = TRUE)
+    if (missing(first) || !is.numeric(first) || length(first) != 1L || is.na(first)) {
+        stop("Supply one numeric cutoff.", call. = FALSE)
+    }
+    if (area == "between") {
+        if (missing(second) || !is.numeric(second) || length(second) != 1L || is.na(second)) {
+            stop("Supply two numeric cutoffs for an interval.", call. = FALSE)
+        }
+        bounds <- sort(c(first, second))
+        p <- if (bounds[1L] >= 0) {
+            cdf(bounds[1L], lower.tail = FALSE) - cdf(bounds[2L], lower.tail = FALSE)
         } else {
-            if (z1 > 0) {
-                zet1 <- paste("+", as.character(round(z1, digits = 3)), sep = "")
-            } else {
-                zet1 <- as.character(round(z1, digits = 3))
-            }
+            cdf(bounds[2L]) - cdf(bounds[1L])
         }
-
-    if (identical(area, "between") & !missing(z1) & missing(z2)) {
-        admisc::stopError("The second z value was not specified.")
-    }
-
-    result <- NA_real_
-
-    if (!missing(z2)) {
-        if (z2 > 0) {
-            zet2 <- paste("+", as.character(round(z2, digits = 3)), sep = "")
-        } else {
-            zet2 <- as.character(round(z2, digits = 3))
-        }
-    }
-
-    if (is.element(area, c("right", "over", "above"))) {
-        result <- 1 - pnorm(z1)
-        if (abs(z1) > 4) {z1 <- 4*sign(z1)}
-    } else if (is.element(area, c("under", "left"))) {
-        result <- pnorm(z1)
-        if (abs(z1) > 4) {
-            z1 <- 4*sign(z1)
-        }
-
-    } else if (identical(area, "between")) {
-        if (z1 > z2) {
-            sz <- z1; z1 <- z2; z2 <- sz
-        }
-
-        result <- pnorm(z2) - pnorm(z1)
-        if (abs(z1) > 4) {
-            z1 <- 4*sign(z1)
-        }
-
-        if (abs(z2) > 4) {
-            z2 <- 4*sign(z2)
-        }
-
+        cuts <- bounds
+    } else if (area %in% c("right", "over", "above")) {
+        p <- cdf(first, lower.tail = FALSE)
+        bounds <- c(first, Inf)
+        cuts <- first
+    } else {
+        p <- cdf(first)
+        bounds <- c(-Inf, first)
+        cuts <- first
     }
 
     if (draw) {
-        old_par <- par(no.readonly = TRUE)
-        on.exit(par(old_par), add = TRUE)
-
-        if (dev.cur() == 1) {
-            dev.new(width = 30/2.54, height = 21/2.54)
-        }
-
-        par(mar = c(1, 0, 0, 0))
-
-        x <- seq(-4, 4, length.out = 1000)
-        y <- dnorm(x)
-
-        plot(
-            x,
-            y,
-            type = "l",
-            xaxt = "n",
-            yaxt = "n",
-            ylab = "",
-            xlab = "",
-            ylim = c(0, max(y)),
-            bty = "n"
-        )
-
-        if (is.element(area, c("right", "over", "above"))) {
-            xright <- seq(z1, 4, 0.001)
-            yright <- dnorm(xright)
-            polygon(
-                c(xright, rev(xright)),
-                c(rep(0, length(xright)), rev(yright)),
-                border = NA,
-                col = "#79a74c"
-            )
-            segments(z1, 0, z1, dnorm(z1))
-        } else if (is.element(area, c("under", "left"))) {
-            xleft <- seq(-4, z1, 0.001)
-            yleft <- dnorm(xleft)
-
-            polygon(
-                c(xleft, rev(xleft)),
-                c(rep(0, length(xleft)), rev(yleft)),
-                border = NA,
-                col = "#79a74c"
-            )
-
-            segments(z1, 0, z1, dnorm(z1))
-        } else if (identical(area, "between")) {
-            xintre <- seq(z1, z2, 0.001)
-            yintre <- dnorm(xintre)
-            polygon(
-                c(xintre, rev(xintre)),
-                c(rep(0,length(xintre)), rev(yintre)),
-                border = NA,
-                col = "#79a74c"
-            )
-
-            segments(z1, 0, z1, dnorm(z1))
-            segments(z2, 0, z2, dnorm(z2))
-        }
-
-        RStudio <- identical(names(dev.cur()), "RStudioGD")
-        Positron <- grepl("Positron", names(dev.cur()))
-
-        tick_length <- ifelse(Positron|RStudio, 0.02, 0.015)
-        label_offset <- ifelse (Positron|RStudio, -1, -1.2)
-
-
-        ticklabels <- c(-4:0, paste("+", as.character(1:4), sep = ""))
-
-        axis(
-            side = 1,
-            at = seq(-4, 4, by = 1),
-            labels = TRUE,
-            cex.axis = ifelse(Positron|RStudio, 0.8, 1),
-            lwd = 0,
-            line = label_offset
-        )
-
-        segments(-4:4, y0 = 0, x1 = -4:4, y1 = -tick_length * (par("usr")[4] - par("usr")[3]))
-        segments(-4, 0, 4, 0)
+        if (dev.cur() == 1L) dev.new(width = 30/2.54, height = 21/2.54)
+        old <- par(mar = c(1, 0, 0, 0))
+        on.exit(par(old), add = TRUE)
+        x <- seq(-limit, limit, length.out = 1001L)
+        y <- density(x)
+        plot(x, y, type = "l", axes = FALSE, xlab = "", ylab = "", ylim = c(0, max(y)))
+        bounds <- pmax(-limit, pmin(limit, bounds))
+        shaded <- seq(bounds[1L], bounds[2L], length.out = 501L)
+        polygon(c(shaded[1L], shaded, shaded[length(shaded)]),
+            c(0, density(shaded), 0), col = "#79a74c", border = NA)
+        cuts <- cuts[abs(cuts) <= limit]
+        if (length(cuts)) segments(cuts, 0, cuts, density(cuts))
+        ticks <- seq(-limit, limit)
+        ide <- grepl("RStudio|Positron", names(dev.cur()))
+        axis(1, at = ticks, line = if (ide) -1 else -1.2, lwd = 0,
+            cex.axis = if (ide) 0.8 else 1)
+        segments(ticks, 0, ticks, -0.015 * diff(par("usr")[3:4]))
+        segments(-limit, 0, limit, 0)
     }
-
-    return(result)
+    .probability_result(p, format)
 }

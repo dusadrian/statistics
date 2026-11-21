@@ -1,222 +1,135 @@
-`anovahv` <- function(x, ...) {
+anovahv <- function(x, ...) {
     UseMethod("anovahv")
 }
 
-
-`anovahv.default` <- function(
+anovahv.default <- function(
     x, y, var.equal = NULL, conf.level = 0.95, numsum = FALSE, ...
 ) {
-
-    if (missing(y)) {
-        admisc::stopError("The grouping variable is missing.")
+    .check_dots(...)
+    if (missing(y) || length(x) != length(y)) {
+        stop("Supply one group label for each observation.", call. = FALSE)
     }
-
-    result <- .anovahv_fit(
-        values = x,
-        group = y,
-        var.equal = var.equal,
-        conf.level = conf.level,
-        numsum = numsum,
-        dname = paste(deparse1(substitute(x)), "by", deparse1(substitute(y)))
-    )
-
-    return(result)
+    frame <- stats::model.frame(values_x ~ group_y,
+        data = list(values_x = x, group_y = y), na.action = stats::na.pass)
+    dname <- paste(.expr_name(substitute(x)), "by", .expr_name(substitute(y)))
+    .anovahv_fit(frame, na.omit, var.equal, conf.level, numsum, match.call(), dname)
 }
 
-
-`anovahv.formula` <- function(
+anovahv.formula <- function(
     formula, data, subset, na.action = na.omit,
-    var.equal = NULL, conf.level = 0.95, numsum = FALSE,
-    ...
+    var.equal = NULL, conf.level = 0.95, numsum = FALSE, ...
 ) {
-
-    if (missing(formula) || length(formula) != 3L) {
-        admisc::stopError("The formula is incorrect.")
-    }
-
-    if (length(attr(terms(formula[-2L]), "term.labels")) != 1L) {
-        admisc::stopError("The formula is incorrect.")
-    }
-
-    m <- match.call(expand.dots = FALSE)
-
-    if (is.matrix(eval(m$data, parent.frame()))) {
-        m$data <- as.data.frame(data)
-    }
-
+    .check_dots(...)
+    original <- match.call()
+    m <- original[c(1L, match(c("formula", "data", "subset"), names(original), 0L))]
     m[[1L]] <- quote(stats::model.frame)
-    m$... <- NULL
-    m$var.equal <- NULL
-    m$conf.level <- NULL
-    m$numsum <- NULL
-
-    summary_mf <- NULL
-    if (isTRUE(numsum)) {
-        summary_call <- m
-        summary_call$na.action <- quote(stats::na.pass)
-        summary_mf <- eval(summary_call, parent.frame())
-        names(summary_mf) <- NULL
+    if (!missing(data)) {
+        m$data <- if (is.matrix(data)) as.data.frame(data) else data
     }
-
-    mf <- eval(m, parent.frame())
-    mf_names <- vapply(
-        names(mf), admisc::getName, character(1)
-    )
-    dname <- paste(mf_names, collapse = " by ")
-    names(mf) <- NULL
-
-    response <- attr(attr(mf, "terms"), "response")
-
-    result <- .anovahv_fit(
-        values = mf[[response]],
-        group = mf[[-response]],
-        var.equal = var.equal,
-        conf.level = conf.level,
-        numsum = numsum,
-        dname = dname,
-        values_name = mf_names[response],
-        group_name = mf_names[-response],
-        summary_values = if (is.null(summary_mf)) NULL else summary_mf[[response]],
-        summary_group = if (is.null(summary_mf)) NULL else summary_mf[[-response]]
-    )
-
-    return(result)
+    m$na.action <- quote(stats::na.pass)
+    frame <- eval(m, parent.frame())
+    terms <- attr(frame, "terms")
+    if (length(frame) != 2L || attr(terms, "response") != 1L ||
+        attr(terms, "intercept") != 1L || length(attr(terms, "offset"))) {
+        stop("Use a one-way formula of the form 'values ~ group'.", call. = FALSE)
+    }
+    .anovahv_fit(frame, na.action, var.equal, conf.level, numsum, original)
 }
 
-
-`.anovahv_fit` <- function(
-    values, group, var.equal = NULL, conf.level = 0.95, numsum = FALSE,
-    dname = NULL, values_name = "values_x", group_name = "group_y",
-    summary_values = NULL, summary_group = NULL
-) {
-
-    if (!is.null(var.equal) && !is.logical(var.equal)) {
-        admisc::stopError("The 'var.equal' argument should be logical or NULL.")
+.anovahv_fit <- function(frame, na.action, var.equal, conf.level, numsum, original,
+    dname = paste(names(frame), collapse = " by ")) {
+    .check_flag(var.equal, "var.equal", allow_null = TRUE)
+    .check_flag(numsum, "numsum")
+    conf.level <- .conf_level(conf.level)
+    if (!is.numeric(frame[[1L]]) || !is.null(dim(frame[[1L]]))) {
+        stop("The response should be a numeric vector.", call. = FALSE)
     }
 
-    if (!is.logical(numsum) || length(numsum) != 1L || is.na(numsum)) {
-        admisc::stopError("The 'numsum' argument should be TRUE or FALSE.")
+    # model.frame has already evaluated the data, transformations and subset.
+    # Keep those terms for prediction, applying the same group conversion there.
+    terms <- attr(frame, "terms")
+    if (!is.factor(frame[[2L]])) {
+        frame[[2L]] <- as.factor(frame[[2L]])
+        predvars <- attr(terms, "predvars")
+        predvars[[3L]] <- call("as.factor", predvars[[3L]])
+        attr(terms, "predvars") <- predvars
+        attr(terms, "dataClasses")[2L] <- "factor"
     }
-
-    conf.level <- .anovahv_conf_level(conf.level)
-
     numerical_summaries <- NULL
     if (numsum) {
-        if (is.null(summary_values)) {
-            summary_values <- values
-        }
-        if (is.null(summary_group)) {
-            summary_group <- group
-        }
-        numerical_summaries <- .anovahv_numsum(
-            summary_values,
-            summary_group
-        )
+        numerical_summaries <- do.call(rbind, lapply(split(frame[[1L]], frame[[2L]]),
+            wmeasures, what = c("mean", "sd", "n", "NA")))
+        class(numerical_summaries) <- c("wmeasures", class(numerical_summaries))
     }
 
-    # unnecessary for declared >= 0.27 but protects against using
-    # earlier versions of declared package
-    if (is.declared(values)) {
-        values <- drop_na(values)
+    if (!is.null(na.action)) {
+        frame <- match.fun(na.action)(frame)
     }
-
-    if (is.declared(group)) {
-        group <- as.factor(group)
+    # Even na.pass needs complete pairs for the variance and means tests.
+    if (anyNA(frame[[1L]]) || anyNA(frame[[2L]])) frame <- na.omit(frame)
+    group <- frame[[2L]]
+    sizes <- tabulate(group, nbins = nlevels(group))
+    if (any(sizes == 0L)) {
+        group <- frame[[2L]] <- droplevels(group)
+        sizes <- sizes[sizes > 0L]
     }
-    else if (!is.factor(group)) {
-        group <- as.factor(group)
+    values <- frame[[1L]]
+    if (nlevels(group) < 2L) {
+        stop("The grouping variable should have at least two observed levels.", call. = FALSE)
     }
-
-    testdf <- na.omit(
-        data.frame(values_x = values, group_y = group)
-    )
-    names(testdf) <- c(values_name, group_name)
-    test_formula <- reformulate(group_name, response = values_name)
-
-    if (nlevels(testdf[[group_name]]) < 2L) {
-        admisc::stopError("The grouping variable should have at least two levels.")
+    # Ordinary omission historically returns the compact fit. na.exclude also
+    # retains the original row positions for fitted values and residuals.
+    if (inherits(attr(frame, "na.action"), "omit")) attr(frame, "na.action") <- NULL
+    attr(frame, "terms") <- terms
+    test <- aov(frame)
+    original[[1L]] <- quote(statistics::anovahv)
+    test$call <- original
+    homog_test <- fligner.test(values, group)
+    welch <- NULL
+    if (all(sizes >= 2L)) {
+        candidate <- oneway.test(values ~ group)
+        if (is.finite(candidate$p.value)) welch <- candidate
     }
+    reason <- "Welch ANOVA requires at least two observations and positive variance in every group."
+    if (isFALSE(var.equal) && is.null(welch)) stop(reason, call. = FALSE)
+    pooled <- .select_pooled(var.equal, homog_test$p.value, conf.level, is.null(welch))
 
-    homog_test <- fligner.test(test_formula, data = testdf)
-    test <- aov(test_formula, data = testdf)
-    tabel <- anova(lm(test_formula, data = testdf))
-    welch <- oneway.test(test_formula, data = testdf)
-
-    output_table <- as.data.frame(matrix(NA, nrow = 2, ncol = 5))
-    rownames(output_table) <- c(group_name, "Residuals")
-    colnames(output_table) <- c("Df", "Sum Sq", "Mean Sq", "F value", "Pr(>F)")
-
-    output_table[ , 1] <- welch$parameter
-    output_table[ , 2] <- round(tabel[["Sum Sq"]], 2)
-    output_table[ , 3] <- round(tabel[["Mean Sq"]], 2)
-    output_table[1, 4] <- round(welch$statistic, 4)
-    output_table[1, 5] <- round(welch$p.value, 4)
-
-    output_table[1, 3] <- output_table[1, 4] * output_table[2, 3]
-    output_table[1, 2] <- output_table[1, 3] * output_table[1, 1]
-    output_table[2, 4] <- ""
-    output_table[2, 5] <- ""
-
-    # Keep the fitted ANOVA model as the result's underlying object. This lets
-    # methods for "aov" and "lm" work without an anovahv-specific adapter.
     result <- test
-    result$homog_test <- homog_test
+    result$data.name <- dname
+    homog_test$data.name <- result$data.name
+    if (!is.null(welch)) {
+        welch$data.name <- result$data.name
+        result$output_table <- .welch_table(welch)
+    }
     result$test <- test
-    result$welch <- welch
-    result$output_table <- output_table
+    result["welch"] <- list(welch)
+    result$homog_test <- homog_test
+    result$selected <- if (pooled) test else welch
+    if (is.null(welch)) result$welch_unavailable <- reason
     result$numsum <- numerical_summaries
     result$var.equal <- var.equal
     result$conf.level <- conf.level
-    result$data.name <- dname
-
     class(result) <- c("anovahv", class(test))
-
-    return(result)
+    result
 }
 
-
-`.anovahv_numsum` <- function(values, group) {
-
-    if (is.declared(group)) {
-        group <- as.factor(group)
-    }
-    else if (!is.factor(group)) {
-        group <- as.factor(group)
-    }
-
-    result <- do.call(
-        rbind,
-        lapply(
-            split(values, group),
-            wmeasures,
-            what = c("mean", "sd", "n", "NA")
-        )
+.welch_table <- function(welch) {
+    data.frame(
+        "F value" = unname(welch$statistic),
+        "num df" = unname(welch$parameter[1L]),
+        "denom df" = unname(welch$parameter[2L]),
+        "Pr(>F)" = welch$p.value, check.names = FALSE
     )
-    class(result) <- c("wmeasures", class(result))
-
-    return(result)
 }
 
-
-`.anovahv_conf_level` <- function(conf.level = 0.95) {
-
-    if (is.null(conf.level)) {
-        conf.level <- 0.95
-    }
-
-    if (!admisc::possibleNumeric(conf.level)) {
-        admisc::stopError("The confidence level should be numeric.")
-    }
-
-    conf.level <- admisc::asNumeric(conf.level)
-
-    if (conf.level < 0 | conf.level > 1) {
-        admisc::stopError("The confidence level should be in the interval [0 - 1].")
-    }
-
-    return(conf.level)
+model.tables.anovahv <- function(x, ...) {
+    # model.tables.aov indexes the frame with the term labels, which include
+    # backticks for non-syntactic names. Keep the public model frame intact.
+    fit <- x$test
+    names(fit$model) <- rownames(attr(fit$terms, "factors"))
+    stats::model.tables(fit, ...)
 }
 
-`anovaFK` <- function(...)  {
+anovaFK <- function(...) {
     anovahv(...)
 }

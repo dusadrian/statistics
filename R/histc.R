@@ -1,100 +1,83 @@
-`histc` <-
-function(x, from, to, size = 15, ...) {
-
-    if (!is.atomic(x) || !is.numeric(x)) {
-        admisc::stopError(simpleError("`x` should be a numerical vector.\n\n"))
+histc <- function(x, from, to, size = 15, ...) {
+    xname <- .expr_name(substitute(x))
+    if (!is.numeric(x) || !is.null(dim(x))) stop("Supply a numeric vector.")
+    x <- x[is.finite(x)]
+    if (!length(x)) stop("Supply at least one finite observation.")
+    args <- list(...)
+    if (length(args)) {
+        # Match positional and abbreviated arguments just as hist() would,
+        # before separating the binning arguments from the plotting arguments.
+        positions <- as.list(seq_along(args))
+        names(positions) <- names(args)
+        hist_call <- as.call(c(quote(hist), list(x = quote(x)), positions))
+        matched <- as.list(match.call(graphics::hist.default, hist_call))[-c(1L, 2L)]
+        names(args)[unlist(matched, use.names = FALSE)] <- names(matched)
     }
-
-    x <- unclass(x)
-    x <- x[!is.na(x)]
-
-    other.args <- list(...)
-    funargs <- unlist(lapply(match.call(), deparse)[-1])
-    has_user_ylim <- ("ylim" %in% names(other.args))
-    old_par <- par(no.readonly = TRUE)
-    on.exit(par(old_par), add = TRUE)
-    if (dev.cur() == 1) {
-        dev.new(width = (size + 1)/2.54, height = (size + 1)/2.54)
-    }
-
-    par(mar = c(4, 4, 2, 0))
-    testh <- hist(x, plot = FALSE)
-    bdiff <- diff(testh$breaks[1:2])
-    
-    xlab <- admisc::getName(funargs[1])
-    maintitle <- paste("Histogram of", xlab)
-    
-    
-    if (length(testarg <- which(names(other.args) == "xlab")) > 0) {
-        xlab <- other.args$xlab
-        other.args <- other.args[-testarg]
-    }
-    
-    if (length(testarg <- which(names(other.args) == "main")) > 0) {
-        maintitle <- other.args$main
-        other.args <- other.args[-testarg]
-    }
-    
-    tohist <- list(as.name("hist"), x, plot = FALSE)
-    tohist <- c(tohist, other.args)
-    
-    if (!missing(from) & !missing(to)) {
-        tohist$breaks <- seq(from, to, by = bdiff)
-        tohist$xlim <- c(from, to)
-        
-        h <- suppressWarnings(eval(as.call(tohist)))
-
-        xfit <- seq(from, to, length = 100)
-        x_sd <- stats::sd(x)
-        yfit <- if (!is.finite(x_sd) || x_sd <= 0) {
-            rep(0, length(xfit))
+    calculation <- c("breaks", "include.lowest", "right", "nclass", "fuzz", "warn.unused")
+    bins <- args[intersect(names(args), calculation)]
+    args[calculation] <- NULL
+    if (!missing(from) || !missing(to)) {
+        if (missing(from)) from <- min(x)
+        if (missing(to)) to <- max(x)
+        if (!is.numeric(from) || length(from) != 1L || !is.finite(from) ||
+            !is.numeric(to) || length(to) != 1L || !is.finite(to) || from >= to) {
+            stop("Supply finite axis limits with 'from' below 'to'.")
         }
-        else {
-            stats::dnorm(xfit, mean = mean(x), sd = x_sd) * bdiff * length(x)
+        if (is.null(args$xlim)) args$xlim <- c(from, to)
+        if (is.null(bins$breaks) && is.null(bins$nclass)) {
+            span <- range(x, from, to)
+            bins$breaks <- pretty(span, n = grDevices::nclass.Sturges(x), min.n = 1L)
         }
+    }
+    h <- do.call(hist, c(list(x = quote(x), plot = FALSE), bins))
+    h$xname <- xname
+    if (isFALSE(args$plot)) return(h)
+    args$plot <- NULL
 
-        if (!has_user_ylim) {
-            ymax <- max(c(h$counts, yfit), na.rm = TRUE)
-            tohist$ylim <- c(0, ymax * 1.1)
+    freq <- args$freq
+    if (!is.null(args$probability)) {
+        .check_flag(args$probability, "probability")
+        if (!is.null(freq) && isTRUE(freq == args$probability)) {
+            stop("'freq' and 'probability' specify conflicting scales.")
         }
-        tohist$xlab <- xlab
-        tohist$main <- maintitle
-        tohist$axes <- FALSE
-        
-        tohist$plot <- NULL
-        eval(as.call(tohist))
+        freq <- !args$probability
     }
-    else {
-        h <- suppressWarnings(eval(as.call(tohist)))
-
-        xfit <- seq(min(h$breaks), max(h$breaks), length = 100)
-        x_sd <- stats::sd(x)
-        yfit <- if (!is.finite(x_sd) || x_sd <= 0) {
-            rep(0, length(xfit))
+    if (is.null(freq)) freq <- h$equidist
+    .check_flag(freq, "freq")
+    args$freq <- freq
+    args$probability <- NULL
+    widths <- diff(h$breaks)
+    grid <- seq(min(h$breaks), max(h$breaks), length.out = 201L)
+    if (freq && !h$equidist) {
+        # Duplicate interior edges so the curve changes count scale at each bin.
+        intervals <- split(grid, findInterval(grid, h$breaks, all.inside = TRUE))
+        pieces <- lapply(seq_along(widths), function(i) {
+            sort(unique(c(h$breaks[c(i, i + 1L)], intervals[[as.character(i)]])))
+        })
+        grid <- unlist(pieces, use.names = FALSE)
+        widths <- rep(widths, lengths(pieces))
+    } else {
+        widths <- widths[1L]
+    }
+    deviation <- sd(x)
+    curve_y <- if (is.finite(deviation) && deviation > 0) dnorm(grid, mean(x), deviation) else numeric()
+    if (freq) curve_y <- curve_y * length(x) * widths
+    if (is.null(args$ylim)) {
+        bars <- if (freq) h$counts else h$density
+        args$ylim <- c(0, max(bars, curve_y) * 1.1)
+    }
+    if (is.null(args$labels)) args$labels <- TRUE
+    if (dev.cur() == 1L) {
+        if (!is.numeric(size) || length(size) != 1L || !is.finite(size) || size <= 0) {
+            stop("Supply a positive device size in centimeters.")
         }
-        else {
-            stats::dnorm(xfit, mean = mean(x), sd = x_sd) * bdiff * length(x)
-        }
-
-        if (!has_user_ylim) {
-            ymax <- max(c(h$counts, yfit), na.rm = TRUE)
-            tohist$ylim <- c(0, ymax * 1.1)
-        }
-        tohist$xlab <- xlab
-        tohist$main <- maintitle
-        tohist$axes <- FALSE
-        tohist$plot <- NULL
-        
-        eval(as.call(tohist))
+        dev.new(width = size/2.54, height = size/2.54)
     }
-    
-    text(h$mids, h$counts, h$counts, pos = 3, cex = 0.9)
-    lines(xfit, yfit, col = "darkblue", lwd = 2)
-    if (!missing(from) & !missing(to)) {
-        axis(1, at = seq(from, to, by = bdiff))
+    if (!isTRUE(args$add)) {
+        old <- par(mar = c(4, 4, 2, 0))
+        on.exit(par(old), add = TRUE)
     }
-    else {
-        axis(1)
-    }
-    axis(2)
+    do.call(plot, c(list(x = quote(h)), args))
+    if (length(curve_y)) lines(grid, curve_y, col = "darkblue", lwd = 2)
+    invisible(h)
 }
